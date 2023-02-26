@@ -2,7 +2,10 @@ from django.shortcuts import render
 # Create your views here.
 def post_list(request):
     user = request.user
+    role = ""
+    username = user.username
     if user.has_perm('global_permissions.is_advisor'):
-        return render(request, 'schedule/post_list.html', {})
+        role = "Advisor"
     else:
-        return render(request, 'schedule/student_post_list.html', {})
+        role = "Student"
+    return render(request, 'schedule/post_list.html', {'role': role, 'username': username})
