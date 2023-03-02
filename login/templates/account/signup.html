@@ -15,6 +15,13 @@
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
+  Permissions Level:
+  <select name="Permissions" id="Permissions">
+    <option value="">--Please choose an option--</option>
+    <option value="Student">Student</option>
+    <option value="Advisor">Advisor</option>
+  </select>
+  <br>
   <button type="submit">{% trans "Sign Up" %} &raquo;</button>
 </form>
 
