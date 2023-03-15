@@ -10,6 +10,10 @@
                     <li class="nav-item active">
                         <a href = "{% url 'submissions' %}" class = "nav-link">Check Submissions</a>
                     </li>
+                {% else %}
+                    <li class="nav-item active">
+                        <a href = "{% url 'schedules' %}" class = "nav-link">Create Schedules</a>
+                    </li>
                 {% endif %}
                 <li class="nav-item active">
                     <a href = "{% url 'logout' %}" class = "nav-link">Log Out</a>
