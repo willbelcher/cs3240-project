@@ -1,4 +1,4 @@
-# Django Practice Assessment
+# Django Schedule Application
 
 __Name:__
 
