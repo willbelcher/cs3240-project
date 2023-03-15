@@ -4,6 +4,8 @@ base_url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.
 field_pattern = "&{}={}"
 
 def get_course_list(year=2023, term="Fall", dept=False, instructor=False):
+    if year == "": year = 2023
+    
     num_term = 0
     if term == "Fall":
         num_term = 8
