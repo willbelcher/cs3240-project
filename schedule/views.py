@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 
+from .api import get_course_list
+
 # Create your views here.
 
 @login_required
@@ -26,3 +28,16 @@ def home(request):
 def logout_view(request):
     logout(request)
     return redirect('home')
+
+@login_required
+def course_search_view(request):
+    courses = []
+    if request.method == "POST":
+        courses = get_course_list(
+            year=request.POST['year'], 
+            term=request.POST['term'], 
+            dept=request.POST['dept'], 
+            instructor=request.POST['instructor']
+        )
+
+    return render(request, 'schedule/course_search.html', {'courses': courses})

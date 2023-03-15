@@ -8,10 +8,10 @@ def get_course_list(year=2023, term="Fall", dept=False, instructor=False):
     if term == "Fall":
         num_term = 8
     elif term == "Spring":
-        num_term = 12
+        num_term = 2
 
     search_url = base_url
-    search_url += field_pattern.format("term", "1{}{}".format(year%100, num_term))
+    search_url += field_pattern.format("term", "1{}{}".format(int(year)%100, num_term))
 
     if dept:
         search_url += field_pattern.format("subject", dept)
@@ -20,3 +20,5 @@ def get_course_list(year=2023, term="Fall", dept=False, instructor=False):
     
     resp = requests.get(search_url)
     courses = resp.json()
+
+    return courses

@@ -1,0 +1,44 @@
+{% include "nav.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Schedule App Title</title>
+    </head>
+    <body>
+        <header>
+            <h1>Course Search</h1>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+            <link rel="stylesheet" href="{% static 'css/schedule.css' %}">
+        </header>
+        <div>
+            {% block content %}
+            <form action="{% url 'course_search' %}" method="post">
+                {% csrf_token %}
+                <fieldset>
+                    <p>Year:</p>
+                    <input type="text" name="year" id="year", value="2023"><br>
+                    <p>Term:</p>
+                    <input type="text" name="term" id="term", value="Fall"><br>
+                    <p>Dept:</p>
+                    <input type="text" name="dept" id="dept"><br>
+                    <p>Instructor:</p>
+                    <input type="text" name="instructor" id="instructor"><br>
+                </fieldset>
+                <input type="submit" value="Search">
+            </form>
+            <div>
+                <ul>
+                    {% for course in courses %}
+                        <li>
+                            <div>
+                                <b>{{ course.descr }}</b>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul> 
+            </div>
+            {% endblock %}
+        </div>
+    </body>
+</html>
