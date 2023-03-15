@@ -23,6 +23,11 @@ def home(request):
     
     return render(request, 'schedule/home.html', {'role': role, 'username': username})
 
+def submissions(request):
+    user = request.user
+    if user.has_perm('global_permissions.is_advisor'):
+        return render(request, 'schedule/schedule_submissions.html')
+
 def logout_view(request):
     logout(request)
     return redirect('home')
