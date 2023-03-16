@@ -67,9 +67,6 @@ def course_search_view(request):
         if instructor:
             search_url += field_pattern.format("instructor_name", instructor)
         
-
-        print(search_url)
-        
         #Store data in JSON
         rawData = requests.get(search_url).json()
 
@@ -84,8 +81,12 @@ def course_search_view(request):
             if "subject" in course:
                 subjects.add(course["subject"])
             #Add instructor name
+            if "instructors" in course:
+                instructors.update(
+                    [x["name"] for x in course["instructors"]]
+                    )
         print(subjects)
-        #print(instructors)
+        print(instructors)
        
         
         courses = requests.get(search_url).json()
