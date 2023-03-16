@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 
+import requests
 from .api import get_course_list
 
 # Create your views here.
@@ -31,16 +32,40 @@ def logout_view(request):
 
 @login_required
 def course_search_view(request):
+    base_url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01"
+    field_pattern = "&{}={}"
+    
     courses = []
     fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': ''} #default field values
-
+    
     if request.method == "POST": # if search has been run
         fields = request.POST # save search fields
-        courses = get_course_list( # search for courses
-            year=request.POST['year'], 
-            term=request.POST['term'], 
-            dept=request.POST['dept'], 
-            instructor=request.POST['instructor']
-        )
+
+        year = fields.get('year', 2023)
+        term = fields.get('term', 'Fall')
+        dept = fields.get('dept', False)
+        instructor = fields.get('instructor', False)
+
+        if year == "":
+            year = 2023
+        
+        num_term = 0
+        if term == "Fall":
+            num_term = 8
+        elif term == "Spring":
+            num_term = 2
+
+        search_url = base_url
+        search_url += field_pattern.format("term", "1{}{}".format(int(year)%100, num_term))
+
+        if dept:
+            search_url += field_pattern.format("subject", dept)
+        if instructor:
+            search_url += field_pattern.format("instructor_name", instructor)
+        
+        resp = requests.get(search_url)
+        courses = resp.json()
 
     return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields})
+
+
