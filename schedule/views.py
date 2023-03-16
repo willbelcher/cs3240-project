@@ -88,8 +88,7 @@ def course_search_view(request):
         #print(instructors)
        
         
-        resp = requests.get(search_url)
-        courses = resp.json()
+        courses = requests.get(search_url).json()
     return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields})
 
 

@@ -45,16 +45,19 @@
 
                 <button type="submit" class="btn btn-primary">Search</button>
             </form>
-            <div>
-                <ul>
-                    {% for course in courses %}
-                        <li>
-                            <div>
+            <div class="container">
+                {% for course in courses %}
+                    <div class="row container align-items-start justify-content-start">
+                        <div class="row">
+                            <div class="col-sm-auto">
+                                <p>{{ course.subject }} {{ course.catalog_nbr }}</p>
+                            </div>
+                            <div class="col">
                                 <b>{{ course.descr }}</b>
                             </div>
-                        </li>
-                    {% endfor %}
-                </ul> 
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
             {% endblock %}
         </div>
