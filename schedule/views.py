@@ -3,7 +3,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 
 import requests
-from .api import get_course_list
 
 # Create your views here.
 
@@ -26,13 +25,16 @@ def home(request):
     
     return render(request, 'schedule/home.html', {'role': role, 'username': username})
 
+# Logouts user and redirects them to the home page
 def logout_view(request):
     logout(request)
     return redirect('home')
 
+# Provides user with filters to search for course by year, term, department, and instructor name
 @login_required
 def course_search_view(request):
     base_url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01"
+
     field_pattern = "&{}={}"
     
     courses = []
@@ -41,10 +43,10 @@ def course_search_view(request):
     if request.method == "POST": # if search has been run
         fields = request.POST # save search fields
 
-        year = fields.get('year', 2023)
-        term = fields.get('term', 'Fall')
-        dept = fields.get('dept', False)
-        instructor = fields.get('instructor', False)
+        year = fields.get('year')
+        term = fields.get('term')
+        subject = fields.get('subject')
+        instructor = fields.get('instructor')
 
         if year == "":
             year = 2023
@@ -54,18 +56,40 @@ def course_search_view(request):
             num_term = 8
         elif term == "Spring":
             num_term = 2
+        elif term == "Summer":
+            num_term = 6
 
         search_url = base_url
         search_url += field_pattern.format("term", "1{}{}".format(int(year)%100, num_term))
 
-        if dept:
-            search_url += field_pattern.format("subject", dept)
+        if subject:
+            search_url += field_pattern.format("subject", subject)
         if instructor:
             search_url += field_pattern.format("instructor_name", instructor)
         
+
+        print(search_url)
+        
+        #Store data in JSON
+        rawData = requests.get(search_url).json()
+
+        #Initialize empty sets to store unique course mnemonics, instructors
+        subjects = set()
+        instructors = set()
+
+        #Iterate through JSON
+        for course in rawData:
+
+            #Add course mnenomics
+            if "subject" in course:
+                subjects.add(course["subject"])
+            #Add instructor name
+        print(subjects)
+        #print(instructors)
+       
+        
         resp = requests.get(search_url)
         courses = resp.json()
-
     return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields})
 
 
