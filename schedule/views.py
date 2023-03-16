@@ -32,12 +32,15 @@ def logout_view(request):
 @login_required
 def course_search_view(request):
     courses = []
-    if request.method == "POST":
-        courses = get_course_list(
+    fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': ''} #default field values
+
+    if request.method == "POST": # if search has been run
+        fields = request.POST # save search fields
+        courses = get_course_list( # search for courses
             year=request.POST['year'], 
             term=request.POST['term'], 
             dept=request.POST['dept'], 
             instructor=request.POST['instructor']
         )
 
-    return render(request, 'schedule/course_search.html', {'courses': courses})
+    return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields})

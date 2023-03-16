@@ -17,13 +17,13 @@
                 {% csrf_token %}
                 <fieldset>
                     <p>Year:</p>
-                    <input type="text" name="year" id="year", value="2023"><br>
+                    <input type="text" name="year" id="year" value={{ fields.year }}><br>
                     <p>Term:</p>
-                    <input type="text" name="term" id="term", value="Fall"><br>
+                    <input type="text" name="term" id="term" value={{ fields.term }}><br>
                     <p>Dept:</p>
-                    <input type="text" name="dept" id="dept"><br>
+                    <input type="text" name="dept" id="dept" value={{ fields.dept }}><br>
                     <p>Instructor:</p>
-                    <input type="text" name="instructor" id="instructor"><br>
+                    <input type="text" name="instructor" id="instructor" value={{ fields.instructor }}><br>
                 </fieldset>
                 <input type="submit" value="Search">
             </form>
