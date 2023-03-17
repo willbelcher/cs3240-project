@@ -38,7 +38,7 @@ def course_search_view(request):
     field_pattern = "&{}={}"
     
     courses = []
-    fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': ''} #default field values
+    fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'only_open': False} #default field values
     
     if request.method == "POST": # if search has been run
         fields = request.POST # save search fields
@@ -47,6 +47,7 @@ def course_search_view(request):
         term = fields.get('term')
         subject = fields.get('subject')
         instructor = fields.get('instructor')
+        only_open = bool(fields.get('only_open'))
 
         if year == "":
             year = 2023
@@ -66,6 +67,8 @@ def course_search_view(request):
             search_url += field_pattern.format("subject", subject)
         if instructor:
             search_url += field_pattern.format("instructor_name", instructor)
+        if only_open:
+            search_url += field_pattern.format("enrl_stat", 'O')
         
         #Store data in JSON
         rawData = requests.get(search_url).json()

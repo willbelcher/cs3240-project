@@ -38,16 +38,21 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-group row align-items-end">
-                    <div class="col-sm-auto row">
-                        <label class="col-sm-auto" for="instructor">Instructor:</label>
-                        <input class="col-sm-auto" type="text" class="form-control" name="instructor" id="instructor" value={{ fields.instructor }}>
+                <div class="row align-items-end">
+                    <div class="form-group col-sm-auto">
+                        <label for="instructor">Instructor:</label>
+                        <input class="form-control" type="text" name="instructor" id="instructor" value={{ fields.instructor }}>
                     </div>
-                    <div class="col-sm-auto">
+                    <div class="form-check col-sm-auto">
+                        <label for="only_open">Only show open</label>
+                        <input class="form-check-input col-sm-auto" type="checkbox" name="only_open" id="only_open" {% if fields.only_open %} checked {% else %} {% endif %}>
+                    </div>
+                    <div class="form-group col-sm-auto">
                         <button type="submit" class="btn btn-primary">Search</button>
                     </div>
                 </div>
             </form>
+            <hr></hr>
             <div class="container align-items-start justify-content-start">
                 {% for course in courses %}
                     <div class="row">
