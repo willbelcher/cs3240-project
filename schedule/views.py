@@ -31,6 +31,8 @@ def logout_view(request):
     return redirect('home')
 
 # Provides user with filters to search for course by year, term, department, and instructor name
+subjects = [] # save subjects between searches
+
 @login_required
 def course_search_view(request):
     base_url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01"
@@ -40,6 +42,18 @@ def course_search_view(request):
     courses = []
     fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'only_open': False} #default field values
     
+    #Initialize empty sets to store unique course mnemonics, instructors
+    instructors = set()
+
+    if len(subjects) == 0: # If mnemonics not retrieved
+        # TODO get different mnemonics if term is changed
+        raw_subjects = requests.get("https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228").json()
+        
+        for subject_info in raw_subjects["subjects"]:
+            subjects.append(subject_info["subject"])
+
+        subjects.sort()
+
     if request.method == "POST": # if search has been run
         fields = request.POST # save search fields
 
@@ -73,26 +87,17 @@ def course_search_view(request):
         #Store data in JSON
         rawData = requests.get(search_url).json()
 
-        #Initialize empty sets to store unique course mnemonics, instructors
-        subjects = set()
-        instructors = set()
-
         #Iterate through JSON
         for course in rawData:
-
-            #Add course mnenomics
-            if "subject" in course:
-                subjects.add(course["subject"])
             #Add instructor name
             if "instructors" in course:
                 instructors.update(
                     [x["name"] for x in course["instructors"]]
                     )
-        print(subjects)
         print(instructors)
        
         
         courses = requests.get(search_url).json()
-    return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields})
+    return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields, 'subjects': subjects})
 
 

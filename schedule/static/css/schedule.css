@@ -1,3 +1,7 @@
 h1 a, h2 a{
     color:yellowgreen
 }
+
+.nav-link {
+    border-radius: 0 !important;
+}
