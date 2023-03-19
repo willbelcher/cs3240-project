@@ -2,3 +2,5 @@ gunicorn
 django
 django-heroku
 requests
+django-allauth
+django-global-permissions

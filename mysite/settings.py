@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    "whitenoise.runserver_nostatic",
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'allauth',
@@ -52,7 +53,8 @@ INSTALLED_APPS = [
 SITE_ID = 1
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -113,6 +115,14 @@ AUTHENTICATION_BACKENDS = [
 
 ]
 
+# Needed by whitenoise for caching and compression of static files
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
@@ -158,7 +168,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 try:
     if 'HEROKU' in os.environ:
         import django_heroku
-
         django_heroku.settings(locals())
 except ImportError:
     found = False
