@@ -27,17 +27,17 @@ class TestLoginAuthentication(TestCase):
 
         self.assertFalse(permission)
 
+    # issue with django crate db permissions
+
     # def test_login_with_user_in_advisor_group(self):
     #     user = User.objects.create(username='foo')
     #     factory = RequestFactory()
     #
     #     request = factory.delete('/')
     #     request.user = user
-    #     permission = Permission.objects.create(codename='is_advisor', name="Is Advisor")
     #
     #     groups = Group.objects.get_or_create("Advisor")
-    #     groups.permissions.add(permission)
     #     user.groups.add(groups)
-    #
     #     permission = user.has_perm('global_permissions.is_advisor')
+    #
     #     self.assertTrue(permission)

@@ -99,7 +99,9 @@ def course_search_view(request):
             search_url += field_pattern.format("enrl_stat", 'O')
 
         #Store data in JSON
+        # rawData = send_request(year, num_term, subject, instructor, base_url)
         rawData = requests.get(search_url).json()
+        print(rawData)
 
         #Iterate through JSON
         for course in rawData:
@@ -112,7 +114,16 @@ def course_search_view(request):
 
 
         courses = requests.get(search_url).json()
+        courses = rawData
     return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields, 'subjects': subjects})
 
+#method is for testing purposes
+def send_request(year, num_term, subject, instructor, url):
+    field_pattern = "&{}={}"
+    url += field_pattern.format("term", "1{}{}".format(int(year) % 100, num_term))
+    if subject:
+        url += field_pattern.format("subject", subject)
+    if instructor:
+        url += field_pattern.format("instructor_name", instructor)
 
-
+    return requests.get(url).json()
