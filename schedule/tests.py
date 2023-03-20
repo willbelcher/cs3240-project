@@ -1,12 +1,9 @@
 import requests
-from django.test import TestCase, RequestFactory, Client
+from django.test import TestCase
 from schedule.views import send_request
-from rest_framework.test import APITestCase
-
-from django.contrib.auth.models import User, Group, Permission
 
 # Create your tests here.
-class TestCourseSearch(APITestCase):
+class TestCourseSearch(TestCase):
     def test_invalid_instructor(self):
         field_pattern = "&{}={}"
         year = 2023
