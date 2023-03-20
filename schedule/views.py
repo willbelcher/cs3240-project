@@ -100,21 +100,20 @@ def course_search_view(request):
 
         #Store data in JSON
         # rawData = send_request(year, num_term, subject, instructor, base_url)
-        rawData = requests.get(search_url).json()
-        print(rawData)
+        # rawData = requests.get(search_url).json()
+        # print(rawData)
 
         #Iterate through JSON
-        for course in rawData:
-            #Add instructor name
-            if "instructors" in course:
-                instructors.update(
-                    [x["name"] for x in course["instructors"]]
-                    )
-        print(instructors)
+        # for course in rawData:
+        #     #Add instructor name
+        #     if "instructors" in course:
+        #         instructors.update(
+        #             [x["name"] for x in course["instructors"]]
+        #             )
+        # print(instructors)
 
 
         courses = requests.get(search_url).json()
-        courses = rawData
     return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields, 'subjects': subjects})
 
 #method is for testing purposes
