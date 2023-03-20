@@ -9,6 +9,15 @@
                 <li class="nav-item">
                     <a href = "{% url 'course_search' %}" class = "btn btn-primary nav-link">Course Search</a>
                 </li>
+                {% if perms.global_permissions.is_advisor %}
+                    <li class="nav-item">
+                        <a href = "{% url 'submissions' %}" class = "btn btn-primary nav-link">Check Submissions</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a href = "{% url 'schedules' %}" class = "btn btn-primary nav-link">Create Schedules</a>
+                    </li>
+                {% endif %}
                 <li class="nav-item">
                     <a href = "{% url 'logout' %}" class = "btn btn-primary nav-link">Log Out</a>
                 </li>
