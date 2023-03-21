@@ -55,6 +55,7 @@ def course_search_view(request):
 
     courses = []
     fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'only_open': False} #default field values
+    days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
 
     #Initialize empty sets to store unique course mnemonics, instructors
     instructors = set()
@@ -76,6 +77,9 @@ def course_search_view(request):
         subject = fields.get('subject')
         instructor = fields.get('instructor')
         only_open = bool(fields.get('only_open'))
+        
+        for day in days.keys():
+            days[day] = bool(fields.get(day))
 
         if year == "":
             year = 2023
@@ -97,6 +101,16 @@ def course_search_view(request):
             search_url += field_pattern.format("instructor_name", instructor)
         if only_open:
             search_url += field_pattern.format("enrl_stat", 'O')
+        
+        if list(days.values()).count(True) != len(days): # Filter by days checked in form
+            filter_days = ""
+            for day, checked in days.items():
+                if checked:
+                    filter_days += day
+            
+            search_url += field_pattern.format("days", filter_days)
+
+
 
         #Store data in JSON
         # rawData = send_request(year, num_term, subject, instructor, base_url)
@@ -114,7 +128,7 @@ def course_search_view(request):
 
 
         courses = requests.get(search_url).json()
-    return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields, 'subjects': subjects})
+    return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields, 'subjects': subjects, 'days': days})
 
 #method is for testing purposes
 def send_request(year, num_term, subject, instructor, url):

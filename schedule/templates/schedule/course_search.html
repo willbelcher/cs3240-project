@@ -39,15 +39,35 @@
                         </select>
                     </div>
                 </div>
-                <div class="row align-items-end">
+                <div class="row">
                     <div class="form-group col-sm-auto">
                         <label for="instructor">Instructor:</label>
                         <input class="form-control" type="text" name="instructor" id="instructor" value={{ fields.instructor }}>
+                    </div>
+                    <div class="col-sm-auto">
+                        <label for="Days">Days:</label>
+                        <div class="dropdown" id="Days">
+                            <button class="dropdown-toggle" style="background-color: inherit" type="button" data-toggle="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Select...
+                            </button>
+                            <ul class="dropdown-menu">
+                                {% for day, checked in days.items %}
+                                    <li>
+                                        <div class="form-check" style="margin-left: 0.5rem; margin-right: 0.5rem">
+                                            <label for={{day}}>{{day}}</label>
+                                            <input class="form-check-input" type="checkbox" name={{day}} id={{day}} {% if checked %} checked {% else %} {% endif %}>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                     </div>
                     <div class="form-check col-sm-auto">
                         <label for="only_open">Only show open</label>
                         <input class="form-check-input col-sm-auto" type="checkbox" name="only_open" id="only_open" {% if fields.only_open %} checked {% else %} {% endif %}>
                     </div>
+                </div>
+                <div class="row">
                     <div class="form-group col-sm-auto">
                         <button type="submit" class="btn btn-primary">Search</button>
                     </div>
