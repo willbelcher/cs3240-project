@@ -54,7 +54,9 @@ def course_search_view(request):
     field_pattern = "&{}={}"
 
     courses = []
-    fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'only_open': False} #default field values
+
+    #default field values
+    fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'only_open': False, 'start_time': '00:00', 'end_time': '23:59'}
     days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
 
     #Initialize empty sets to store unique course mnemonics, instructors
@@ -77,6 +79,8 @@ def course_search_view(request):
         subject = fields.get('subject')
         instructor = fields.get('instructor')
         only_open = bool(fields.get('only_open'))
+        start_time = fields.get('start_time')
+        end_time = fields.get('end_time')
         
         for day in days.keys():
             days[day] = bool(fields.get(day))
@@ -110,7 +114,15 @@ def course_search_view(request):
             
             search_url += field_pattern.format("days", filter_days)
 
+        if start_time != "00:00" or end_time != "23:59":
+            start_h, start_m = start_time.split(":") # convert to sis time range format (ex. 2:30 -> 2.5)
+            start_m = round(int(start_m)/30)/2
 
+            end_h, end_m = end_time.split(":") # convert to sis time range format
+            end_m = round(int(end_m)/30)/2
+
+            formatted_range = "{}.{},{}.{}".format(start_h, start_m, end_h, end_m)
+            search_url += field_pattern.format("time_range", formatted_range)
 
         #Store data in JSON
         # rawData = send_request(year, num_term, subject, instructor, base_url)
