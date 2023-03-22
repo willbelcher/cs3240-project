@@ -56,7 +56,7 @@ def course_search_view(request):
     courses = []
 
     #default field values
-    fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'only_open': False, 'start_time': '00:00', 'end_time': '23:59'}
+    fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'course_name': '', 'course_nmbr': '', 'only_open': False, 'start_time': '00:00', 'end_time': '23:59'}
     days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
 
     #Initialize empty sets to store instructors
@@ -78,6 +78,8 @@ def course_search_view(request):
         term = fields.get('term')
         subject = fields.get('subject')
         instructor = fields.get('instructor')
+        course_name = fields.get('course_name')
+        course_nmbr = fields.get('course_nmbr')
         only_open = bool(fields.get('only_open'))
         start_time = fields.get('start_time')
         end_time = fields.get('end_time')
@@ -103,6 +105,10 @@ def course_search_view(request):
             search_url += field_pattern.format("subject", subject)
         if instructor:
             search_url += field_pattern.format("instructor_name", instructor)
+        if course_name:
+            search_url += field_pattern.format("keyword", course_name)
+        if course_nmbr:
+            search_url += field_pattern.format("class_nbr", course_nmbr)
         if only_open:
             search_url += field_pattern.format("enrl_stat", 'O')
         
@@ -138,7 +144,7 @@ def course_search_view(request):
         #             )
         # print(instructors)
 
-
+        print(search_url)
         courses = requests.get(search_url).json()
     return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields, 'subjects': subjects, 'days': days})
 
