@@ -59,7 +59,7 @@ def course_search_view(request):
     fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'only_open': False, 'start_time': '00:00', 'end_time': '23:59'}
     days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
 
-    #Initialize empty sets to store unique course mnemonics, instructors
+    #Initialize empty sets to store instructors
     instructors = set()
 
     if len(subjects) == 0: # If mnemonics not retrieved
