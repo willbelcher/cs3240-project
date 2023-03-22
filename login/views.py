@@ -8,4 +8,5 @@ def login(request):
     if user.is_authenticated:
         return HttpResponseRedirect('schedule/')  # no need to login, just jump to home page
     else:
-        return render(request, 'login/login.html', {})
+        # return render(request, 'login/login.html', {})
+        return render(request, 'account/login.html', {})
