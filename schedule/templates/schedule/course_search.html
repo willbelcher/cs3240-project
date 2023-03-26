@@ -39,21 +39,50 @@
                         </select>
                     </div>
                 </div>
-                <div class="row align-items-end">
+                <div class="row">
                     <div class="form-group col-sm-auto">
                         <label for="instructor">Instructor:</label>
-                        <input class="form-control" type="text" name="instructor" id="instructor" value={{ fields.instructor }}>
+                        <input class="custom-control" type="text" name="instructor" id="instructor" value={{ fields.instructor }}>
+                    </div>
+                    <div class="form-group col-sm-auto">
+                        <label for="days">Days:</label>
+                        <div class="dropdown" style="display: inline-block;" name="days" id="days">
+                            <button class="dropdown-toggle" style="background-color: inherit" type="button" data-toggle="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Select...
+                            </button>
+                            <ul class="dropdown-menu">
+                                {% for day, checked in days.items %}
+                                    <li>
+                                        <div class="form-check" style="margin-left: 0.5rem; margin-right: 0.5rem">
+                                            <label for={{day}}>{{day}}</label>
+                                            <input class="form-check-input" type="checkbox" name={{day}} id={{day}} {% if checked %} checked {% else %} {% endif %}>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- Change to another input type -->
+                    <div class="form-group col-sm-auto">
+                        <label for="start_time">Start time:</label>
+                        <input type="time" class="custom-select" name="start_time" id="start_time" value={{fields.start_time}} step="1800">
+                        <label for="end_time">End time:</label>
+                        <input type="time" class="custom-select" name="end_time" id="end_time" value={{fields.end_time}} step="1800">
                     </div>
                     <div class="form-check col-sm-auto">
                         <label for="only_open">Only show open</label>
                         <input class="form-check-input col-sm-auto" type="checkbox" name="only_open" id="only_open" {% if fields.only_open %} checked {% else %} {% endif %}>
                     </div>
+                </div>
+                <div class="row">
                     <div class="form-group col-sm-auto">
                         <button type="submit" class="btn btn-primary">Search</button>
                     </div>
                 </div>
             </form>
+
             <hr></hr>
+
             <div class="container align-items-start justify-content-start">
                 {% for course in courses %}
                     <div class="row">
