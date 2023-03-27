@@ -9,6 +9,12 @@
                 <li class="nav-item">
                     <a href = "{% url 'course_search' %}" class = "btn btn-primary nav-link">Course Search</a>
                 </li>
+                <li class="nav-item">
+                    <a href = "{% url 'add_course' %}" class = "btn btn-primary nav-link">Add Course</a>
+                </li>
+                <li class="nav-item">
+                    <a href = "{% url 'view_cart' %}" class = "btn btn-primary nav-link">View Cart</a>
+                </li>
                 {% if perms.global_permissions.is_advisor %}
                     <li class="nav-item">
                         <a href = "{% url 'submissions' %}" class = "btn btn-primary nav-link">Check Submissions</a>
