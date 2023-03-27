@@ -1,10 +1,41 @@
-{% extends 'nav.html' %}
+{% include "nav.html" %}
 
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adding Courses to Cart</title>
+</head>
+<body>
+  {% block content %}
   <div class="container">
-    <h2>Course Added Successfully</h2>
-    <p>The course has been added to your cart.</p>
-    <a href="{% url 'add_course' %}" class="btn btn-primary">Add Another Course</a>
-    <a href="{% url 'view_cart' %}" class="btn btn-secondary">View Cart</a>
+
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div class="container">
+      <h2>Add Course to Cart</h2>
+      <form method="post" action="{% url 'add_course' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="term" class="form-label">Term</label>
+          <input type="text" class="form-control" id="term" name="term" placeholder="Enter term, e.g., 1232" required>
+        </div>
+        <div class="mb-3">
+          <label for="class_nbr" class="form-label">Class Number</label>
+          <input type="text" class="form-control" id="class_nbr" name="class_nbr" placeholder="Enter class number, e.g., 16031" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Course</button>
+      </form>
+    </div>
   </div>
-{% endblock %}
+  {% endblock %}  
+</body>
+</html>
+
