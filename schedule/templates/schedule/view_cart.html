@@ -1,3 +1,4 @@
+{% include "nav.html" %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +18,7 @@
                 <th>Class Number</th>
                 <th>Subject</th>
                 <th>Catalog Number</th>
-                <th>Instructor Name</th>
+                <th>Instructor Name NOT ADDED YET IN CODE</th>
                 <th>Title</th>
             </tr>
             </thead>
@@ -29,12 +30,18 @@
                 <td>{{ course.catalog_nbr }}</td>
                 <td>{{ course.instructor_name }}</td>
                 <td>{{ course.title }}</td>
+                <td>
+                    <form method="POST" action="{% url 'remove_course' course.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Remove</button>
+                    </form>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
         {% else %}
-        <p>Your cart is empty. <a href="{% url 'add_course' %}">Add a course</a>.</p>
+            <p>Your cart is empty. <a href="{% url 'add_course' %}">Add a course</a>.</p>
         {% endif %}
     </div>
     {% endblock %}
