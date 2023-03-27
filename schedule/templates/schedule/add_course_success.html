@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container">
+    <h2>Course Added Successfully</h2>
+    <p>The course has been added to your cart.</p>
+    <a href="{% url 'add_course' %}" class="btn btn-primary">Add Another Course</a>
+    <a href="{% url 'view_cart' %}" class="btn btn-secondary">View Cart</a>
+  </div>
+{% endblock %}

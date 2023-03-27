@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Cart</title>
+</head>
+<body>
+    {% block content %}
+    <div class="container">
+    <h2>Your Cart</h2>
+        {% if courses %}
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Class Number</th>
+                <th>Subject</th>
+                <th>Catalog Number</th>
+                <th>Instructor Name</th>
+                <th>Title</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for course in courses %}
+                <tr>
+                <td>{{ course.class_nbr }}</td>
+                <td>{{ course.subject }}</td>
+                <td>{{ course.catalog_nbr }}</td>
+                <td>{{ course.instructor_name }}</td>
+                <td>{{ course.title }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Your cart is empty. <a href="{% url 'add_course' %}">Add a course</a>.</p>
+        {% endif %}
+    </div>
+    {% endblock %}
+</body>
+</html>
