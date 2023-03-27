@@ -53,9 +53,12 @@ def course_search_view(request):
     field_pattern = "&{}={}"
 
     courses = []
-    fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'only_open': False} #default field values
 
-    #Initialize empty sets to store unique course mnemonics, instructors
+    #default field values
+    fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'only_open': False, 'start_time': '00:00', 'end_time': '23:59'}
+    days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
+
+    #Initialize empty sets to store instructors
     instructors = set()
 
     if len(subjects) == 0: # If mnemonics not retrieved
@@ -75,6 +78,11 @@ def course_search_view(request):
         subject = fields.get('subject')
         instructor = fields.get('instructor')
         only_open = bool(fields.get('only_open'))
+        start_time = fields.get('start_time')
+        end_time = fields.get('end_time')
+        
+        for day in days.keys():
+            days[day] = bool(fields.get(day))
 
         if year == "":
             year = 2023
@@ -96,6 +104,24 @@ def course_search_view(request):
             search_url += field_pattern.format("instructor_name", instructor)
         if only_open:
             search_url += field_pattern.format("enrl_stat", 'O')
+        
+        if list(days.values()).count(True) != len(days): # Filter by days checked in form
+            filter_days = ""
+            for day, checked in days.items():
+                if checked:
+                    filter_days += day
+            
+            search_url += field_pattern.format("days", filter_days)
+
+        if start_time != "00:00" or end_time != "23:59":
+            start_h, start_m = start_time.split(":") # convert to sis time range format (ex. 2:30 -> 2.5)
+            start_m = round(int(start_m)/30)/2
+
+            end_h, end_m = end_time.split(":") # convert to sis time range format
+            end_m = round(int(end_m)/30)/2
+
+            formatted_range = "{}.{},{}.{}".format(start_h, start_m, end_h, end_m)
+            search_url += field_pattern.format("time_range", formatted_range)
 
         #Store data in JSON
         # rawData = send_request(year, num_term, subject, instructor, base_url)
@@ -113,7 +139,7 @@ def course_search_view(request):
 
 
         courses = requests.get(search_url).json()
-    return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields, 'subjects': subjects})
+    return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields, 'subjects': subjects, 'days': days})
 
 #method is for testing purposes
 def send_request(year, num_term, subject, instructor, url):
