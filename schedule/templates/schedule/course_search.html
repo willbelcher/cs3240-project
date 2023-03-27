@@ -107,26 +107,88 @@
 
         <hr></hr>
 
-        <div class="container align-items-start justify-content-start">
-            {% for course in courses %}
-                <div class="row">
-                    <div class="col-sm-auto">
-                        <p>{{ course.subject }} {{ course.catalog_nbr }}</p>
-                    </div>
-                    <div class="col">
-                        <b>{{ course.descr }}</b>
-                    </div>
+        {% if courses %}
+        <div class="container card">
+            <div class="row">
+                <div class="col">
+                    {% for course in courses %}
+                        <div class="card container">
+                            <div class="card-header row">
+                                <div class="col-sm-auto">
+                                    <p>{{ course.subject }} {{ course.catalog_nbr }}</p>
+                                </div>
+                                <div class="col">
+                                    <b>{{ course.descr }}</b>
+                                </div>
+                                <div class="col">
+                                    <button class="btn btn-primary" data-toggle="collapse" data-target="#extra_info">
+                                        See More
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body row">
+                                <div class="col-sm-auto">
+                                    <p>Instructor: {{ course.instructors.0.name }}</p>
+                                </div>
+                                <div class="col">
+                                    <p>Capacity: {{ course.enrollment_total }}/{{ course.class_capacity }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
-                <div class="row">
-                    <div class="col-sm-auto">
-                        <p>Instructor: {{ course.instructors.0.name }}</p>
-                    </div>
-                    <div class="col">
-                        <p>Capacity: {{ course.enrollment_total }}/{{ course.class_capacity }}</p>
-                    </div>
+                <div class="col collapse" id="extra_info">
+                    {% for course in courses %}
+                        <div class="card container">
+                            <div class="card-body row">
+                                <div class="col-sm-auto">
+                                    <p>{{ course.location_descr }} {{ course.instruction_mode_descr }}</p>
+                                </div>
+{#                                <div class="col">#}
+{#                                    <b>{{ course.descr }}</b>#}
+{#                                </div>#}
+                            </div>
+                            <div class="card-body row">
+                                <div class="col-sm-auto">
+{#                                    <p>Instructor: {{ course.instructors.0.name }}</p>#}
+                                    {% for days in course.meetings %}
+                                        {{ days.days }}
+                                        {{ days.facility_descr }}
+                                        {% endfor %}
+                                </div>
+                                <div class="col">
+{#                                    <p>Capacity: {{ course.enrollment_total }}/{{ course.class_capacity }}</p>#}
+                                    <button class="btn-primary btn">Add to Schedule</button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
+            </div>
         </div>
+        {% endif %}
+
+
+        {#        <div class="container align-items-start justify-content-start">#}
+        {#            {% for course in courses %}#}
+        {#                <div class="row">#}
+        {#                    <div class="col-sm-auto">#}
+        {#                        <p>{{ course.subject }} {{ course.catalog_nbr }}</p>#}
+        {#                    </div>#}
+        {#                    <div class="col">#}
+        {#                        <b>{{ course.descr }}</b>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#                <div class="row">#}
+        {#                    <div class="col-sm-auto">#}
+        {#                        <p>Instructor: {{ course.instructors.0.name }}</p>#}
+        {#                    </div>#}
+        {#                    <div class="col">#}
+        {#                        <p>Capacity: {{ course.enrollment_total }}/{{ course.class_capacity }}</p>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            {% endfor %}#}
+        {#        </div>#}
     {% endblock %}
 </div>
 </body>
