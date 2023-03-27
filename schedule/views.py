@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from .models import Cart, Course
 
 
 import requests
@@ -152,3 +153,51 @@ def send_request(year, num_term, subject, instructor, url):
         url += field_pattern.format("instructor_name", instructor)
 
     return requests.get(url).json()
+
+
+@login_required
+def add_course(request):
+    if request.method == 'POST':
+        # Get the required data from the form
+        term = request.POST['term']
+        class_nbr = request.POST['class_nbr']
+
+        # Build the URL
+        base_url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01"
+        url = f"{base_url}&term={term}&class_nbr={class_nbr}"
+
+        # Make the request
+        response = requests.get(url)
+        course_data = response.json()
+
+        # Create a new course and add it to the cart
+        course = Course(
+            class_nbr=class_nbr,
+            subject=course_data['subject'],
+            catalog_nbr=course_data['catalog_nbr'],
+            instructor_name=course_data['instructor_name'],
+            title=course_data['title']
+        )
+
+        # Get the user's cart or create one if it doesn't exist
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+
+        # Add the course to the cart
+        course.cart = cart
+        course.save()
+
+        return render(request, 'add_course_success.html')
+
+    return render(request, 'add_course_form.html')
+
+@login_required
+def view_cart(request):
+    # Get the user's cart
+    cart = Cart.objects.get(user=request.user)
+
+    # Get the courses associated with the cart
+    courses = Course.objects.filter(cart=cart)
+
+    # Render the view_cart template with the courses
+    context = {'courses': courses}
+    return render(request, 'view_cart.html', context)
