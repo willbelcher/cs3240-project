@@ -26,7 +26,6 @@ def home(request):
 
     return render(request, 'schedule/home.html', {'role': role, 'username': username})
 
-# Logouts user and redirects them to the home page
 
 def submissions(request):
     user = request.user
@@ -39,7 +38,7 @@ def schedules(request):
     if not user.has_perm('global_permissions.is_advisor'):
         return render(request, 'schedule/schedule_creation.html')
 
-
+# Logouts user and redirects them to the home page
 def logout_view(request):
     logout(request)
     return redirect('home')
