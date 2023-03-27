@@ -144,6 +144,7 @@ header .item-button a:hover{
 
 .animated-text {
     animation: fadeIn 5s ease-in-out;
+}
     
 .dropdown-menu {
     --bs-dropdown-min-width: 0;
