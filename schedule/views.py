@@ -1,6 +1,7 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.contrib import messages
 from .models import Cart, Course
 
 
@@ -158,37 +159,43 @@ def send_request(year, num_term, subject, instructor, url):
 @login_required
 def add_course(request):
     if request.method == 'POST':
-        # Get the required data from the form
-        term = request.POST['term']
-        class_nbr = request.POST['class_nbr']
+        term = request.POST.get('term', '').strip()
+        class_nbr = request.POST.get('class_nbr', '').strip()
 
-        # Build the URL
-        base_url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01"
-        url = f"{base_url}&term={term}&class_nbr={class_nbr}"
+        # Validate input
+        if not term:
+            messages.error(request, 'Term is required.')
+        elif not class_nbr:
+            messages.error(request, 'Class Number is required.')
+        else:
+            # Build the SIS API URL
+            url = f'https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term={term}&class_nbr={class_nbr}'
 
-        # Make the request
-        response = requests.get(url)
-        course_data = response.json()
+            # Make the request to the SIS API
+            response = requests.get(url)
 
-        # Create a new course and add it to the cart
-        course = Course(
-            class_nbr=class_nbr,
-            subject=course_data['subject'],
-            catalog_nbr=course_data['catalog_nbr'],
-            instructor_name=course_data['instructor_name'],
-            title=course_data['title']
-        )
+            if response.status_code == 200:
+                # Parse the JSON response
+                json_data = response.json()
+                course_data = json_data[0]  # Assuming the course data is in the first element of the list
 
-        # Get the user's cart or create one if it doesn't exist
-        cart, _ = Cart.objects.get_or_create(user=request.user)
+                # Extract course information
+                subject = course_data['subject']
+                catalog_nbr = course_data['catalog_nbr']
+                title = course_data['title']
+                instructor_name = course_data['instructor_name']
 
-        # Add the course to the cart
-        course.cart = cart
-        course.save()
+                # Save the course to the user's cart
+                cart, _ = Cart.objects.get_or_create(user=request.user)
+                course = Course(cart=cart, class_nbr=class_nbr, subject=subject, catalog_nbr=catalog_nbr, title=title, instructor_name=instructor_name)
+                course.save()
 
-        return render(request, 'add_course_success.html')
+                messages.success(request, 'Course added successfully!')
+                return redirect('add_course_success_url')
+            else:
+                messages.error(request, 'Failed to fetch course data. Please check the input and try again.')
 
-    return render(request, 'add_course_form.html')
+    return render(request, 'schedule/add_course_form.html')
 
 @login_required
 def view_cart(request):
@@ -200,4 +207,11 @@ def view_cart(request):
 
     # Render the view_cart template with the courses
     context = {'courses': courses}
-    return render(request, 'view_cart.html', context)
+    return render(request, 'schedule/view_cart.html', context)
+
+@login_required
+def remove_course(request, course_id):
+    course = get_object_or_404(Course, id=course_id, cart__user=request.user)
+    course.delete()
+    messages.success(request, 'Course removed from cart.')
+    return redirect('view_cart')
