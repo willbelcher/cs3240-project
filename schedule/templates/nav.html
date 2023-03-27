@@ -9,21 +9,38 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/II5N2bsXsVf4PFNbeuriC/7N7lD3nRt83_f1Q8" crossorigin="anonymous">
 </head>
 <body>
-    <nav class="navbar sticky-top navbar-expand-sm navbar-light" style = "background: #73D7FF;">
-        <div class = "container">  
-            <ul class="navbar-nav">
-                <li class="nav-item active">
-                    <a href = "{% url 'home' %}" class = "btn btn-primary nav-link">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a href = "{% url 'course_search' %}" class = "btn btn-primary nav-link">Course Search</a>
-                </li>
-                <li class="nav-item">
-                    <a href = "{% url 'add_course' %}" class = "btn btn-primary nav-link">Add Course</a>
-                </li>
-                <li class="nav-item">
-                    <a href = "{% url 'view_cart' %}" class = "btn btn-primary nav-link">View Cart</a>
-                </li>
+    <header>
+        <div class="container-fluid">
+
+            <div class="navb-logo">
+
+                <!--Probably need to find better picture-->
+                {% load static %}
+                <img src="{% static 'img/uva_logo.png' %}" alt="Logo">
+            </div>
+
+            <div class="navb-items d-none d-xl-flex">
+
+                <!-- Home Page Link -->
+                <div class="item">
+                    <a href="{% url 'home' %}">Home</a>
+                </div>
+
+                <!-- Course Search Link -->
+                <div class="item">
+                    <a href="{% url 'course_search' %}">Course Search</a>
+                </div>
+
+                <div class="item">
+                    <a href="{% url 'add_course' %}">Add Course</a>
+                </div>
+
+                <div class="item">
+                    <a href="{% url 'view_cart' %}">View Cart</a>
+                </div>
+
+                <!-- Check Submissions (of schedule submission) Link -->
+                <!-- Only available to users with Advisor Status -->
                 {% if perms.global_permissions.is_advisor %}
                 <div class="item">
                     <a href="{% url 'submissions' %}">Check Submissions</a>
