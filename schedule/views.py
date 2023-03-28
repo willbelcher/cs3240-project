@@ -85,6 +85,7 @@ def course_search_view(request):
         instructor = fields.get('instructor')
         course_name = fields.get('course_name')
         course_nmbr = fields.get('course_nmbr')
+        catalog_nbr = fields.get('catalog_nbr')
         only_open = bool(fields.get('only_open'))
         start_time = fields.get('start_time')
         end_time = fields.get('end_time')
@@ -114,6 +115,8 @@ def course_search_view(request):
             search_url += field_pattern.format("keyword", course_name)
         if course_nmbr:
             search_url += field_pattern.format("class_nbr", course_nmbr)
+        if catalog_nbr:
+            search_url += field_pattern.format("catalog_nbr", catalog_nbr)
         if only_open:
             search_url += field_pattern.format("enrl_stat", 'O')
         
