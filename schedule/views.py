@@ -7,8 +7,8 @@ from .models import Cart, Course, Schedule, ScheduleItem, User
 
 import requests
 
-# Create your views here.
 
+# View for Home Page
 @login_required
 def home(request):
     # Checks to make sure that the user is logged in to assign the correct name
@@ -28,17 +28,11 @@ def home(request):
 
     return render(request, 'schedule/home.html', {'role': role, 'username': username})
 
-
+# View for Submitted Schedules Page (Advisor)
 def submissions(request):
     user = request.user
     if user.has_perm('global_permissions.is_advisor'):
         return render(request, 'schedule/schedule_submissions.html')
-
-
-def schedules(request):
-    user = request.user
-    if not user.has_perm('global_permissions.is_advisor'):
-        return render(request, 'schedule/schedule_creation.html')
 
 # Logouts user and redirects them to the home page
 def logout_view(request):
@@ -154,7 +148,7 @@ def send_request(year, num_term, subject, instructor, url):
 
     return requests.get(url).json()
 
-
+# View to Add Course to Cart
 @login_required
 def add_course(request):
     if request.method == 'POST':
@@ -174,6 +168,7 @@ def add_course(request):
             response = requests.get(url)
 
             if response.status_code == 200:
+
                 # Parse the JSON response
                 json_data = response.json()
                 course_data = json_data[0]  # Assuming the course data is in the first element of the list
@@ -192,10 +187,11 @@ def add_course(request):
                 messages.success(request, 'Course added successfully!')
                 return redirect('add_course_success_url')
             else:
-                messages.error(request, 'Failed to fetch course data. Please check the input and try again.')
+                messages.error(request, 'Failed to fetch course data.')
 
     return render(request, 'schedule/add_course_form.html')
 
+# View for View Cart Page
 @login_required
 def view_cart(request):
     # Get the user's cart
@@ -208,6 +204,7 @@ def view_cart(request):
     context = {'courses': courses}
     return render(request, 'schedule/view_cart.html', context)
 
+# Removes a course from the user's cart
 @login_required
 def remove_course(request, course_id):
     course = get_object_or_404(Course, id=course_id, cart__user=request.user)
@@ -215,6 +212,7 @@ def remove_course(request, course_id):
     messages.success(request, 'Course removed from cart.')
     return redirect('view_cart')
 
+# Adds a course to the user's schedule from their cart
 @login_required
 def add_to_schedule(request, course_id):
     course = get_object_or_404(Course, id=course_id, cart__user=request.user)
@@ -224,6 +222,7 @@ def add_to_schedule(request, course_id):
     messages.success(request, 'Course added to schedule.')
     return redirect('view_cart')
 
+# View for View Schedule Page
 @login_required
 def view_schedule(request):
     schedule = get_object_or_404(Schedule, user=request.user)
@@ -234,10 +233,12 @@ def view_schedule(request):
     }
     return render(request, 'schedule/view_schedule.html', context)
 
+# Submits schedule to advisor
 @login_required
 def submit_schedule(request):
     schedule = get_object_or_404(Schedule, user=request.user)
-    # Replace "advisor_username" with the username of the advisor you want to assign the schedule to
+
+    # Replace "advisor_username" with the username of the student's advisor username
     advisor = get_object_or_404(User, username="advisor_username")
     schedule.advisor = advisor
     schedule.submitted = True
