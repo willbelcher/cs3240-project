@@ -1,0 +1,55 @@
+{% include "nav.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Schedule</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/schedule.css' %}">
+</head>
+<body>
+    {% block content %}
+    <div class="container">
+    <h2>Your Schedule</h2>
+        {% if schedule_items %}
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Class Number</th>
+                <th>Subject</th>
+                <th>Catalog Number</th>
+                <th>Instructor Name</th>
+                <th>Title</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for schedule_item in schedule_items %}
+                <tr>
+                <td>{{ schedule_item.course.class_nbr }}</td>
+                <td>{{ schedule_item.course.subject }}</td>
+                <td>{{ schedule_item.course.catalog_nbr }}</td>
+                <td>{{ schedule_item.course.instructor_name }}</td>
+                <td>{{ schedule_item.course.title }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p>Your schedule is empty. <a href="{% url 'view_cart' %}">Add a course from the cart</a>.</p>
+        {% endif %}
+
+        {% if not schedule.submitted %}
+        <form method="POST" action="{% url 'submit_schedule' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Submit to Advisor</button>
+        </form>
+        {% else %}
+        <p>Your schedule has been submitted to the advisor.</p>
+        {% endif %}
+    </div>
+    {% endblock %}
+</body>
+</html>

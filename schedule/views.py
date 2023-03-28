@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
-from .models import Cart, Course
+from .models import Cart, Course, Schedule, ScheduleItem, User
 
 
 import requests
@@ -214,3 +214,33 @@ def remove_course(request, course_id):
     course.delete()
     messages.success(request, 'Course removed from cart.')
     return redirect('view_cart')
+
+@login_required
+def add_to_schedule(request, course_id):
+    course = get_object_or_404(Course, id=course_id, cart__user=request.user)
+    schedule, _ = Schedule.objects.get_or_create(user=request.user)
+    schedule_item = ScheduleItem(schedule=schedule, course=course)
+    schedule_item.save()
+    messages.success(request, 'Course added to schedule.')
+    return redirect('view_cart')
+
+@login_required
+def view_schedule(request):
+    schedule = get_object_or_404(Schedule, user=request.user)
+    schedule_items = ScheduleItem.objects.filter(schedule=schedule)
+    context = {
+        'schedule': schedule,
+        'schedule_items': schedule_items,
+    }
+    return render(request, 'schedule/view_schedule.html', context)
+
+@login_required
+def submit_schedule(request):
+    schedule = get_object_or_404(Schedule, user=request.user)
+    # Replace "advisor_username" with the username of the advisor you want to assign the schedule to
+    advisor = get_object_or_404(User, username="advisor_username")
+    schedule.advisor = advisor
+    schedule.submitted = True
+    schedule.save()
+    messages.success(request, 'Schedule submitted to advisor.')
+    return redirect('view_schedule')
