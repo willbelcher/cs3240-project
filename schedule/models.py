@@ -29,3 +29,14 @@ class Course(models.Model):
     catalog_nbr = models.CharField(max_length=10)
     instructor_name = models.CharField(max_length=50)
     title = models.CharField(max_length=200)
+
+
+class Schedule(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    advisor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='schedules_advised')
+    submitted = models.BooleanField(default=False)
+
+
+class ScheduleItem(models.Model):
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
