@@ -135,38 +135,35 @@
                 <div class="row">
                     <div class="col">
                         {% for course in courses %}
-                            <form method="POST" action="{% url 'add_class_to_schedule' %}">
-                            {% csrf_token %}
-                                <div class="card container">
-                                    <div class="card-header row">
-                                        <div class="col-sm-auto">
-                                            <p>{{ course.subject }} {{ course.catalog_nbr }}</p>
-                                            <p>{{ forloop.counter }}</p>
-                                        </div>
-                                        <div class="col">
-                                            <b>{{ course.descr }}</b>
-                                        </div>
-                                        <div class="col">
-                                            <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
-                                                    data-bs-target="#extra_info_{{ forloop.counter }}" aria-expanded="false"
-                                                    aria-controls="filter_collapse_button">
-                                                See More
-                                            </button>
-                                        </div>
+                            <div class="card container">
+                                <div class="card-header row">
+                                    <div class="col-sm-auto">
+                                        <p>{{ course.subject }} {{ course.catalog_nbr }}</p>
+                                        <p>{{ forloop.counter }}</p>
                                     </div>
-                                    <div class="card-body row">
-                                        <div class="col-sm-auto">
-                                            <p>Instructor: {{ course.instructors.0.name }}</p>
-                                        </div>
-                                        <div class="col">
-                                            <p>
-                                                Capacity: {{ course.enrollment_total }}/{{ course.class_capacity }}
-                                            </p>
-                                            <p>{{ course.units }} Credits</p>
-                                        </div>
+                                    <div class="col">
+                                        <b>{{ course.descr }}</b>
+                                    </div>
+                                    <div class="col">
+                                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#extra_info_{{ forloop.counter }}" aria-expanded="false"
+                                                aria-controls="filter_collapse_button">
+                                            See More
+                                        </button>
                                     </div>
                                 </div>
-                            </form>
+                                <div class="card-body row">
+                                    <div class="col-sm-auto">
+                                        <p>Instructor: {{ course.instructors.0.name }}</p>
+                                    </div>
+                                    <div class="col">
+                                        <p>
+                                            Capacity: {{ course.enrollment_total }}/{{ course.class_capacity }}
+                                        </p>
+                                        <p>{{ course.units }} Credits</p>
+                                    </div>
+                                </div>
+                            </div>
                         {% endfor %}
                     </div>
                     <div class="col"  id="extra_info">
@@ -181,19 +178,10 @@
                                     {#                                    <b>{{ course.descr }}</b>#}
                                     {#                                </div>#}
                                 </div>
-                                <div class="card-body row">
-                                    <div class="col-sm-auto">
-                                        {#                                    <p>Instructor: {{ course.instructors.0.name }}</p>#}
-                                        {% for days in course.meetings %}
-                                            {{ days.days }}
-                                            {{ days.facility_descr }}
-                                        {% endfor %}
-                                    </div>
-                                    <div class="col">
-                                        {#                                    <p>Capacity: {{ course.enrollment_total }}/{{ course.class_capacity }}</p>#}
-                                        <button class="btn-primary btn">Add to Schedule</button>
-                                    </div>
-                                </div>
+                                {#                                <div class="card-body row">#}
+                                {#                                    <div class="col">#}
+                                {#                                    </div>#}
+                                {#                                </div>#}
                             </div>
                         {% endfor %}
                     </div>
