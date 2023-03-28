@@ -46,6 +46,12 @@ def logout_view(request):
 # Provides user with filters to search for course by year, term, department, and instructor name
 subjects = [] # save subjects between searches
 
+def add_class_to_schedule_view(request):
+    if (request.method == "POST") :
+        print("request is: ", request)
+        days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
+        return render(request, 'schedule/course_search.html', {'subjects': subjects, 'days': days})
+
 @login_required
 def course_search_view(request):
     base_url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01"

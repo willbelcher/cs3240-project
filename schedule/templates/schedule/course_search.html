@@ -126,50 +126,55 @@
 
         <hr>
 
+        {#        output of classes from sis#}
         {% if courses %}
             <div class="container card">
                 <div class="row">
                     <div class="col">
                         {% for course in courses %}
-                            <div class="card container">
-                                <div class="card-header row">
-                                    <div class="col-sm-auto">
-                                        <p>{{ course.subject }} {{ course.catalog_nbr }}</p>
-                                        <p>{{ forloop.counter }}</p>
+                            <form method="POST" action="{% url 'add_class_to_schedule' %}">
+                            {% csrf_token %}
+                                <div class="card container">
+                                    <div class="card-header row">
+                                        <div class="col-sm-auto">
+                                            <p>{{ course.subject }} {{ course.catalog_nbr }}</p>
+                                            <p>{{ forloop.counter }}</p>
+                                        </div>
+                                        <div class="col">
+                                            <b>{{ course.descr }}</b>
+                                        </div>
+                                        <div class="col">
+                                            <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                                                    data-bs-target="#extra_info_{{ forloop.counter }}" aria-expanded="false"
+                                                    aria-controls="filter_collapse_button">
+                                                See More
+                                            </button>
+                                            {#                                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#extra_info_{{ forloop.counter }}" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">#}
+                                            {#                                            Toggle both elements#}
+                                            {#                                        </button>#}
+                                             <button class="btn btn-primary" type="submit">
+                                                +
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div class="col">
-                                        <b>{{ course.descr }}</b>
-                                    </div>
-                                    <div class="col">
-{#                                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse"#}
-{#                                                data-bs-target="#extra_info" aria-expanded="false"#}
-{#                                                aria-controls="filter_collapse_button">#}
-{#                                            See More#}
-{#                                        </button>#}
-                                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
-                                                data-bs-target="#extra_info_{{ forloop.counter }}" aria-expanded="false"
-                                                aria-controls="filter_collapse_button">
-                                            See More
-                                        </button>
+                                    <div class="card-body row">
+                                        <div class="col-sm-auto">
+                                            <p>Instructor: {{ course.instructors.0.name }}</p>
+                                        </div>
+                                        <div class="col">
+                                            <p>
+                                                Capacity: {{ course.enrollment_total }}/{{ course.class_capacity }}
+                                            </p>
+                                            <p>{{ course.units }} Credits</p>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="card-body row">
-                                    <div class="col-sm-auto">
-                                        <p>Instructor: {{ course.instructors.0.name }}</p>
-                                    </div>
-                                    <div class="col">
-                                        <p>
-                                            Capacity: {{ course.enrollment_total }}/{{ course.class_capacity }}
-                                        </p>
-                                        <p>{{ course.units }} Credits</p>
-                                    </div>
-                                </div>
-                            </div>
+                            </form>
                         {% endfor %}
                     </div>
-                    <div class="col" id="extra_info">
+                    <div class="col"  id="extra_info">
                         {% for course in courses %}
-                            <div class="collapse card container" id="extra_info_{{ forloop.counter }}">
+                            <div class="collapse card container multi-collapse" id="extra_info_{{ forloop.counter }}">
                                 <div class="card-body row">
                                     <div class="col-sm-auto">
                                         <p>{{ course.location_descr }} {{ course.instruction_mode_descr }}</p>
