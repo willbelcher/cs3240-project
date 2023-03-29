@@ -1,18 +1,35 @@
 {% include "nav.html" %}
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>Plan-it Pal</title>
-    {#    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"#}
-    {#          integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">#}
-    {#    <link rel="stylesheet" href="{% static 'css/schedule.css' %}">#}
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static 'css/schedule.css' %}">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N"
-            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>
+        function toggler(divId) {
+            console.log(divId);
+            {#$("#" + divId).toggle();#}
+            if($("#"+divId).hasClass('invisible')){
+                $("#" + divId).removeClass('invisible').addClass('visible');
+                $("#" + divId + "_button").html("Less Info")
+            }
+            else{
+                $("#" + divId).removeClass('visible').addClass('invisible');
+                $("#" + divId + "_button").html("More Info")
+            }
+
+        }
+    </script>
+
 </head>
 <body>
 <div>
@@ -53,7 +70,7 @@
                 <div class="form-group col-md-auto">
                     <label for="subject">Catalog Number:</label>
                     <input class="custom-control" type="text" name="catalog_nbr" id="catalog_nbr"
-                           value={{ fields.instructor }}>
+                           value={{ fields.catalog_nbr }}>
                 </div>
             </div>
 
@@ -129,13 +146,13 @@
 
         <hr>
 
-        {#        output of classes from sis#}
+        {# NOTE!!! below is output of classes from sis#}
         {% if courses %}
             <div class="container card">
+            {% for course in courses %}
                 <div class="row">
                     <div class="col">
-                        {% for course in courses %}
-                            <div class="card container">
+                        <div class="card container m-1" id="class_card">
                                 <div class="card-header row">
                                     <div class="col-sm-auto">
                                         <p>{{ course.subject }} {{ course.catalog_nbr }}</p>
@@ -145,10 +162,8 @@
                                         <b>{{ course.descr }}</b>
                                     </div>
                                     <div class="col">
-                                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
-                                                data-bs-target="#extra_info_{{ forloop.counter }}" aria-expanded="false"
-                                                aria-controls="filter_collapse_button">
-                                            See More
+                                        <button class="btn btn-primary" type="button" id="extra_info_{{ forloop.counter }}_button" onclick="toggler('extra_info_{{ forloop.counter }}')">
+                                            More Info
                                         </button>
                                     </div>
                                 </div>
@@ -160,56 +175,128 @@
                                         <p>
                                             Capacity: {{ course.enrollment_total }}/{{ course.class_capacity }}
                                         </p>
+                                    </div>
+                                </div>
+                                <div class="card-body row">
+                                    <div class="col-sm-auto">
                                         <p>{{ course.units }} Credits</p>
                                     </div>
                                 </div>
                             </div>
-                        {% endfor %}
                     </div>
-                    <div class="col"  id="extra_info">
-                        {% for course in courses %}
-                            <div class="collapse card container multi-collapse" id="extra_info_{{ forloop.counter }}">
-                                <div class="card-body row">
-                                    <div class="col-sm-auto">
-                                        <p>{{ course.location_descr }} {{ course.instruction_mode_descr }}</p>
-                                        <p></p>
+
+                    <div class="col">
+                        <div class="card container invisible m-1" id="extra_info_{{ forloop.counter }}" >
+                                    <div class="card-header row">
+                                        <div class="col-sm-auto">
+                                            <p>{{ course.subject }} {{ course.catalog_nbr }}</p>
+                                            <p>{{ forloop.counter }}</p>
+                                        </div>
+                                        <div class="col">
+                                            <b>{{ course.descr }}</b>
+                                        </div>
                                     </div>
-                                    {#                                <div class="col">#}
-                                    {#                                    <b>{{ course.descr }}</b>#}
-                                    {#                                </div>#}
+                                    <div class="card-body row">
+                                        <div class="col-sm-auto">
+                                            <p>Location: {{ course.location_descr }}</p>
+                                        </div>
+                                        <div class="col-sm-auto">
+                                            <p>Instruction: {{ course.instruction_mode_descr }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="card-body row align-items-stretch">
+                                        <div class="col">
+                                            Days:
+                                        </div>
+                                        {% for days in course.meetings %}
+                                            <div class="col">
+                                                {{ days.days }} @ {{ days.facility_descr }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
                                 </div>
-                                {#                                <div class="card-body row">#}
-                                {#                                    <div class="col">#}
-                                {#                                    </div>#}
-                                {#                                </div>#}
-                            </div>
-                        {% endfor %}
                     </div>
                 </div>
+            {% endfor %}
             </div>
-        {% endif %}
+            {% endif %}
 
-
-        {#        <div class="container align-items-start justify-content-start">#}
-        {#            {% for course in courses %}#}
-        {#                <div class="row">#}
-        {#                    <div class="col-sm-auto">#}
-        {#                        <p>{{ course.subject }} {{ course.catalog_nbr }}</p>#}
-        {#                    </div>#}
-        {#                    <div class="col">#}
-        {#                        <b>{{ course.descr }}</b>#}
-        {#                    </div>#}
-        {#                </div>#}
-        {#                <div class="row">#}
-        {#                    <div class="col-sm-auto">#}
-        {#                        <p>Instructor: {{ course.instructors.0.name }}</p>#}
-        {#                    </div>#}
-        {#                    <div class="col">#}
-        {#                        <p>Capacity: {{ course.enrollment_total }}/{{ course.class_capacity }}</p>#}
-        {#                    </div>#}
-        {#                </div>#}
-        {#            {% endfor %}#}
-        {#        </div>#}
+{#            <div class="container card">#}
+{#                <div class="row">#}
+{#                    <div class="col">#}
+{#                        {% for course in courses %}#}
+{#                            <div class="card container">#}
+{#                                <div class="card-header row">#}
+{#                                    <div class="col-sm-auto">#}
+{#                                        <p>{{ course.subject }} {{ course.catalog_nbr }}</p>#}
+{#                                        <p>{{ forloop.counter }}</p>#}
+{#                                    </div>#}
+{#                                    <div class="col">#}
+{#                                        <b>{{ course.descr }}</b>#}
+{#                                    </div>#}
+{#                                    <div class="col">#}
+{#                                        <button class="btn btn-primary" type="button" onclick="toggler('extra_info_{{ forloop.counter }}')">#}
+{#                                            Click here#}
+{#                                        </button>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                                <div class="card-body row">#}
+{#                                    <div class="col-sm-auto">#}
+{#                                        <p>Instructor: {{ course.instructors.0.name }}</p>#}
+{#                                    </div>#}
+{#                                    <div class="col">#}
+{#                                        <p>#}
+{#                                            Capacity: {{ course.enrollment_total }}/{{ course.class_capacity }}#}
+{#                                        </p>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                                <div class="card-body row">#}
+{#                                    <div class="col-sm-auto">#}
+{#                                        <p>{{ course.units }} Credits</p>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        {% endfor %}#}
+{#                    </div>#}
+{#                    <div class="col" id="extra_info">#}
+{#                        <div class="sticky-top" style="position: -webkit-sticky">#}
+{#                            {% for course in courses %}#}
+{#                                <div class="card container invisible" id="extra_info_{{ forloop.counter }}" >#}
+{#                                    <div class="card-header row">#}
+{#                                        <div class="col-sm-auto">#}
+{#                                            <p>{{ course.subject }} {{ course.catalog_nbr }}</p>#}
+{#                                            <p>{{ forloop.counter }}</p>#}
+{#                                        </div>#}
+{#                                        <div class="col">#}
+{#                                            <b>{{ course.descr }}</b>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                    <div class="card-body row">#}
+{#                                        <div class="col-sm-auto">#}
+{#                                            <p>Location: {{ course.location_descr }}</p>#}
+{#                                        </div>#}
+{#                                        <div class="col-sm-auto">#}
+{#                                            <p>Instruction: {{ course.instruction_mode_descr }}</p>#}
+{#                                        </div>#}
+{#                                         <div class="col">#}
+{#                                            Days:#}
+{#                                        </div>#}
+{#                                        {% for days in course.meetings %}#}
+{#                                            <div class="col">#}
+{#                                                {{ days.days }} @ {{ days.facility_descr }}#}
+{#                                            </div>#}
+{#                                        {% endfor %}#}
+{#                                    </div>#}
+{#                                    <div class="card-body row align-items-stretch">#}
+{#                                       #}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            {% endfor %}#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        {% endif %}#}
     {% endblock %}
 </div>
 </body>
