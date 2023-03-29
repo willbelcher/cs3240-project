@@ -167,8 +167,8 @@ def add_course(request):
         # Validate input
         if not term:
             messages.error(request, 'Term is required.')
-        elif not class_nbr:
-            messages.error(request, 'Class Number is required.')
+        #elif not class_nbr:
+            #messages.error(request, 'Class Number is required.')
         else:
             # Build the SIS API URL
             url = f'https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term={term}&class_nbr={class_nbr}'
@@ -198,7 +198,7 @@ def add_course(request):
             else:
                 messages.error(request, 'Failed to fetch course data.')
 
-    return render(request, 'schedule/add_course_form.html')
+    return render(request, 'schedule/course_search.html')
 
 # View for View Cart Page
 @login_required
