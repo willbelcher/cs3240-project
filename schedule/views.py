@@ -176,8 +176,8 @@ def add_course(request):
                 # Extract course information
                 subject = course_data['subject']
                 catalog_nbr = course_data['catalog_nbr']
-                title = course_data['title']
-                instructor_name = course_data['instructor_name']
+                title = course_data['descr']
+                instructor_name = course_data['instructors'][0]['name']
 
                 # Save the course to the user's cart
                 cart, _ = Cart.objects.get_or_create(user=request.user)
@@ -195,7 +195,8 @@ def add_course(request):
 @login_required
 def view_cart(request):
     # Get the user's cart
-    cart = Cart.objects.get(user=request.user)
+    #if the cart is created instead of get, the function returns a tuple so need to accomadate for that
+    cart, created = Cart.objects.get_or_create(user=request.user)
 
     # Get the courses associated with the cart
     courses = Course.objects.filter(cart=cart)
