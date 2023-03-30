@@ -160,6 +160,7 @@ def send_request(year, num_term, subject, instructor, url):
 # View to Add Course to Cart
 @login_required
 def add_course(request):
+    subjects = get_subjects()
     if request.method == 'POST':
         term = request.POST.get('term', '').strip()
         class_nbr = request.POST.get('class_nbr', '').strip()
@@ -198,7 +199,10 @@ def add_course(request):
             else:
                 messages.error(request, 'Failed to fetch course data.')
 
-    return render(request, 'schedule/course_search.html')
+   #resest all the filters so the website doesn't break on a following course search
+    days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
+    fields = {'start_time' : "00:00", 'end_time':"23:59"}
+    return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields':fields, 'days':days})
 
 # View for View Cart Page
 @login_required
