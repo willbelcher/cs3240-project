@@ -18,7 +18,6 @@
     <script>
         function toggler(divId) {
             console.log(divId);
-            {#$("#" + divId).toggle();#}
             if($("#"+divId).hasClass('invisible')){
                 $("#" + divId).removeClass('invisible').addClass('visible');
                 $("#" + divId + "_button").html("Less Info")
