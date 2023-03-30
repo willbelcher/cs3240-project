@@ -184,6 +184,10 @@
                             <div class="container">
                                 <form method="post" action="{% url 'add_course' %}">
                                   {% csrf_token %}
+                                    <input class="collapse" type="text" name="term" id="term
+"                                       value={{ course.strm }}>
+                                    <input class="collapse" type="text" name="class_nbr" id="class_nbr"
+                                        value={{ course.class_nbr }}>
                                   <button type="submit" class="btn btn-primary">Add Course</button>
                                 </form>
                             </div>
