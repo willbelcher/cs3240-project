@@ -157,6 +157,17 @@ def send_request(year, num_term, subject, instructor, url):
 
     return requests.get(url).json()
 
+def get_subjects():
+    raw_subjects = requests.get(
+        "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228").json()
+
+    for subject_info in raw_subjects["subjects"]:
+        subjects.append(subject_info["subject"])
+
+    subjects.sort()
+
+    return subjects
+
 # View to Add Course to Cart
 @login_required
 def add_course(request):
