@@ -26,7 +26,6 @@ def home(request):
 
     return render(request, 'schedule/home.html', {'role': role, 'username': username})
 
-# Logouts user and redirects them to the home page
 
 def submissions(request):
     user = request.user
@@ -39,7 +38,7 @@ def schedules(request):
     if not user.has_perm('global_permissions.is_advisor'):
         return render(request, 'schedule/schedule_creation.html')
 
-
+# Logouts user and redirects them to the home page
 def logout_view(request):
     logout(request)
     return redirect('home')
@@ -56,7 +55,7 @@ def course_search_view(request):
     courses = []
 
     #default field values
-    fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'only_open': False, 'start_time': '00:00', 'end_time': '23:59'}
+    fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'course_name': '', 'course_nmbr': '', 'only_open': False, 'start_time': '00:00', 'end_time': '23:59'}
     days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
 
     #Initialize empty sets to store instructors
@@ -78,6 +77,9 @@ def course_search_view(request):
         term = fields.get('term')
         subject = fields.get('subject')
         instructor = fields.get('instructor')
+        course_name = fields.get('course_name')
+        course_nmbr = fields.get('course_nmbr')
+        catalog_nbr = fields.get('catalog_nbr')
         only_open = bool(fields.get('only_open'))
         start_time = fields.get('start_time')
         end_time = fields.get('end_time')
@@ -103,6 +105,12 @@ def course_search_view(request):
             search_url += field_pattern.format("subject", subject)
         if instructor:
             search_url += field_pattern.format("instructor_name", instructor)
+        if course_name:
+            search_url += field_pattern.format("keyword", course_name)
+        if course_nmbr:
+            search_url += field_pattern.format("class_nbr", course_nmbr)
+        if catalog_nbr:
+            search_url += field_pattern.format("catalog_nbr", catalog_nbr)
         if only_open:
             search_url += field_pattern.format("enrl_stat", 'O')
         
@@ -138,7 +146,7 @@ def course_search_view(request):
         #             )
         # print(instructors)
 
-
+        print(search_url)
         courses = requests.get(search_url).json()
     return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields, 'subjects': subjects, 'days': days})
 
