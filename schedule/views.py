@@ -30,9 +30,35 @@ def home(request):
 
 # View for Submitted Schedules Page (Advisor)
 def submissions(request):
+    # # Get the user's cart
+    #     #if the cart is created instead of get, the function returns a tuple so need to accomadate for that
+    #     cart, created = Cart.objects.get_or_create(user=request.user)
+    #
+    #     # Get the courses associated with the cart
+    #     courses = Course.objects.filter(cart=cart)
+    #
+    #     # Render the view_cart template with the courses
+    #     context = {'courses': courses}
+    #     return render(request, 'schedule/view_cart.html', context)
     user = request.user
     if user.has_perm('global_permissions.is_advisor'):
-        return render(request, 'schedule/schedule_submissions.html')
+        count = 0
+        schedules = Schedule.objects.filter(submitted = True).values()
+        context = {'schedules':[]}
+        for schedule in schedules:
+            users = User.objects.get(pk=schedule['user_id'])
+            context['schedules'].append({'user': users, 'courses':[]})
+            items = ScheduleItem.objects.filter(schedule = schedule['id']).values()
+            for item in items:
+                    course = Course.objects.get(pk=item['course_id'])
+                    context['schedules'][count]['courses'].append(course)
+                    print(course)
+                    print(course.title)
+            count = count + 1
+            print(schedule)
+        print("context: \n", context)
+
+        return render(request, 'schedule/schedule_submissions.html', context)
 
 # Logouts user and redirects them to the home page
 def logout_view(request):
@@ -264,7 +290,7 @@ def submit_schedule(request):
     schedule = get_object_or_404(Schedule, user=request.user)
 
     # Replace "advisor_username" with the username of the student's advisor username
-    advisor = get_object_or_404(User, username="advisor_username")
+    advisor = get_object_or_404(User, username="devang6")
     schedule.advisor = advisor
     schedule.submitted = True
     schedule.save()
