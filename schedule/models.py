@@ -35,7 +35,7 @@ class Schedule(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     advisor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='schedules_advised')
     submitted = models.BooleanField(default=False)
-
+    approved = models.BooleanField(default=False)
 
 class ScheduleItem(models.Model):
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
