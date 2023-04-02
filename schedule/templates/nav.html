@@ -31,6 +31,10 @@
                     <a href="{% url 'course_search' %}">Course Search</a>
                 </div>
 
+                <div class="item">
+                    <a href="{% url 'view_cart' %}">View Cart</a>
+                </div>
+
                 <!-- Check Submissions (of schedule submission) Link -->
                 <!-- Only available to users with Advisor Status -->
                 {% if perms.global_permissions.is_advisor %}
@@ -42,7 +46,7 @@
                 <!-- Only available to users with Student Status -->
                 {% else %}
                 <div class="item">
-                    <a href="{% url 'schedules' %}">Schedule Builder</a>
+                    <a href="{% url 'view_schedule' %}">View Schedule</a>
                 </div>
 
                 <!-- Logout Link-->

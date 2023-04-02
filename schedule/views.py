@@ -1,12 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.contrib import messages
+from .models import Cart, Course, Schedule, ScheduleItem, User
 
 
 import requests
 
-# Create your views here.
 
+# View for Home Page
 @login_required
 def home(request):
     # Checks to make sure that the user is logged in to assign the correct name
@@ -26,17 +28,35 @@ def home(request):
 
     return render(request, 'schedule/home.html', {'role': role, 'username': username})
 
-
+# View for Submitted Schedules Page (Advisor)
 def submissions(request):
+    # # Get the user's cart
+    #     #if the cart is created instead of get, the function returns a tuple so need to accomadate for that
+    #     cart, created = Cart.objects.get_or_create(user=request.user)
+    #
+    #     # Get the courses associated with the cart
+    #     courses = Course.objects.filter(cart=cart)
+    #
+    #     # Render the view_cart template with the courses
+    #     context = {'courses': courses}
+    #     return render(request, 'schedule/view_cart.html', context)
     user = request.user
     if user.has_perm('global_permissions.is_advisor'):
-        return render(request, 'schedule/schedule_submissions.html')
+        count = 0
+        schedules = Schedule.objects.filter(submitted = True).values()
+        context = {'schedules':[]}
 
+        for schedule in schedules:
+            users = User.objects.get(pk=schedule['user_id'])
+            items = ScheduleItem.objects.filter(schedule=schedule['id']).values()
 
-def schedules(request):
-    user = request.user
-    if not user.has_perm('global_permissions.is_advisor'):
-        return render(request, 'schedule/schedule_creation.html')
+            context['schedules'].append({'user': users, 'courses':[]})
+            for item in items:
+                    course = Course.objects.get(pk=item['course_id'])
+                    context['schedules'][count]['courses'].append(course)
+            count = count + 1
+
+        return render(request, 'schedule/schedule_submissions.html', context)
 
 # Logouts user and redirects them to the home page
 def logout_view(request):
@@ -160,3 +180,117 @@ def send_request(year, num_term, subject, instructor, url):
         url += field_pattern.format("instructor_name", instructor)
 
     return requests.get(url).json()
+
+def get_subjects():
+    raw_subjects = requests.get(
+        "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228").json()
+
+    for subject_info in raw_subjects["subjects"]:
+        subjects.append(subject_info["subject"])
+
+    subjects.sort()
+
+    return subjects
+
+# View to Add Course to Cart
+@login_required
+def add_course(request):
+    subjects = get_subjects()
+    if request.method == 'POST':
+        term = request.POST.get('term', '').strip()
+        class_nbr = request.POST.get('class_nbr', '').strip()
+
+        # Validate input
+        if not term:
+            messages.error(request, 'Term is required.')
+        #elif not class_nbr:
+            #messages.error(request, 'Class Number is required.')
+        else:
+            # Build the SIS API URL
+            url = f'https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term={term}&class_nbr={class_nbr}'
+
+            # Make the request to the SIS API
+            response = requests.get(url)
+
+            if response.status_code == 200:
+
+                # Parse the JSON response
+                json_data = response.json()
+                course_data = json_data[0]  # Assuming the course data is in the first element of the list
+
+                # Extract course information
+                subject = course_data['subject']
+                catalog_nbr = course_data['catalog_nbr']
+                title = course_data['descr']
+                instructor_name = course_data['instructors'][0]['name']
+
+                # Save the course to the user's cart
+                cart, _ = Cart.objects.get_or_create(user=request.user)
+                course = Course(cart=cart, class_nbr=class_nbr, subject=subject, catalog_nbr=catalog_nbr, title=title, instructor_name=instructor_name)
+                course.save()
+
+                messages.success(request, 'Course added successfully!')
+                return redirect('add_course_success_url')
+            else:
+                messages.error(request, 'Failed to fetch course data.')
+
+   #resest all the filters so the website doesn't break on a following course search
+    days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
+    fields = {'start_time' : "00:00", 'end_time':"23:59"}
+    return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields':fields, 'days':days})
+
+# View for View Cart Page
+@login_required
+def view_cart(request):
+    # Get the user's cart
+    #if the cart is created instead of get, the function returns a tuple so need to accomadate for that
+    cart, created = Cart.objects.get_or_create(user=request.user)
+
+    # Get the courses associated with the cart
+    courses = Course.objects.filter(cart=cart)
+
+    # Render the view_cart template with the courses
+    context = {'courses': courses}
+    return render(request, 'schedule/view_cart.html', context)
+
+# Removes a course from the user's cart
+@login_required
+def remove_course(request, course_id):
+    course = get_object_or_404(Course, id=course_id, cart__user=request.user)
+    course.delete()
+    messages.success(request, 'Course removed from cart.')
+    return redirect('view_cart')
+
+# Adds a course to the user's schedule from their cart
+@login_required
+def add_to_schedule(request, course_id):
+    course = get_object_or_404(Course, id=course_id, cart__user=request.user)
+    schedule, _ = Schedule.objects.get_or_create(user=request.user)
+    schedule_item = ScheduleItem(schedule=schedule, course=course)
+    schedule_item.save()
+    messages.success(request, 'Course added to schedule.')
+    return redirect('view_cart')
+
+# View for View Schedule Page
+@login_required
+def view_schedule(request):
+    schedule = get_object_or_404(Schedule, user=request.user)
+    schedule_items = ScheduleItem.objects.filter(schedule=schedule)
+    context = {
+        'schedule': schedule,
+        'schedule_items': schedule_items,
+    }
+    return render(request, 'schedule/view_schedule.html', context)
+
+# Submits schedule to advisor
+@login_required
+def submit_schedule(request):
+    schedule = get_object_or_404(Schedule, user=request.user)
+
+    # Replace "advisor_username" with the username of the student's advisor username
+    advisor = get_object_or_404(User, username="devang6")
+    schedule.advisor = advisor
+    schedule.submitted = True
+    schedule.save()
+    messages.success(request, 'Schedule submitted to advisor.')
+    return redirect('view_schedule')

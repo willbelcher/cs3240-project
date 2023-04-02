@@ -12,5 +12,14 @@
     <h1>Submission Page</h1>
     <br>
     <p>This will be where advisors can see student-submitted schedule and see if they want to approve or deny these schedules</p>
+    {% if schedules %}
+        {% for schedule in schedules %}
+            <p>Schedule for {{ schedule.user }}</p>
+
+            {% for course in schedule.courses %}
+                <p>{{ course.subject }} {{ course.title }}</p>
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
 </body>
 </html>

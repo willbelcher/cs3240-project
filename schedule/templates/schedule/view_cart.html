@@ -1,0 +1,58 @@
+{% include "nav.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Cart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/schedule.css' %}">
+</head>
+<body>
+    {% block content %}
+    <div class="container">
+    <h2>Your Cart</h2>
+        {% if courses %}
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Class Number</th>
+                <th>Subject</th>
+                <th>Catalog Number</th>
+                <th>Instructor Name</th>
+                <th>Title</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for course in courses %}
+                <tr>
+                <td>{{ course.class_nbr }}</td>
+                <td>{{ course.subject }}</td>
+                <td>{{ course.catalog_nbr }}</td>
+                <td>{{ course.instructor_name }}</td>
+                <td>{{ course.title }}</td>
+                <td>
+                    <form method="POST" action="{% url 'remove_course' course.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Remove</button>
+                    </form>
+                    </td>
+                </tr>
+                <td>
+                    <form method="POST" action="{% url 'add_to_schedule' course.id %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-primary">Add to Schedule</button>
+                    </form>
+                  </td>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p>Your cart is empty. <a href="{% url 'add_course' %}">Add a course</a>.</p>
+        {% endif %}
+    </div>
+    {% endblock %}
+</body>
+</html>
