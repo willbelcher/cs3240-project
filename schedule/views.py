@@ -202,9 +202,9 @@ def add_course(request):
 
         # Validate input
         if not term:
-            messages.error(request, 'Term is required.')
-        #elif not class_nbr:
-            #messages.error(request, 'Class Number is required.')
+            messages.error(request, 'Term is required. we got', term)
+        elif not class_nbr:
+            messages.error(request, 'Class Number is required.')
         else:
             # Build the SIS API URL
             url = f'https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term={term}&class_nbr={class_nbr}'
@@ -243,8 +243,8 @@ def add_course(request):
 @login_required
 def view_cart(request):
     # Get the user's cart
-    #if the cart is created instead of get, the function returns a tuple so need to accomadate for that
-    cart, created = Cart.objects.get_or_create(user=request.user)
+    #if the cart is created instead of get, the function returns a tuple so need to accommodate for that
+    cart, _ = Cart.objects.get_or_create(user=request.user)
 
     # Get the courses associated with the cart
     courses = Course.objects.filter(cart=cart)
@@ -252,7 +252,6 @@ def view_cart(request):
     # Render the view_cart template with the courses
     context = {'courses': courses}
     return render(request, 'schedule/view_cart.html', context)
-
 # Removes a course from the user's cart
 @login_required
 def remove_course(request, course_id):
