@@ -32,7 +32,7 @@
 <body>
 <div>
     {% block content %}
-        <form class="container align-items-start justify-content-start" action="{% url 'course_search' %}"
+        <form class="container align-items-start justify-content-start" action="{% url 'schedule:course_search' %}"
               method="post">
             {% csrf_token %}
             <div class="row" id="form_div">
@@ -186,7 +186,7 @@
                             </div>
 
                             <div class="container">
-                                <form method="post" action="{% url 'add_course' %}">
+                                <form method="post" action="{% url 'schedule:add_course' %}">
                                   {% csrf_token %}
                                     <input class="collapse" type="text" name="term" id="term
 "                                       value={{ course.strm }}>
