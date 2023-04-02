@@ -13,13 +13,35 @@
     <br>
     <p>This will be where advisors can see student-submitted schedule and see if they want to approve or deny these schedules</p>
     {% if schedules %}
-        {% for schedule in schedules %}
-            <p>Schedule for {{ schedule.user }}</p>
-
-            {% for course in schedule.courses %}
-                <p>{{ course.subject }} {{ course.title }}</p>
+        <table class="table">
+            {% for schedule in schedules %}
+                <tr>
+                    <td>
+                        <p>Schedule for {{ schedule.user }}</p>
+                        {% for course in schedule.courses %}
+                            <p>{{ course.subject }} {{ course.title }}</p>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% if schedule.id %}
+                        
+                            <form method="POST" action="{% url 'schedule:approve_schedule' schedule.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success">Approve</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if schedule.id %}
+                            <form method="POST" action="{% url 'schedule:deny_schedule' schedule.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Deny</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
             {% endfor %}
-        {% endfor %}
+        </table>
     {% endif %}
 </body>
 </html>
