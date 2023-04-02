@@ -3,7 +3,7 @@ from django.http.response import Http404
 from django.test import TestCase, RequestFactory
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.messages.storage.fallback import FallbackStorage
-from schedule.views import send_request, add_course, remove_course, add_to_schedule
+from schedule.views import send_request, add_course, remove_course, add_to_schedule, view_schedule
 from schedule.models import Course, Schedule, ScheduleItem, User
 
 # Create your tests here.
@@ -96,7 +96,7 @@ class TestCourseSearch(TestCase):
 
         self.assertEqual(0, Course.objects.all().count())
 
-    def test_add_schedule_equivalence(self):
+    def test_add_to_schedule_equivalence(self):
         factory = RequestFactory()
         user = User.objects.create_superuser(username='foo', is_superuser=True)
         course_id = addDummyCourse(factory, user)
@@ -114,7 +114,7 @@ class TestCourseSearch(TestCase):
     def test_add_to_schedule_error(self):
         factory = RequestFactory()
         user = User.objects.create_superuser(username='foo', is_superuser=True)
-        course_id = addDummyCourse(factory, user)
+        addDummyCourse(factory, user)
         self.assertEqual(1, Course.objects.all().count())
 
         request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
@@ -126,3 +126,21 @@ class TestCourseSearch(TestCase):
         self.assertEqual(0, Schedule.objects.all().count())
         self.assertEqual(0, ScheduleItem.objects.all().count())
 
+    def test_view_schedule(self):
+        factory = RequestFactory()
+        user = User.objects.create_superuser(username='foo', is_superuser=True)
+        course_id = addDummyCourse(factory, user)
+
+        request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
+        setupRequest(request, user)
+
+        add_to_schedule(request, course_id)
+
+        self.assertEqual(1, Schedule.objects.all().count())
+        self.assertEqual(1, ScheduleItem.objects.all().count())
+
+        request = factory.get("/schedule/view_schedule/")
+        setupRequest(request, user)
+        response = view_schedule(request)
+
+        self.assertEqual(response.status_code, 200)
