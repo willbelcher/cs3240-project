@@ -17,7 +17,7 @@ class TestLoginAuthentication(TestCase):
         self.assertTrue(permission)
 
     def test_student_login(self):
-        user = User.objects.create(username='foo')
+        user = User.objects.create_user(username='foo')
         factory = RequestFactory()
 
         request = factory.delete('/')
