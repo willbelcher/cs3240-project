@@ -19,7 +19,7 @@
                     <td>
                         <p>Schedule for {{ schedule.user }}</p>
                         {% for course in schedule.courses %}
-                            <p>{{ course.subject }} {{ course.title }}</p>
+                            <p>{{ course.title }}</p>
                         {% endfor %}
                     </td>
                     <td>
@@ -42,6 +42,8 @@
                 </tr>
             {% endfor %}
         </table>
+    {% else %}
+        <p>No schedules have been submitted yet.</p>
     {% endif %}
 </body>
 </html>

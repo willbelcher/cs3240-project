@@ -29,22 +29,29 @@ def home(request):
 
 # View for Submitted Schedules Page (Advisor)
 def submissions(request):
-    # # Get the user's cart
-    #     #if the cart is created instead of get, the function returns a tuple so need to accomadate for that
-    #     cart, created = Cart.objects.get_or_create(user=request.user)
-    #
-    #     # Get the courses associated with the cart
-    #     courses = Course.objects.filter(cart=cart)
-    #
-    #     # Render the view_cart template with the courses
-    #     context = {'courses': courses}
-    #     return render(request, 'schedule/view_cart.html', context)
     user = request.user
     if user.has_perm('global_permissions.is_advisor'):
+        count = 0
+        schedules = Schedule.objects.filter(submitted = True).values()
+        context = {'schedules': []}
+
+        for schedule in schedules:
+            users = User.objects.get(pk=schedule['user_id'])
+            items = ScheduleItem.objects.filter(schedule=schedule['id']).values()
+
+            context['schedules'].append({'user': users, 'courses':[]})
+            for item in items:
+                    course = Course.objects.get(pk=item['course_id'])
+                    context['schedules'][count]['courses'].append(course)
+            count = count + 1
         schedules = Schedule.objects.filter(submitted=True)
-        return render(request, 'schedule/schedule_submissions.html', {'schedules': schedules})
+        context.update({'schedules': schedules})
+
+        return render(request, 'schedule/schedule_submissions.html', context)
     else:
+
         return HttpResponse("You are not authorized to view this page.")
+    
 
 # Logouts user and redirects them to the home page
 def logout_view(request):
@@ -280,7 +287,7 @@ def submit_schedule(request):
     schedule = get_object_or_404(Schedule, user=request.user)
 
     # Replace "advisor_username" with the username of the student's advisor username
-    advisor = get_object_or_404(User, username="devang6")
+    advisor = get_object_or_404(User, username="glendonchin")
     schedule.advisor = advisor
     schedule.submitted = True
     schedule.save()
@@ -291,22 +298,31 @@ def submit_schedule(request):
 from django.contrib.auth.decorators import user_passes_test
 
 # Helper function to check if a user is an advisor
-def is_advisor(request, user):
-    user = request.user
-    if user.has_perm('global_permissions.is_advisor'):
-        return True
-    return False
+def is_advisor(user):
+    is_advisor = user.groups.filter(name='glendonchin').exists()
+    print(f"User {user.username} is advisor: {is_advisor}")
+    return user.groups.filter(name='glendonchin').exists()
 
+@login_required
 @user_passes_test(is_advisor)
 def approve_schedule(request, schedule_id):
-    schedule = get_object_or_404(Schedule, pk=schedule_id)
-    schedule.approved = True
+    schedule = get_object_or_404(Schedule, id=schedule_id)
+    schedule.status = 'approved'
     schedule.save()
-    return redirect('schedule:advisor_view_schedules')
+    # Redirect to the submissions page
+    return redirect('schedule:submissions')
 
+@login_required
 @user_passes_test(is_advisor)
 def deny_schedule(request, schedule_id):
-    schedule = get_object_or_404(Schedule, pk=schedule_id)
-    schedule.approved = False
-    schedule.save()
-    return redirect('advisor_view_schedules')
+    schedule = get_object_or_404(Schedule, id=schedule_id)
+    if request.method == 'POST':
+        comments = request.POST.get('comments')
+        schedule.status = 'denied'
+        schedule.comments = comments
+        schedule.save()
+        # Redirect to the submissions page
+        return redirect('schedule:submissions')
+    else:
+        # Render the deny schedule form
+        return render(request, 'deny_schedule.html', {'schedule': schedule})
