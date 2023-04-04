@@ -199,6 +199,14 @@ def add_course(request):
 
                 # Save the course to the user's cart
                 cart, _ = Cart.objects.get_or_create(user=request.user)
+
+                courses_in_cart = Course.objects.filter(cart=cart)
+                if courses_in_cart:
+                    for cart_course in courses_in_cart:
+                        if cart_course.subject == subject and cart_course.catalog_nbr == catalog_nbr:
+                            messages.error(request, "Can not add identical course to Cart")
+                            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days})
+
                 course = Course(cart=cart, class_nbr=class_nbr, subject=subject, catalog_nbr=catalog_nbr, title=title, instructor_name=instructor_name)
                 course.save()
 
