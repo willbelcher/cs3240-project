@@ -77,13 +77,7 @@ def course_search_view(request):
     instructors = set()
 
     if len(subjects) == 0: # If mnemonics not retrieved
-        # TODO get different mnemonics if term is changed
-        raw_subjects = requests.get("https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228").json()
-
-        for subject_info in raw_subjects["subjects"]:
-            subjects.append(subject_info["subject"])
-
-        subjects.sort()
+        get_subjects()
 
     if request.method == "POST": # if search has been run
         fields = request.POST # save search fields
@@ -147,21 +141,6 @@ def course_search_view(request):
             formatted_range = "{}.{},{}.{}".format(start_h, start_m, end_h, end_m)
             search_url += field_pattern.format("time_range", formatted_range)
 
-        #Store data in JSON
-        # rawData = send_request(year, num_term, subject, instructor, base_url)
-        # rawData = requests.get(search_url).json()
-        # print(rawData)
-
-        #Iterate through JSON
-        # for course in rawData:
-        #     #Add instructor name
-        #     if "instructors" in course:
-        #         instructors.update(
-        #             [x["name"] for x in course["instructors"]]
-        #             )
-        # print(instructors)
-
-        print(search_url)
         courses = requests.get(search_url).json()
     return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields, 'subjects': subjects, 'days': days})
 
@@ -185,24 +164,21 @@ def get_subjects():
 
     subjects.sort()
 
-    return subjects
-
 def add_course_success(request):
     pass
 
 # View to Add Course to Cart
 @login_required
 def add_course(request):
-    subjects = get_subjects()
     if request.method == 'POST':
         term = request.POST.get('term', '').strip()
         class_nbr = request.POST.get('class_nbr', '').strip()
 
         # Validate input
         if not term:
-            messages.error(request, 'Term is required.')
-        #elif not class_nbr:
-            #messages.error(request, 'Class Number is required.')
+            messages.error(request, 'Term is required. we got', term)
+        elif not class_nbr:
+            messages.error(request, 'Class Number is required.')
         else:
             # Build the SIS API URL
             url = f'https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term={term}&class_nbr={class_nbr}'
@@ -242,8 +218,8 @@ def add_course(request):
 @login_required
 def view_cart(request):
     # Get the user's cart
-    #if the cart is created instead of get, the function returns a tuple so need to accomadate for that
-    cart, created = Cart.objects.get_or_create(user=request.user)
+    #if the cart is created instead of get, the function returns a tuple so need to accommodate for that
+    cart, _ = Cart.objects.get_or_create(user=request.user)
 
     # Get the courses associated with the cart
     courses = Course.objects.filter(cart=cart)
@@ -251,7 +227,6 @@ def view_cart(request):
     # Render the view_cart template with the courses
     context = {'courses': courses}
     return render(request, 'schedule/view_cart.html', context)
-
 # Removes a course from the user's cart
 @login_required
 def remove_course(request, course_id):
