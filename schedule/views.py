@@ -77,7 +77,13 @@ def course_search_view(request):
     instructors = set()
 
     if len(subjects) == 0: # If mnemonics not retrieved
-        get_subjects()
+        raw_subjects = requests.get(
+            "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228").json()
+
+        for subject_info in raw_subjects["subjects"]:
+            subjects.append(subject_info["subject"])
+
+        subjects.sort()
 
     if request.method == "POST": # if search has been run
         fields = request.POST # save search fields
@@ -154,15 +160,6 @@ def send_request(year, num_term, subject, instructor, url):
         url += field_pattern.format("instructor_name", instructor)
 
     return requests.get(url).json()
-
-def get_subjects():
-    raw_subjects = requests.get(
-        "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228").json()
-
-    for subject_info in raw_subjects["subjects"]:
-        subjects.append(subject_info["subject"])
-
-    subjects.sort()
 
 def add_course_success(request):
     pass
