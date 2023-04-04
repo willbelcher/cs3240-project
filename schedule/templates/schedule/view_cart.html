@@ -34,14 +34,14 @@
                 <td>{{ course.instructor_name }}</td>
                 <td>{{ course.title }}</td>
                 <td>
-                    <form method="POST" action="{% url 'remove_course' course.id %}">
+                    <form method="POST" action="{% url 'schedule:remove_course' course.id %}">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-danger">Remove</button>
                     </form>
                     </td>
                 </tr>
                 <td>
-                    <form method="POST" action="{% url 'add_to_schedule' course.id %}">
+                    <form method="POST" action="{% url 'schedule:add_to_schedule' course.id %}">
                       {% csrf_token %}
                       <button type="submit" class="btn btn-primary">Add to Schedule</button>
                     </form>
@@ -50,7 +50,7 @@
             </tbody>
         </table>
         {% else %}
-            <p>Your cart is empty. <a href="{% url 'add_course' %}">Add a course</a>.</p>
+            <p>Your cart is empty. <a href="{% url 'schedule:add_course' %}">Add a course</a>.</p>
         {% endif %}
     </div>
     {% endblock %}

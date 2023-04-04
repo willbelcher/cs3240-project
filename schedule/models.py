@@ -35,7 +35,14 @@ class Schedule(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     advisor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='schedules_advised')
     submitted = models.BooleanField(default=False)
-
+    approved = models.BooleanField(default=False)
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('denied', 'Denied'),
+    ]
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    comments = models.TextField(blank=True, null=True)
 
 class ScheduleItem(models.Model):
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)

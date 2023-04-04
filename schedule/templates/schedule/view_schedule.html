@@ -38,11 +38,11 @@
             </tbody>
         </table>
         {% else %}
-            <p>Your schedule is empty. <a href="{% url 'view_cart' %}">Add a course from the cart</a>.</p>
+            <p>Your schedule is empty. <a href="{% url 'schedule:view_cart' %}">Add a course from the cart</a>.</p>
         {% endif %}
 
         {% if not schedule.submitted %}
-        <form method="POST" action="{% url 'submit_schedule' %}">
+        <form method="POST" action="{% url 'schedule:submit_schedule' %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary">Submit to Advisor</button>
         </form>
