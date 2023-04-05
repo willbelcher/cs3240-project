@@ -10,6 +10,8 @@ from django.http import HttpResponse
 # View for Home Page
 @login_required
 def home(request):
+    color_dict = {"pending": "yellow", "approved": "green", "denied": "red"}
+
     # Checks to make sure that the user is logged in to assign the correct name
     if request.user.is_authenticated:
         user = request.user
@@ -25,7 +27,16 @@ def home(request):
     else:
         role = "Student"
 
-    return render(request, 'schedule/home.html', {'role': role, 'username': username})
+    schedules = Schedule.objects.filter(user=request.user).values()
+    has_schedule = len(schedules) != 0
+
+    stat = None
+    color = None
+    if has_schedule:
+        stat = schedules[0]['status']
+        color = color_dict[stat]
+
+    return render(request, 'schedule/home.html', {'role': role, 'username': username, 'has_schedule': has_schedule, 'schedule_status': stat, 'status_color': color})
 
 # View for Submitted Schedules Page (Advisor)
 def submissions(request):

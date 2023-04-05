@@ -149,3 +149,10 @@ header .item-button a:hover{
 .dropdown-menu {
     --bs-dropdown-min-width: 0;
 }
+
+.status {
+    display: inline-block;
+    width: fit-content;
+    color: #fff;
+    background-color: #102447;
+}
