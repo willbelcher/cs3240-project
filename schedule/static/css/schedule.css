@@ -150,6 +150,10 @@ header .item-button a:hover{
     --bs-dropdown-min-width: 0;
 }
 
+.animated-div {
+    animation: fadeIn 5s ease-in-out;
+}
+
 .status {
     display: inline-block;
     width: fit-content;

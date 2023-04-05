@@ -30,13 +30,12 @@ def home(request):
     schedules = Schedule.objects.filter(user=request.user).values()
     has_schedule = len(schedules) != 0
 
-    stat = None
-    color = None
+    schedule = {"exists": has_schedule, "color": None, "status": None}
     if has_schedule:
-        stat = schedules[0]['status']
-        color = color_dict[stat]
+        schedule['status'] = schedules[0]['status']
+        schedule['color'] = color_dict[schedule['status']]
 
-    return render(request, 'schedule/home.html', {'role': role, 'username': username, 'has_schedule': has_schedule, 'schedule_status': stat, 'status_color': color})
+    return render(request, 'schedule/home.html', {'role': role, 'username': username, 'schedule': schedule})
 
 # View for Submitted Schedules Page (Advisor)
 def submissions(request):

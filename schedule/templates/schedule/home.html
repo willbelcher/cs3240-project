@@ -12,10 +12,10 @@
             <p class="animated-text">Welcome to Plan-it Pal {{username}}</p>
             <p class="animated-text">Your current status is {{role}}</p>
             {% block content %}
-            {% if has_schedule %}
-            <div class="container card status">
+            {% if schedule.exists %}
+            <div class="container card status animated-div">
                 <b>Your schedule is: </b>
-                <b style="color:{{status_color}}">{{schedule_status}}</b>
+                <b style="color:{{schedule.color}}">{{schedule.status}}</b>
             </div>
             {% endif %}
             {% endblock %}
