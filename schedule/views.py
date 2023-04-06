@@ -70,7 +70,7 @@ def logout_view(request):
 
 # Provides user with filters to search for course by year, term, department, and instructor name
 subjects = [] # save subjects between searches
-day_map = {'Mo': 'M', 'Tu': 'T', 'We': 'W', 'Th': 'R', 'Fr': 'F'}
+day_map = {'Mo': 'M', 'Tu': 'T', 'We': 'W', 'Th': 'R', 'Fr': 'F'} # Maps day to SIS api format
 
 @login_required
 def course_search_view(request):
@@ -84,7 +84,7 @@ def course_search_view(request):
     days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
     fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'course_name': '', 'course_nmbr': '', 'only_open': False, 'start_time': '00:00', 'end_time': '23:59'}
     
-    #reloads params if search has been run
+    #reloads params if search has been run previously
     if request.session.has_key('search_params'):
         fields = request.session.get('search_params')
 
