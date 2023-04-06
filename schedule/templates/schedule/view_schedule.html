@@ -49,6 +49,11 @@
         {% else %}
         <p>Your schedule has been submitted to the advisor.</p>
         {% endif %}
+
+        <th>Status</th>
+
+        <!-- Display the schedule's status -->
+        <td>{{ schedule.status }}</td>
     </div>
     {% endblock %}
 </body>
