@@ -299,16 +299,21 @@ from django.contrib.auth.decorators import user_passes_test
 
 # Helper function to check if a user is an advisor
 def is_advisor(user):
-    is_advisor = user.groups.filter(name='glendonchin').exists()
+    #is_advisor = user.groups.filter(name='glendonchin').exists()
+    if user.has_perm('global_permissions.is_advisor'):
+        is_advisor=True
     print(f"User {user.username} is advisor: {is_advisor}")
-    return user.groups.filter(name='glendonchin').exists()
+    return is_advisor
 
 @login_required
 @user_passes_test(is_advisor)
 def approve_schedule(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
+    print(f"Before approval: {schedule.status}")  # Add this line
     schedule.status = 'approved'
     schedule.save()
+    schedule.refresh_from_db()  # Add this line
+    print(f"After approval: {schedule.status}")  # Add this line
     # Redirect to the submissions page
     return redirect('schedule:submissions')
 
