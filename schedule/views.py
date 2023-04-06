@@ -70,6 +70,7 @@ def logout_view(request):
 
 # Provides user with filters to search for course by year, term, department, and instructor name
 subjects = [] # save subjects between searches
+day_map = {'Mo': 'M', 'Tu': 'T', 'We': 'W', 'Th': 'R', 'Fr': 'F'}
 
 @login_required
 def course_search_view(request):
@@ -80,17 +81,21 @@ def course_search_view(request):
     courses = []
 
     #default field values
-    fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'course_name': '', 'course_nmbr': '', 'only_open': False, 'start_time': '00:00', 'end_time': '23:59'}
     days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
+    fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'course_name': '', 'course_nmbr': '', 'only_open': False, 'start_time': '00:00', 'end_time': '23:59'}
+    
+    #reloads params if search has been run
+    if request.session.has_key('search_params'):
+        fields = request.session.get('search_params')
 
-    #Initialize empty sets to store instructors
-    instructors = set()
+        for day in days.keys():
+            days[day] = fields.get(day)
 
     if len(subjects) == 0: # If mnemonics not retrieved
         get_subjects()
 
     if request.method == "POST": # if search has been run
-        fields = request.POST # save search fields
+        fields = request.POST.dict() # save search fields
 
         year = fields.get('year')
         term = fields.get('term')
@@ -102,9 +107,12 @@ def course_search_view(request):
         only_open = bool(fields.get('only_open'))
         start_time = fields.get('start_time')
         end_time = fields.get('end_time')
+
+        fields['only_open'] = only_open
         
         for day in days.keys():
             days[day] = bool(fields.get(day))
+            fields[day] = days[day]
 
         if year == "":
             year = 2023
@@ -134,12 +142,12 @@ def course_search_view(request):
             search_url += field_pattern.format("enrl_stat", 'O')
         
         if list(days.values()).count(True) != len(days): # Filter by days checked in form
-            filter_days = ""
+            filter_days = []
             for day, checked in days.items():
                 if checked:
-                    filter_days += day
+                    filter_days.append(day_map[day])
             
-            search_url += field_pattern.format("days", filter_days)
+            search_url += field_pattern.format("days", ",".join(filter_days))
 
         if start_time != "00:00" or end_time != "23:59":
             start_h, start_m = start_time.split(":") # convert to sis time range format (ex. 2:30 -> 2.5)
@@ -151,7 +159,9 @@ def course_search_view(request):
             formatted_range = "{}.{},{}.{}".format(start_h, start_m, end_h, end_m)
             search_url += field_pattern.format("time_range", formatted_range)
 
+        request.session['search_params'] = fields
         courses = requests.get(search_url).json()
+
     return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields, 'subjects': subjects, 'days': days})
 
 #method is for testing purposes
@@ -218,10 +228,7 @@ def add_course(request):
             else:
                 messages.error(request, 'Failed to fetch course data.')
 
-   #resest all the filters so the website doesn't break on a following course search
-    days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
-    fields = {'start_time' : "00:00", 'end_time':"23:59"}
-    return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields':fields, 'days':days})
+    return redirect('schedule:course_search')
 
 
 # View for View Cart Page
