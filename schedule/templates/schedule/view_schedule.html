@@ -50,10 +50,16 @@
         <p>Your schedule has been submitted to the advisor.</p>
         {% endif %}
 
-        <th>Status</th>
-
         <!-- Display the schedule's status -->
+        <th>Status</th>
         <td>{{ schedule.status }}</td>
+
+        
+        <br>
+
+        <!-- Display comment feedback -->
+        <th>Comments</th>
+        <td>{{ schedule.comments }}</td>
     </div>
     {% endblock %}
 </body>
