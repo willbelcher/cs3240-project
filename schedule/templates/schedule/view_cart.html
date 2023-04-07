@@ -12,47 +12,47 @@
 </head>
 <body>
     {% block content %}
-    <div class="container">
-    <h2>Your Cart</h2>
-        {% if courses %}
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th>Class Number</th>
-                <th>Subject</th>
-                <th>Catalog Number</th>
-                <th>Instructor Name</th>
-                <th>Title</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for course in courses %}
+        <br>
+        <div class="container">
+        <h2>Your Cart</h2>
+            {% if courses %}
+            <table class="table table-striped">
+                <thead>
                 <tr>
-                <td>{{ course.class_nbr }}</td>
-                <td>{{ course.subject }}</td>
-                <td>{{ course.catalog_nbr }}</td>
-                <td>{{ course.instructor_name }}</td>
-                <td>{{ course.title }}</td>
-                <td>
-                    <form method="POST" action="{% url 'schedule:remove_course' course.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Remove</button>
-                    </form>
-                    </td>
+                    <th>Class Number</th>
+                    <th>Subject</th>
+                    <th>Catalog Number</th>
+                    <th>Instructor Name</th>
+                    <th>Title</th>
                 </tr>
-                <td>
-                    <form method="POST" action="{% url 'schedule:add_to_schedule' course.id %}">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-primary">Add to Schedule</button>
-                    </form>
-                  </td>
-            {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-            <p>Your cart is empty. <a href="{% url 'schedule:add_course' %}">Add a course</a>.</p>
-        {% endif %}
-    </div>
+                </thead>
+                <tbody>
+                {% for course in courses %}
+                    <tr>
+                    <td>{{ course.class_nbr }}</td>
+                    <td>{{ course.subject }}</td>
+                    <td>{{ course.catalog_nbr }}</td>
+                    <td>{{ course.instructor_name }}</td>
+                    <td>{{ course.title }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'schedule:add_to_schedule' course.id %}" class="d-inline-block mr-2">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">Add to Schedule</button>
+                        </form>
+                        <form method="POST" action="{% url 'schedule:remove_course' course.id %}" class="d-inline-block">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Remove</button>
+                        </form>
+                    </td>
+                    </tr>
+
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p>Your cart is empty. <a href="{% url 'schedule:add_course' %}">Add a course</a>.</p>
+            {% endif %}
+        </div>
     {% endblock %}
 </body>
 </html>
