@@ -168,6 +168,7 @@ header .item-button a:hover{
 .custom-add-btn {
     background-color: #274d8a; /* Replace with your desired color */
     border-color: #F84C1E; /* Replace with your desired color */
+    color: #ffffff; /* White text color */
 }
 
 .custom-add-btn:hover {
@@ -183,6 +184,7 @@ header .item-button a:hover{
 .custom-remove-btn {
     background-color: #274d8a; /* Replace with your desired color */
     border-color: #F84C1E; /* Replace with your desired color */
+    color: #ffffff; /* White text color */
 }
 
 .custom-remove-btn:hover {

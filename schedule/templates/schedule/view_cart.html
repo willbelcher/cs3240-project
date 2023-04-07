@@ -45,14 +45,15 @@
                             <!-- Add (from Cart) to Schedule Button -->
                             <form method="POST" action="{% url 'schedule:add_to_schedule' course.id %}" class="d-inline-block mr-5">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-primary add-to-schedule custom-add-btn" data-row-id="{{ course.id }}">Add to Schedule</button>
+                                <button type="submit" class="btn add-to-schedule custom-add-btn" data-row-id="{{ course.id }}">Add to Schedule</button>
                             </form>
 
                             <!-- Remove (from Cart) Button -->
                             <form method="POST" action="{% url 'schedule:remove_course' course.id %}" class="d-inline-block">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-danger remove-course custom-remove-btn custom-remove-effect" data-row-id="{{ course.id }}">Remove from Cart</button>
+                                <button type="submit" class="btn remove-course custom-remove-btn" data-row-id="{{ course.id }}">Remove from Cart</button>
                             </form>
+                            
                         </td>
                         </tr>
 
@@ -77,12 +78,10 @@
                 var $button = $(this);
                 var $form = $button.parent();
 
-                $button.removeClass("btn-primary").addClass("btn-success");
-                setTimeout(function() {
-                    $row.fadeOut(2000, function() {
-                        $row.remove();
-                    });
+                $button.addClass("custom-add-btn-clicked");
 
+                $row.fadeOut(2000, function() {
+                    $row.remove();
                     $.ajax({
                         url: $form.attr('action'),
                         method: 'POST',
@@ -91,44 +90,38 @@
                             xhr.setRequestHeader('X-CSRFToken', $form.find('input[name="csrfmiddlewaretoken"]').val());
                         },
                         success: function() {
-                            
                         },
                         error: function() {
-                            // Error case
-                            //alert("Test error");
                         }
                     });
-                }, 1000);
+                });
             });
 
             $(".remove-course").click(function(event) {
-            event.preventDefault();
-            var rowId = $(this).data("row-id");
-            var $row = $("#row_" + rowId);
-            var $form = $(this).parent("form");
+                event.preventDefault();
+                var rowId = $(this).data("row-id");
+                var $row = $("#row_" + rowId);
+                var $form = $(this).parent("form");
 
-            $row.fadeOut(2000, function() {
-                $row.remove();
-                $form.submit();
-            }).addClass("custom-remove-effect");
+                $(this).addClass("custom-remove-btn-clicked");
 
-            $.ajax({
-                url: $form.attr('action'),
-                method: 'POST',
-                data: $form.serialize(),
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-CSRFToken', $form.find('input[name="csrfmiddlewaretoken"]').val());
-                },
-                success: function() {
-                    
-                },
-                error: function() {
-                    // Error case
-                    //alert("Test error");
-                }
+                $row.fadeOut(2000, function() {
+                    $row.remove();
+                    $.ajax({
+                        url: $form.attr('action'),
+                        method: 'POST',
+                        data: $form.serialize(),
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRFToken', $form.find('input[name="csrfmiddlewaretoken"]').val());
+                        },
+                        success: function() {
+                        },
+                        error: function() {
+                        }
+                    });
+                });
             });
         });
-    });
 
     </script>
 
