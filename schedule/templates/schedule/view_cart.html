@@ -70,6 +70,8 @@
     
     <!-- Javascript to add fade out effect when selecting buttons -->
     <script>
+
+        //Turns "Add to Schedule" button green upon being clicked and then fades out the whole row
         $(document).ready(function() {
             $(".add-to-schedule").click(function(event) {
                 event.preventDefault();
@@ -97,6 +99,7 @@
                 });
             });
 
+            //Turns "Remove from Cart" button red upon being clicked and then fades out the whole row
             $(".remove-course").click(function(event) {
                 event.preventDefault();
                 var rowId = $(this).data("row-id");
