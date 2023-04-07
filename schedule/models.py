@@ -30,6 +30,11 @@ class Course(models.Model):
     instructor_name = models.CharField(max_length=50)
     title = models.CharField(max_length=200)
 
+class CourseTime(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    days = models.CharField(max_length=10)
+    starting_time = models.CharField(default='00:00',max_length=10)
+    ending_time = models.CharField(default='00:00',max_length=10)
 
 class Schedule(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

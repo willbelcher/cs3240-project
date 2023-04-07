@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
-from .models import Cart, Course, Schedule, ScheduleItem, User
+from .models import Cart, Course, Schedule, ScheduleItem, User, CourseTime
 import requests
 from django.http import HttpResponse
 
@@ -49,7 +49,6 @@ def submissions(request):
 
         return render(request, 'schedule/schedule_submissions.html', context)
     else:
-
         return HttpResponse("You are not authorized to view this page.")
     
 
@@ -98,6 +97,15 @@ def course_search_view(request):
         only_open = bool(fields.get('only_open'))
         start_time = fields.get('start_time')
         end_time = fields.get('end_time')
+
+        print("course_nmbr", course_nmbr)
+        print("catalog_nbr", catalog_nbr)
+
+        # if not course_nmbr.isnumeric():
+        #     course_nmbr = ""
+        #
+        # if not catalog_nbr.isnumeric():
+        #     catalog_nbr = ""
         
         for day in days.keys():
             days[day] = bool(fields.get(day))
@@ -115,7 +123,6 @@ def course_search_view(request):
 
         search_url = base_url
         search_url += field_pattern.format("term", "1{}{}".format(int(year)%100, num_term))
-
         if subject:
             search_url += field_pattern.format("subject", subject)
         if instructor:
@@ -147,6 +154,7 @@ def course_search_view(request):
             formatted_range = "{}.{},{}.{}".format(start_h, start_m, end_h, end_m)
             search_url += field_pattern.format("time_range", formatted_range)
 
+        print(search_url)
         courses = requests.get(search_url).json()
     return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields, 'subjects': subjects, 'days': days})
 
@@ -205,10 +213,16 @@ def add_course(request):
                     for cart_course in courses_in_cart:
                         if cart_course.subject == subject and cart_course.catalog_nbr == catalog_nbr:
                             messages.error(request, "Can not add identical course to Cart")
-                            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days})
+                            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days, 'class_messages':'Can not add identical course to Cart'})
 
                 course = Course(cart=cart, class_nbr=class_nbr, subject=subject, catalog_nbr=catalog_nbr, title=title, instructor_name=instructor_name)
                 course.save()
+
+                for json_days in course_data['meetings']:
+                    start_time = json_days['start_time'][0:5].replace(".", ":")
+                    end_time = json_days['end_time'][0:5].replace(".", ":")
+                    time = CourseTime.objects.create(course=course, days=json_days['days'], starting_time=start_time, ending_time=end_time)
+                    time.save()
 
                 messages.success(request, 'Course added successfully!')
                 return redirect('schedule:add_course_success')
