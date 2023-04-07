@@ -17,9 +17,13 @@
         <div class="container">
         <h2>Your Cart</h2>
             {% if courses %}
+
+            <!-- Displays courses added to the cart in a table -->
             <table class="table table-striped">
                 <thead>
                 <tr>
+                    
+                    <!-- Table Header Fields -->
                     <th>Class Number</th>
                     <th>Subject</th>
                     <th>Catalog Number</th>
@@ -28,52 +32,57 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for course in courses %}
-                    <tr id="row_{{ course.id }}">
-                    <td>{{ course.class_nbr }}</td>
-                    <td>{{ course.subject }}</td>
-                    <td>{{ course.catalog_nbr }}</td>
-                    <td>{{ course.instructor_name }}</td>
-                    <td>{{ course.title }}</td>
-                    <td>
-                        <form method="POST" action="{% url 'schedule:add_to_schedule' course.id %}" class="d-inline-block mr-2">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary" data-row-id="{{ course.id }}">Add to Schedule</button>
-                        </form>
+                    <!-- Course Data corresponding to Table Header Fields-->
+                    {% for course in courses %}
+                        <tr id="row_{{ course.id }}">
+                        <td>{{ course.class_nbr }}</td>
+                        <td>{{ course.subject }}</td>
+                        <td>{{ course.catalog_nbr }}</td>
+                        <td>{{ course.instructor_name }}</td>
+                        <td>{{ course.title }}</td>
+                        <td>
 
-                        
-                        <form method="POST" action="{% url 'schedule:remove_course' course.id %}" class="d-inline-block">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">Remove</button>
-                        </form>
-                    </td>
-                    </tr>
+                            <!-- Add (from Cart) to Schedule Button -->
+                            <form method="POST" action="{% url 'schedule:add_to_schedule' course.id %}" class="d-inline-block mr-2">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary add-to-schedule" data-row-id="{{ course.id }}">Add to Schedule</button>
+                            </form>
 
-                {% endfor %}
+                            <!-- Remove (from Cart) Button -->
+                            <form method="POST" action="{% url 'schedule:remove_course' course.id %}" class="d-inline-block">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger remove-course" data-row-id="{{ course.id }}">Remove</button>
+                            </form>
+                        </td>
+                        </tr>
+
+                    {% endfor %}
                 </tbody>
             </table>
+
+            <!-- Notify user that the cart is currently empty -->
             {% else %}
                 <p>Your cart is empty. <a href="{% url 'schedule:add_course' %}">Add a course</a>.</p>
             {% endif %}
         </div>
     {% endblock %}
     
+    <!-- Javascript to add fade out effect when selecting buttons -->
     <script>
         $(document).ready(function() {
-            $("button[data-row-id]").click(function(event) {
+            $(".add-to-schedule").click(function(event) {
                 event.preventDefault();
                 var rowId = $(this).data("row-id");
                 var $row = $("#row_" + rowId);
                 var $button = $(this);
                 var $form = $button.parent();
-    
+
                 $button.removeClass("btn-primary").addClass("btn-success");
-    
                 setTimeout(function() {
                     $row.fadeOut(2000, function() {
                         $row.remove();
                     });
-    
+
                     $.ajax({
                         url: $form.attr('action'),
                         method: 'POST',
@@ -82,19 +91,30 @@
                             xhr.setRequestHeader('X-CSRFToken', $form.find('input[name="csrfmiddlewaretoken"]').val());
                         },
                         success: function() {
-                            // Success handling, if necessary
+                            
                         },
                         error: function() {
-                            // Handle error case here
-                            //alert("An error occurred. Please try again.");
+                            // Error case
+                            //alert("Test error");
                         }
                     });
-    
                 }, 1000);
+        });
+
+        $(".remove-course").click(function(event) {
+            event.preventDefault();
+            var rowId = $(this).data("row-id");
+            var $row = $("#row_" + rowId);
+            var $form = $(this).parent("form");
+
+            $row.fadeOut(2000, function() {
+                $row.remove();
+                
+                $form.submit();
             });
         });
+    });
     </script>
-    
-    
+
 </body>
 </html>
