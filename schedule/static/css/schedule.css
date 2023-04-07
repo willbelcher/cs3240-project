@@ -160,3 +160,27 @@ header .item-button a:hover{
     color: #fff;
     background-color: #102447;
 }
+
+
+
+/* Styling for "Add to Schedule" and "Remove" buttons in View Cart Page*/
+
+.custom-add-btn {
+    background-color: #274d8a; /* Replace with your desired color */
+    border-color: #F84C1E; /* Replace with your desired color */
+}
+
+.custom-add-btn:hover {
+    background-color: #F84C1E; /* Replace with your desired hover color */
+    border-color: #274d8a; /* Replace with your desired hover color */
+}
+
+.custom-remove-btn {
+    background-color: #274d8a; /* Replace with your desired color */
+    border-color: #F84C1E; /* Replace with your desired color */
+}
+
+.custom-remove-btn:hover {
+    background-color: #F84C1E; /* Replace with your desired hover color */
+    border-color: #274d8a; /* Replace with your desired hover color */
+}
