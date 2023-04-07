@@ -51,7 +51,7 @@
                             <!-- Remove (from Cart) Button -->
                             <form method="POST" action="{% url 'schedule:remove_course' course.id %}" class="d-inline-block">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-danger remove-course custom-remove-btn" data-row-id="{{ course.id }}">Remove from Cart</button>
+                                <button type="submit" class="btn btn-danger remove-course custom-remove-btn custom-remove-effect" data-row-id="{{ course.id }}">Remove from Cart</button>
                             </form>
                         </td>
                         </tr>
@@ -99,9 +99,9 @@
                         }
                     });
                 }, 1000);
-        });
+            });
 
-        $(".remove-course").click(function(event) {
+            $(".remove-course").click(function(event) {
             event.preventDefault();
             var rowId = $(this).data("row-id");
             var $row = $("#row_" + rowId);
@@ -109,11 +109,27 @@
 
             $row.fadeOut(2000, function() {
                 $row.remove();
-                
                 $form.submit();
+            }).addClass("custom-remove-effect");
+
+            $.ajax({
+                url: $form.attr('action'),
+                method: 'POST',
+                data: $form.serialize(),
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRFToken', $form.find('input[name="csrfmiddlewaretoken"]').val());
+                },
+                success: function() {
+                    
+                },
+                error: function() {
+                    // Error case
+                    //alert("Test error");
+                }
             });
         });
     });
+
     </script>
 
 </body>
