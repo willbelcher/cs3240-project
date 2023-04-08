@@ -23,7 +23,7 @@ class Cart(models.Model):
 
 
 class Course(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True)
     class_nbr = models.IntegerField()
     subject = models.CharField(max_length=10)
     catalog_nbr = models.CharField(max_length=10)

@@ -11,6 +11,14 @@
         <section class="section-1">
             <p class="animated-text">Welcome to Plan-it Pal {{username}}</p>
             <p class="animated-text">Your current status is {{role}}</p>
+            {% block content %}
+            {% if schedule.exists %}
+            <div class="container card status animated-div">
+                <b>Your schedule is: </b>
+                <b style="color:{{schedule.color}}">{{schedule.status}}</b>
+            </div>
+            {% endif %}
+            {% endblock %}
         </section>
     </body>
 </html>
