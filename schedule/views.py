@@ -253,17 +253,10 @@ def remove_course(request, course_id):
 def add_to_schedule(request, course_id):
     course = get_object_or_404(Course, id=course_id, cart__user=request.user)
     schedule, _ = Schedule.objects.get_or_create(user=request.user)
-    scheduled_course = Course(
-        class_nbr=course.class_nbr,
-        subject=course.subject,
-        catalog_nbr=course.catalog_nbr,
-        instructor_name=course.instructor_name,
-        title=course.title
-    )
-    scheduled_course.save()
-    schedule_item = ScheduleItem(schedule=schedule, course=scheduled_course)
+    schedule_item = ScheduleItem(schedule=schedule, course=course)
     schedule_item.save()
-    course.delete()
+    course.cart = None
+    course.save()
     messages.success(request, 'Course added to schedule.')
     return redirect('schedule:view_cart')
 
