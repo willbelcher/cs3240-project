@@ -31,19 +31,8 @@ def home(request):
 def submissions(request):
     user = request.user
     if user.has_perm('global_permissions.is_advisor'):
-        count = 0
-        schedules = Schedule.objects.filter(submitted = True).values()
         context = {'schedules': []}
 
-        for schedule in schedules:
-            users = User.objects.get(pk=schedule['user_id'])
-            items = ScheduleItem.objects.filter(schedule=schedule['id']).values()
-
-            context['schedules'].append({'user': users, 'courses':[]})
-            for item in items:
-                    course = Course.objects.get(pk=item['course_id'])
-                    context['schedules'][count]['courses'].append(course)
-            count = count + 1
         schedules = Schedule.objects.filter(submitted=True)
         context.update({'schedules': schedules})
 
@@ -285,7 +274,8 @@ def is_advisor(user):
 def approve_schedule(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
     print(f"Before approval: {schedule.status}")  # Add this line
-    schedule.status = 'approved'
+    schedule.status = 'Approved'
+    schedule.approved = True
     schedule.save()
     schedule.refresh_from_db()  # Add this line
     print(f"After approval: {schedule.status}")  # Add this line
@@ -298,7 +288,8 @@ def deny_schedule(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
     if request.method == 'POST':
         comments = request.POST.get('comments')
-        schedule.status = 'denied'
+        schedule.status = 'Denied'
+        schedule.approved = False
         schedule.comments = comments
         schedule.save()
         # Redirect to the submissions page
