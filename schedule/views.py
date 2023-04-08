@@ -228,15 +228,18 @@ def add_course(request):
 @login_required
 def view_cart(request):
     # Get the user's cart
-    #if the cart is created instead of get, the function returns a tuple so need to accommodate for that
     cart, _ = Cart.objects.get_or_create(user=request.user)
 
-    # Get the courses associated with the cart
-    courses = Course.objects.filter(cart=cart)
+    # Get the user's schedule
+    schedule, _ = Schedule.objects.get_or_create(user=request.user)
+
+    # Get the courses associated with the cart and exclude those in the user's schedule
+    courses = Course.objects.filter(cart=cart).exclude(scheduleitem__schedule=schedule)
 
     # Render the view_cart template with the courses
     context = {'courses': courses}
     return render(request, 'schedule/view_cart.html', context)
+
 # Removes a course from the user's cart
 @login_required
 def remove_course(request, course_id):
@@ -252,6 +255,8 @@ def add_to_schedule(request, course_id):
     schedule, _ = Schedule.objects.get_or_create(user=request.user)
     schedule_item = ScheduleItem(schedule=schedule, course=course)
     schedule_item.save()
+    course.cart = None
+    course.save()
     messages.success(request, 'Course added to schedule.')
     return redirect('schedule:view_cart')
 
