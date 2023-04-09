@@ -15,6 +15,9 @@ def no_military(value):
             ans += " pm"
             return ans
         else:
+            if hour == 12:
+                value += " pm"
+                return value
             value += " am"
             return value
     return value
