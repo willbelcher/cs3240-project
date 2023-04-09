@@ -183,7 +183,12 @@ def course_search_view(request):
 
         print(search_url)
         courses = requests.get(search_url).json()
-    return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields, 'subjects': subjects, 'days': days})
+        if len(courses) == 0:
+            no_classes_found = True
+    return render(request, 'schedule/course_search.html', {'courses': courses, 'fields': fields, 'subjects': subjects,
+                                                           'days': days, 'active_class_messages' : active_class_messages,
+                                                           'class_messages': class_messages,
+                                                           'no_classes_found':no_classes_found})
 
 #method is for testing purposes
 def send_request(year, num_term, subject, instructor, url):
