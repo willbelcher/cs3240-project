@@ -262,7 +262,7 @@ def add_course(request):
                             class_messages.append("Can not add an identical course to Cart")
                             return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days, 'active_class_messages':active_class_messages, 'class_messages':class_messages})
 
-                course = Course(cart=cart, class_nbr=class_nbr, subject=subject, catalog_nbr=catalog_nbr, title=title, instructor_name=instructor_name)
+                course = Course(cart=cart, class_nbr=class_nbr, subject=subject, catalog_nbr=catalog_nbr, title=title, instructor_name=instructor_name, units=units)
                 course.save()
 
                 for json_days in course_data['meetings']:
@@ -314,6 +314,7 @@ def remove_course(request, course_id):
 def add_to_schedule(request, course_id):
     course = get_object_or_404(Course, id=course_id, cart__user=request.user)
     schedule, _ = Schedule.objects.get_or_create(user=request.user)
+    total_units = schedule.total_units
 
     times = CourseTime.objects.filter(course = course) #get all meetings of course thats to be added
     items = ScheduleItem.objects.filter(schedule=schedule.id)
