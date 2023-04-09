@@ -144,10 +144,12 @@
         </form>
 
         <hr>
-        {% if class_messages != NULL %}
+        {% if active_class_messages %}
+            {% for message in class_messages %}
             <div class="alert alert-warning" role="alert">
-                {{ class_messages }}
+                {{ message }}
             </div>
+            {% endfor %}
         {% endif %}
 
         {# NOTE!!! below is output of classes from sis#}

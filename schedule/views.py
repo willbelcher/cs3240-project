@@ -81,6 +81,9 @@ def course_search_view(request):
     #default field values
     fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'course_name': '', 'course_nmbr': '', 'only_open': False, 'start_time': '00:00', 'end_time': '23:59'}
     days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
+    active_class_messages = False
+    no_classes_found = False
+    class_messages = []
 
     #Initialize empty sets to store instructors
     instructors = set()
@@ -108,8 +111,13 @@ def course_search_view(request):
         start_time = fields.get('start_time')
         end_time = fields.get('end_time')
 
-        print("course_nmbr", course_nmbr)
-        print("catalog_nbr", catalog_nbr)
+        if subject == "" and (start_time == "00:00" and end_time == "23:59"):
+            messages.error(request, "Please enter a more specific search")
+            active_class_messages = True
+            class_messages.append("A Subject or Specific Time range is required")
+            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days,
+                                                                   'active_class_messages':active_class_messages,
+                                                                   'class_messages': class_messages})
 
         if not catalog_nbr.isnumeric():
             catalog_nbr = ""
@@ -196,6 +204,8 @@ def add_course_success(request):
 def add_course(request):
     days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
     fields = {'start_time': "00:00", 'end_time': "23:59"}
+    active_class_messages = False
+    class_messages = []
     if request.method == 'POST':
         term = request.POST.get('term', '').strip()
         class_nbr = request.POST.get('class_nbr', '').strip()
@@ -232,7 +242,9 @@ def add_course(request):
                     for cart_course in courses_in_cart:
                         if cart_course.subject == subject and cart_course.catalog_nbr == catalog_nbr:
                             messages.error(request, "Can not add identical course to Cart")
-                            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days, 'class_messages':'Can not add identical course to Cart'})
+                            active_class_messages = True
+                            class_messages.append("Can not add an identical course to Cart")
+                            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days, 'active_class_messages':active_class_messages, 'class_messages':class_messages})
 
                 course = Course(cart=cart, class_nbr=class_nbr, subject=subject, catalog_nbr=catalog_nbr, title=title, instructor_name=instructor_name)
                 course.save()
@@ -243,13 +255,16 @@ def add_course(request):
                     time = CourseTime.objects.create(course=course, days=json_days['days'], starting_time=start_time, ending_time=end_time)
                     time.save()
 
+                active_class_messages = True
+                class_messages.append("Course added successfully!")
                 messages.success(request, 'Course added successfully!')
+
                 return redirect('schedule:add_course_success')
             else:
                 messages.error(request, 'Failed to fetch course data.')
 
    #resest all the filters so the website doesn't break on a following course search
-    return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields':fields, 'days':days})
+    return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields':fields, 'days':days, 'active_class_messages':active_class_messages, 'class_messages':class_messages})
 
 
 # View for View Cart Page
