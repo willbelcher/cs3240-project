@@ -98,7 +98,7 @@ def course_search_view(request):
         subjects.sort()
 
     if request.method == "POST": # if search has been run
-        fields = request.POST # save search fields
+        fields = request.POST.copy() # save search fields
 
         year = fields.get('year')
         term = fields.get('term')
@@ -119,14 +119,24 @@ def course_search_view(request):
                                                                    'active_class_messages':active_class_messages,
                                                                    'class_messages': class_messages})
 
-        if not catalog_nbr.isnumeric():
-            catalog_nbr = ""
-        if not course_nmbr.isnumeric():
+        if not catalog_nbr.isnumeric() and not catalog_nbr == "" :
+            fields['catalog_nbr'] = ""
+            catalog_nbr=""
+            active_class_messages = True
+            class_messages.append("Catalog Number Field returned to default value")
+        if not course_nmbr.isnumeric() and not course_nmbr == "":
             course_nmbr = ""
+            fields['course_nmbr'] = ""
+            active_class_messages = True
+            class_messages.append("Course Number Field returned to default value")
         if " " in instructor:
             instructor = instructor.split(" ")[0]
+            active_class_messages = True
+            class_messages.append("Instructor Field has been reverted to a valid value")
         if " " in course_name:
             course_name = course_name.split(" ")[0]
+            active_class_messages = True
+            class_messages.append("Course Name Field has been reverted to a valid value")
         
         for day in days.keys():
             days[day] = bool(fields.get(day))
