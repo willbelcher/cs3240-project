@@ -37,6 +37,7 @@
             {% endfor %}
             </tbody>
         </table>
+            <h3>Total Units: {{ schedule.total_units }}</h3>
         {% else %}
             <p>Your schedule is empty. <a href="{% url 'schedule:view_cart' %}">Add a course from the cart</a>.</p>
         {% endif %}

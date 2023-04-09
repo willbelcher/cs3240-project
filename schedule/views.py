@@ -248,6 +248,7 @@ def add_course(request):
                 catalog_nbr = course_data['catalog_nbr']
                 title = course_data['descr']
                 instructor_name = course_data['instructors'][0]['name']
+                units = int(course_data['units'])
 
                 # Save the course to the user's cart
                 cart, _ = Cart.objects.get_or_create(user=request.user)
@@ -359,6 +360,20 @@ def add_to_schedule(request, course_id):
                             context = {'courses': courses, 'active_class_messages':True, 'class_messages':"Can not add this course, it overlaps with a class already in your schedule."}
                             return render(request, 'schedule/view_cart.html', context)
 
+    if schedule.total_units + course.units > 19:
+        # Get the user's cart
+        print(total_units)
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+
+        # Get the courses associated with the cart and exclude those in the user's schedule
+        courses = Course.objects.filter(cart=cart).exclude(scheduleitem__schedule=schedule)
+
+        # Render the view_cart template with the courses
+        context = {'courses': courses, 'active_class_messages': True,
+                   'class_messages': "Can not add this course, it will surpass the 19 credit limit."}
+        return render(request, 'schedule/view_cart.html', context)
+    schedule.total_units = total_units + course.units
+    schedule.save()
 
     schedule_item = ScheduleItem(schedule=schedule, course=course)
     schedule_item.save()
@@ -374,6 +389,7 @@ def add_to_schedule(request, course_id):
 def view_schedule(request):
     schedule = get_object_or_404(Schedule, user=request.user)
     schedule_items = ScheduleItem.objects.filter(schedule=schedule)
+
     context = {
         'schedule': schedule,
         'schedule_items': schedule_items,
