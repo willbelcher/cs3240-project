@@ -267,7 +267,9 @@ def add_course(request):
                 for json_days in course_data['meetings']:
                     start_time = json_days['start_time'][0:5].replace(".", ":")
                     end_time = json_days['end_time'][0:5].replace(".", ":")
-                    time = CourseTime.objects.create(course=course, days=json_days['days'], starting_time=start_time, ending_time=end_time)
+                    all_days = json_days['days']
+
+                    time = CourseTime.objects.create(course=course, days=all_days, starting_time=start_time, ending_time=end_time)
                     time.save()
 
                 active_class_messages = True
