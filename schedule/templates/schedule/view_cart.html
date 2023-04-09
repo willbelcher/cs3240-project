@@ -74,65 +74,65 @@
         </div>
     {% endblock %}
     
-    <!-- Javascript to add fade out effect when selecting buttons -->
-    <script>
-
-        //Turns "Add to Schedule" button green upon being clicked and then fades out the whole row
-        $(document).ready(function() {
-            $(".add-to-schedule").click(function(event) {
-                event.preventDefault();
-                var rowId = $(this).data("row-id");
-                var $row = $("#row_" + rowId);
-                var $button = $(this);
-                var $form = $button.parent();
-
-                $button.addClass("custom-add-btn-clicked");
-
-                $row.fadeOut(2000, function() {
-                    $row.remove();
-                    $.ajax({
-                        url: $form.attr('action'),
-                        method: 'POST',
-                        data: $form.serialize(),
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRFToken', $form.find('input[name="csrfmiddlewaretoken"]').val());
-                        },
-                        success: function() {
-                        },
-                        error: function() {
-                        }
-                    });
-                });
-            });
-
-            //Turns "Remove from Cart" button red upon being clicked and then fades out the whole row
-            $(".remove-course").click(function(event) {
-                event.preventDefault();
-                var rowId = $(this).data("row-id");
-                var $row = $("#row_" + rowId);
-                var $form = $(this).parent("form");
-
-                $(this).addClass("custom-remove-btn-clicked");
-
-                $row.fadeOut(2000, function() {
-                    $row.remove();
-                    $.ajax({
-                        url: $form.attr('action'),
-                        method: 'POST',
-                        data: $form.serialize(),
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRFToken', $form.find('input[name="csrfmiddlewaretoken"]').val());
-                        },
-                        success: function() {
-                        },
-                        error: function() {
-                        }
-                    });
-                });
-            });
-        });
-
-    </script>
+{#    <!-- Javascript to add fade out effect when selecting buttons -->#}
+{#    <script>#}
+{##}
+{#        //Turns "Add to Schedule" button green upon being clicked and then fades out the whole row#}
+{#        $(document).ready(function() {#}
+{#            $(".add-to-schedule").click(function(event) {#}
+{#                event.preventDefault();#}
+{#                var rowId = $(this).data("row-id");#}
+{#                var $row = $("#row_" + rowId);#}
+{#                var $button = $(this);#}
+{#                var $form = $button.parent();#}
+{##}
+{#                $button.addClass("custom-add-btn-clicked");#}
+{##}
+{#                $row.fadeOut(2000, function() {#}
+{#                    $row.remove();#}
+{#                    $.ajax({#}
+{#                        url: $form.attr('action'),#}
+{#                        method: 'POST',#}
+{#                        data: $form.serialize(),#}
+{#                        beforeSend: function(xhr) {#}
+{#                            xhr.setRequestHeader('X-CSRFToken', $form.find('input[name="csrfmiddlewaretoken"]').val());#}
+{#                        },#}
+{#                        success: function() {#}
+{#                        },#}
+{#                        error: function() {#}
+{#                        }#}
+{#                    });#}
+{#                });#}
+{#            });#}
+{##}
+{#            //Turns "Remove from Cart" button red upon being clicked and then fades out the whole row#}
+{#            $(".remove-course").click(function(event) {#}
+{#                event.preventDefault();#}
+{#                var rowId = $(this).data("row-id");#}
+{#                var $row = $("#row_" + rowId);#}
+{#                var $form = $(this).parent("form");#}
+{##}
+{#                $(this).addClass("custom-remove-btn-clicked");#}
+{##}
+{#                $row.fadeOut(2000, function() {#}
+{#                    $row.remove();#}
+{#                    $.ajax({#}
+{#                        url: $form.attr('action'),#}
+{#                        method: 'POST',#}
+{#                        data: $form.serialize(),#}
+{#                        beforeSend: function(xhr) {#}
+{#                            xhr.setRequestHeader('X-CSRFToken', $form.find('input[name="csrfmiddlewaretoken"]').val());#}
+{#                        },#}
+{#                        success: function() {#}
+{#                        },#}
+{#                        error: function() {#}
+{#                        }#}
+{#                    });#}
+{#                });#}
+{#            });#}
+{#        });#}
+{##}
+{#    </script>#}
 
 </body>
 </html>
