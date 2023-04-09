@@ -311,10 +311,59 @@ def remove_course(request, course_id):
 def add_to_schedule(request, course_id):
     course = get_object_or_404(Course, id=course_id, cart__user=request.user)
     schedule, _ = Schedule.objects.get_or_create(user=request.user)
+
+    times = CourseTime.objects.filter(course = course) #get all meetings of course thats to be added
+    items = ScheduleItem.objects.filter(schedule=schedule.id)
+    for item in items:
+        added_course = Course.objects.get(pk = item.course.id) #get all courses already in schedule
+
+        if added_course.subject == course.subject and added_course.catalog_nbr == course.catalog_nbr:
+            cart, _ = Cart.objects.get_or_create(user=request.user)
+
+            # Get the courses associated with the cart and exclude those in the user's schedule
+            courses = Course.objects.filter(cart=cart).exclude(scheduleitem__schedule=schedule)
+
+            # Render the view_cart template with the courses
+            context = {'courses': courses, 'active_class_messages': True,
+                       'class_messages': "Can not add this course, the same course is already added"}
+            return render(request, 'schedule/view_cart.html', context)
+
+        added_course_times = CourseTime.objects.filter(course = added_course) #get these already-added course times
+        for time in times:
+            time_starting_hour = int(time.starting_time.split(":")[0])
+            time_ending_hour = int(time.ending_time.split(":")[0])
+
+            # splits each day string "MoWe" into tokens of 2 characters ["Mo", "We"]
+            split_days = [time.days[i:i + 2] for i in range(0, len(time.days), 2)]
+
+            for added_course_time in added_course_times:
+                for day in split_days:
+                    # if the to-be-added course has any day in common with an existing class
+                    if day in added_course_time.days:
+                        added_course_starting_hour = int(added_course_time.starting_time.split(":")[0])
+                        added_course_ending_time = int(added_course_time.ending_time.split(":")[0])
+
+                        if added_course_starting_hour <= time_starting_hour <= added_course_ending_time or \
+                                time_starting_hour <= added_course_starting_hour <= time_ending_hour:
+                            messages.error(request, 'Courses overlap!')
+                            course.save()
+                            # Get the user's cart
+                            cart, _ = Cart.objects.get_or_create(user=request.user)
+
+                            # Get the courses associated with the cart and exclude those in the user's schedule
+                            courses = Course.objects.filter(cart=cart).exclude(scheduleitem__schedule=schedule)
+
+                            # Render the view_cart template with the courses
+                            context = {'courses': courses, 'active_class_messages':True, 'class_messages':"Can not add this course, it overlaps with a class already in your schedule."}
+                            return render(request, 'schedule/view_cart.html', context)
+
+
     schedule_item = ScheduleItem(schedule=schedule, course=course)
     schedule_item.save()
+
     course.cart = None
     course.save()
+
     messages.success(request, 'Course added to schedule.')
     return redirect('schedule:view_cart')
 

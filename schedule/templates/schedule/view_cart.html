@@ -12,10 +12,16 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
+{% if active_class_messages %}
+            <div class="alert alert-warning" role="alert">
+                {{ class_messages }}
+            </div>
+        {% endif %}
     {% block content %}
         <br>
         <div class="container">
         <h2>Your Cart</h2>
+        <hr>
             {% if courses %}
 
             <!-- Displays courses added to the cart in a table -->
