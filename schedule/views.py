@@ -111,11 +111,14 @@ def course_search_view(request):
         print("course_nmbr", course_nmbr)
         print("catalog_nbr", catalog_nbr)
 
-        # if not course_nmbr.isnumeric():
-        #     course_nmbr = ""
-        #
-        # if not catalog_nbr.isnumeric():
-        #     catalog_nbr = ""
+        if not catalog_nbr.isnumeric():
+            catalog_nbr = ""
+        if not course_nmbr.isnumeric():
+            course_nmbr = ""
+        if " " in instructor:
+            instructor = instructor.split(" ")[0]
+        if " " in course_name:
+            course_name = course_name.split(" ")[0]
         
         for day in days.keys():
             days[day] = bool(fields.get(day))
