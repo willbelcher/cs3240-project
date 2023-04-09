@@ -157,11 +157,17 @@ def course_search_view(request):
         if start_time != "00:00" or end_time != "23:59":
             start_h, start_m = start_time.split(":") # convert to sis time range format (ex. 2:30 -> 2.5)
             start_m = round(int(start_m)/30)/2
+            start_time = float(start_h) + float(start_m)
 
             end_h, end_m = end_time.split(":") # convert to sis time range format
             end_m = round(int(end_m)/30)/2
+            end_time = float(end_h) + float(end_m)
 
-            formatted_range = "{}.{},{}.{}".format(start_h, start_m, end_h, end_m)
+            if start_time == 0.0:
+                start_time = 0.5
+            if end_time == 24.0:
+                end_time = 23.5
+            formatted_range = "{},{}".format(start_time, end_time)
             search_url += field_pattern.format("time_range", formatted_range)
 
         print(search_url)
