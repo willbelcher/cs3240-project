@@ -11,46 +11,46 @@
     <link rel="stylesheet" href="{% static 'css/schedule.css' %}">
 </head>
 <body>
-    {% block content %}
+{% block content %}
     <div class="container">
-    <h2>Your Schedule</h2>
+        <h2>Your Schedule</h2>
         {% if schedule_items %}
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th>Class Number</th>
-                <th>Subject</th>
-                <th>Catalog Number</th>
-                <th>Instructor Name</th>
-                <th>Title</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for schedule_item in schedule_items %}
+            <table class="table table-striped">
+                <thead>
                 <tr>
-                <td>{{ schedule_item.course.class_nbr }}</td>
-                <td>{{ schedule_item.course.subject }}</td>
-                <td>{{ schedule_item.course.catalog_nbr }}</td>
-                <td>{{ schedule_item.course.instructor_name }}</td>
-                <td>{{ schedule_item.course.title }}</td>
+                    <th>Class Number</th>
+                    <th>Subject</th>
+                    <th>Catalog Number</th>
+                    <th>Instructor Name</th>
+                    <th>Title</th>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                {% for schedule_item in schedule_items %}
+                    <tr>
+                        <td>{{ schedule_item.course.class_nbr }}</td>
+                        <td>{{ schedule_item.course.subject }}</td>
+                        <td>{{ schedule_item.course.catalog_nbr }}</td>
+                        <td>{{ schedule_item.course.instructor_name }}</td>
+                        <td>{{ schedule_item.course.title }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
             <h3>Total Units: {{ schedule.total_units }}</h3>
         {% else %}
             <p>Your schedule is empty. <a href="{% url 'schedule:view_cart' %}">Add a course from the cart</a>.</p>
         {% endif %}
 
         {% if not schedule.submitted and schedule_items%}
-        <form method="POST" action="{% url 'schedule:submit_schedule' %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary">Submit to Advisor</button>
-        </form>
+            <form method="POST" action="{% url 'schedule:submit_schedule' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Submit to Advisor</button>
+            </form>
         {% elif schedule.submitted %}
-        <p>Your schedule has been submitted to the advisor.</p>
+            <p>Your schedule has been submitted to the advisor.</p>
         {% endif %}
     </div>
-    {% endblock %}
+{% endblock %}
 </body>
 </html>
