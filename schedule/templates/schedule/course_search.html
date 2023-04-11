@@ -160,6 +160,7 @@
         </form>
 
         <hr>
+
         {% if active_class_messages %}
             {% for message in class_messages %}
             <div class="alert alert-warning" role="alert">
@@ -167,6 +168,9 @@
             </div>
             {% endfor %}
         {% endif %}
+
+        <br>
+        <br>
 
         <!-- If filtered courses are found, display the courses -->
 
@@ -177,92 +181,153 @@
         {% endif %}
         
         {% if courses %}
-            <div class="container card">
+            <div class="container">
+
+                <!-- Display all courses that match filters -->
                 {% for course in courses %}
-                    <div class="row">
-                        <div class="col">
-                            <div class="card container m-1" id="class_card">
-                                <div class="card-header row">
-                                    <div class="col-sm-auto">
-                                        <p>{{ course.subject }} {{ course.catalog_nbr }}</p>
-                                        <p>{{ forloop.counter }}</p>
-                                    </div>
-                                    <div class="col">
-                                        <b>{{ course.descr }}</b>
-                                    </div>
-                                    <div class="col">
-                                        <button class="btn btn-primary" type="button" id="extra_info_{{ forloop.counter }}_button" onclick="toggler('extra_info_{{ forloop.counter }}')">
-                                            More Info
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="card-body row">
-                                    <div class="col-sm-auto">
-                                        <p>Instructor: {{ course.instructors.0.name }}</p>
-                                    </div>
-                                    <div class="col">
-                                        <p>
-                                            Capacity: {{ course.enrollment_total }}/{{ course.class_capacity }}
-                                        </p>
-                                        <p>
-                                            Wait List: {{ course.wait_tot }} / {{ course.wait_cap }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="card-body row">
-                                    <div class="col-sm-auto">
-                                        <p>{{ course.units }} Credits</p>
-                                    </div>
-                                    <div class="col">
+                    <div class="card mb-3">
+                        <div class="card-header">
 
-                                    </div>
-                                    {% if not perms.global_permissions.is_advisor %}
-                                    <div class="col">
-                                        <form method="post" action="{% url 'schedule:add_course' %}">
-                                            {% csrf_token %}
-                                            <input class="collapse" type="text" name="term" id="term
-"                                       value={{ course.strm }}>
-                                            <input class="collapse" type="text" name="class_nbr" id="class_nbr"
-                                                   value={{ course.class_nbr }}>
-                                            <button type="submit" class="btn btn-primary">Add Course</button>
-                                        </form>
+                            <div class="row align-items-center">
 
-                                    </div>
-                                    {% endif %}
+                                <!-- Course Subject (i.e. CS) and Catalog Number (i.e. 3100) -->
+                                <div class="col-sm-auto">
+                                    <h5 class="mb-0">{{ course.subject }} {{ course.catalog_nbr }}</h5>
+                                </div>
+                                
+                                <!-- Course Title (i.e. Data Structures and Algorithms 2)-->
+                                <div class="col">
+                                    <strong>{{ course.descr }}</strong>
+                                </div>
+
+                                <!-- Modal for More Info -->
+                                <div class="col-auto">
+                                    <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#extra_info_{{ forloop.counter }}">
+                                        More Info
+                                    </button>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col">
-                            <div class="card container invisible m-1" id="extra_info_{{ forloop.counter }}" >
-                                <div class="card-header row">
-                                    <div class="col-sm-auto">
-                                        <p>{{ course.subject }} {{ course.catalog_nbr }}</p>
-                                        <p>{{ forloop.counter }}</p>
+                        <!-- Modal that contains additional information -->
+                        <!-- Currently displays Location ()-->
+                        <div class="modal fade" id="extra_info_{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="extraInfoModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="extraInfoModalLabel">{{ course.subject }} {{ course.catalog_nbr }} - {{ course.descr }}</h5>
+                                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
                                     </div>
-                                    <div class="col">
-                                        <b>{{ course.descr }}</b>
-                                    </div>
-                                </div>
-                                <div class="card-body row">
-                                    <div class="col-sm-auto">
-                                        <p>Location: {{ course.location_descr }}</p>
-                                    </div>
-                                    <div class="col-sm-auto">
-                                        <p>Instruction: {{ course.instruction_mode_descr }}</p>
-                                    </div>
-                                </div>
-                                <div class="card-body row align-items-stretch">
-                                    <div class="col">
-                                        Days:
-                                    </div>
-                                    {% for days in course.meetings %}
+                                    <div class="modal-body">
                                         <div class="col">
-                                            {{ days.days }} @ {{ days.facility_descr }} from {{ days.start_time|slice:"0:5"|to_colon|no_military }} to {{ days.end_time|slice:"0:5"|to_colon|no_military }}
+                                            <div class="sticky-top" style="position: -webkit-sticky">
+                                                <div class="card container">
+                                                    <div class="card-header row">
+                                                        <div class="col-sm-auto">
+                                                            <p>{{ course.subject }} {{ course.catalog_nbr }}</p>
+                                                        </div>
+                                                        <div class="col">
+                                                            <b>{{ course.descr }}</b>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body row">
+                                                        
+                                                        <div class="col-sm-auto">
+
+                                                            <!-- Displays Location of a class -->
+                                                            {% for place in course.meetings %}
+                                                                <p><b>Location:</b> {{ course.location_descr }} @ {{ place.facility_descr }}</p>
+                                                            {% endfor %}
+                                                            <hr>
+                                                            
+                                                            <!-- Displays Instruction Type (i.e. On Grounds vs Off Grounds) of class-->
+                                                            <p><b>Instruction Type:</b> {{ course.instruction_mode_descr }}</p>
+                                                            <hr>
+                                                            
+                                                            <!-- Displays days a class takes place-->
+                                                            <p>
+                                                                <b>Days: </b>
+                                                                {% for days in course.meetings %}
+                                                                    {{days.days}}
+                                                                {% endfor %}
+                                                            </p>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    {% endfor %}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+                    
+            
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-auto">
+                                    <p><b>Instructor:</b> {{ course.instructors.0.name }}</p>
+                                </div>
+                                <div class="col-sm-auto">
+                                    <p>
+                                        <b>Capacity:</b> {{ course.enrollment_total }}/{{ course.class_capacity }}
+                                    </p>
+                                </div>
+                                <div class="col-sm-auto">
+                                    <p>
+                                        <b>Wait List:</b> {{ course.wait_tot }} / {{ course.wait_cap }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-auto">
+                                    <p><b>Credits:</b> {{ course.units }}</p>
+                                </div>
+                            </div>
+                        </div>
+            
+                        <div class="card-body collapse" id="extra_info_{{ forloop.counter }}">
+                            <div class="row">
+                                <div class="col-sm-auto">
+                                    <p>Location: {{ course.location_descr }}</p>
+                                </div>
+                                <div class="col-sm-auto">
+                                    <p>Instruction: {{ course.instruction_mode_descr }}</p>
+                                </div>
+                            </div>
+            
+                            <div class="row">
+                                <div class="col-sm-auto">
+                                    <strong>Days:</strong>
+                                </div>
+                                {% for days in course.meetings %}
+                                    <div class="col">
+                                        {{ days.days }} @ {{ days.facility_descr }} from {{ days.start_time|slice:"0:5"|to_colon }} to {{ days.end_time|slice:"0:5"|to_colon }}
+                                    </div>
+                                {% endfor %} 
+                            </div>
+                        </div>
+            
+                        <!-- Function to change color of "Add to Cart" button to green following it being clicked -->
+                        <script>
+                            function changeButtonColor(event) {
+                                event.target.classList.remove("btn-primary");
+                                event.target.classList.add("btn-success");
+                            }
+                        </script>
+
+                        <div class="card-footer">
+                            <form method="post" action="{% url 'schedule:add_course' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="term" id="term" value={{ course.strm }}>
+                                <input type="hidden" name="class_nbr" id="class_nbr" value={{ course.class_nbr }}>
+                                <button type="submit" class="btn btn-primary" onclick="changeButtonColor(event)">Add to Cart</button>
+                            </form>
                         </div>
                     </div>
                 {% endfor %}
