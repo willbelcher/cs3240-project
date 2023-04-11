@@ -44,11 +44,11 @@ class Schedule(models.Model):
     submitted = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)
     STATUS_CHOICES = [
-        ('Pending', 'pending'),
-        ('Approved', 'approved'),
-        ('Denied', 'denied'),
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Denied', 'Denied'),
     ]
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     comments = models.TextField(blank=True, null=True)
 
 class ScheduleItem(models.Model):
