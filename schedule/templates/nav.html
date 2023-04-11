@@ -5,63 +5,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Home{% endblock %}</title>
-    <!-- Add the Bootstrap CSS -->
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/II5N2bsXsVf4PFNbeuriC/7N7lD3nRt83_f1Q8" crossorigin="anonymous">
+
+    <!-- Adjusts logo on navigation bar -->
+    <style>
+        .navb-logo {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .navb-logo img {
+            max-height: 40px;
+            max-width: 100%;
+            object-fit: contain;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <div class="container-fluid">
+<header>
+    <div class="container-fluid">
 
-            <div class="navb-logo">
+        <div class="navb-logo">
 
-                <!--Probably need to find better picture-->
-                {% load static %}
-                <img src="{% static 'img/uva_logo.png' %}" alt="Logo">
+            <!--Probably need to find better picture-->
+            {% load static %}
+            <img src="{% static 'img/uva_logo.png' %}" alt="Logo">
+        </div>
+
+        <div class="navb-items d-none d-xl-flex">
+
+            <!-- Home Page Link -->
+            <div class="item">
+                <a href="{% url 'schedule:home' %}">Home</a>
             </div>
 
-            <div class="navb-items d-none d-xl-flex">
+            <!-- Course Search Link -->
+            <div class="item">
+                <a href="{% url 'schedule:course_search' %}">Course Search</a>
+            </div>
 
-                <!-- Home Page Link -->
-                <div class="item">
-                    <a href="{% url 'schedule:home' %}">Home</a>
-                </div>
-
-                <!-- Course Search Link -->
-                <div class="item">
-                    <a href="{% url 'schedule:course_search' %}">Course Search</a>
-                </div>
-
-                <div class="item">
-                    <a href="{% url 'schedule:view_cart' %}">View Cart</a>
-                </div>
-
-                <!-- Check Submissions (of schedule submission) Link -->
-                <!-- Only available to users with Advisor Status -->
-                {% if perms.global_permissions.is_advisor %}
+            <!-- Check Submissions (of schedule submission) Link -->
+            <!-- Only available to users with Advisor Status -->
+            {% if perms.global_permissions.is_advisor %}
                 <div class="item">
                     <a href="{% url 'schedule:submissions' %}">Check Submissions</a>
                 </div>
 
                 <!-- Schedule Builder Link -->
                 <!-- Only available to users with Student Status -->
-                {% else %}
+            {% else %}
+                <div class="item">
+                    <a href="{% url 'schedule:view_cart' %}">View Cart</a>
+                </div>
+
                 <div class="item">
                     <a href="{% url 'schedule:view_schedule' %}">View Schedule</a>
                 </div>
 
                 <!-- Logout Link-->
-                {% endif %}
-                <div class="item-button">
-                    <a href="{% url 'schedule:logout' %}" type="button">Logout</a>
-                </div>
-
+            {% endif %}
+            <div class="item-button">
+                <a href="{% url 'schedule:logout' %}" type="button">Logout</a>
             </div>
+
         </div>
-    </header> 
+    </div>
+</header>
 
 
-    <!-- Add the Bootstrap JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybB3S4O4AmNo2E1/4xK5M2bxmNDMzKqs5Gmuj5E5vsyI5+a5k" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/" crossorigin="anonymous"></script>
+<!-- Add the Bootstrap JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybB3S4O4AmNo2E1/4xK5M2bxmNDMzKqs5Gmuj5E5vsyI5+a5k" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/" crossorigin="anonymous"></script>
 </body>
 </html>
