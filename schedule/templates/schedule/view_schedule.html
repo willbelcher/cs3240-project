@@ -37,16 +37,20 @@
             {% endfor %}
             </tbody>
         </table>
+            <h3>Total Units: {{ schedule.total_units }}</h3>
         {% else %}
             <p>Your schedule is empty. <a href="{% url 'schedule:view_cart' %}">Add a course from the cart</a>.</p>
         {% endif %}
 
-        {% if not schedule.submitted %}
+        {% if not schedule.submitted and schedule.total_units > 12%}
         <form method="POST" action="{% url 'schedule:submit_schedule' %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary">Submit to Advisor</button>
         </form>
-        {% else %}
+        {% elif schedule.total_units < 12 %}
+            <button disabled class="btn btn-primary">Submit to Advisor </button>
+            <p>Your schedule needs more than 12 credits, or you will not be a full-time student!</p>
+        {% elif schedule.submitted %}
         <p>Your schedule has been submitted to the advisor.</p>
         {% endif %}
 

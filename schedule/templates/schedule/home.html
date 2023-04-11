@@ -2,15 +2,23 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Plan-it Pal</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-            <link rel="stylesheet" href="{% static 'css/schedule.css' %}">
-    </head>
-    <body>
-        <section class="section-1">
-            <p class="animated-text">Welcome to Plan-it Pal {{username}}</p>
-            <p class="animated-text">Your current status is {{role}}</p>
-        </section>
-    </body>
+<head>
+    <title>Plan-it Pal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/schedule.css' %}">
+</head>
+<body>
+<section class="section-1">
+    <p class="animated-text">Welcome to Plan-it Pal {{username}}</p>
+    <p class="animated-text">Your current status is {{role}}</p>
+    {% block content %}
+        {% if schedule.exists %}
+            <div class="container card status animated-div">
+                <b>Your schedule is: </b>
+                <b style="color:{{schedule.color}}">{{schedule.status}}</b>
+            </div>
+        {% endif %}
+    {% endblock %}
+</section>
+</body>
 </html>
