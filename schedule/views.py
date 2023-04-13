@@ -397,6 +397,20 @@ def view_schedule(request):
     }
     return render(request, 'schedule/view_schedule.html', context)
 
+def remove_course_from_schedule(request, course_id):
+    # course = get_object_or_404(Course, id=course_id, cart__user=request.user)
+    # course.delete()
+    # messages.success(request, 'Course removed from cart.')
+    # return redirect('schedule:view_cart')
+    print(course_id)
+    course = get_object_or_404(Course, pk = course_id)
+    course.delete()
+    # schedule_item = ScheduleItem.objects.get(course = course)
+    # schedule_item.delete()
+    messages.success(request, 'Removed Course from the Schedule')
+    return redirect('schedule:view_schedule')
+
+
 # Submits schedule to advisor
 @login_required
 def submit_schedule(request):
