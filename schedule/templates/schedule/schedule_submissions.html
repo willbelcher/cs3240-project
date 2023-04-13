@@ -15,11 +15,12 @@
 <h1>Submission Page</h1>
 <br>
 {% if schedules %}
-    <table class="table table-hover">
+    <table class="table">
         {% for schedule in schedules %}
             <tr>
                 <td>
-                    <p>Schedule for {{ schedule.user }}
+                    <div class="row">
+                        <p>Schedule for {{ schedule.user }}
                         <button class="btn" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#schedule_courses_{{ forloop.counter }}" aria-expanded="false"
                                 aria-controls="filter_collapse_button">
@@ -29,6 +30,8 @@
                             </svg>
                         </button>
                     </p>
+                    <p>Total Units: {{ schedule.total_units }}</p>
+                    </div>
                     <div class="collapse" id="schedule_courses_{{ forloop.counter }}">
                         <table class="table table-striped table-sm">
                             <thead>
