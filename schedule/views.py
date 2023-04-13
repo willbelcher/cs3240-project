@@ -49,13 +49,11 @@ def submissions(request):
             users = User.objects.get(pk=schedule['user_id'])
             items = ScheduleItem.objects.filter(schedule=schedule['id']).values()
 
-            context['schedules'].append({'user': users, 'courses':[]})
+            context['schedules'].append({'id': schedule['id'],'user': users, 'courses':[]})
             for item in items:
                     course = Course.objects.get(pk=item['course_id'])
                     context['schedules'][count]['courses'].append(course)
             count = count + 1
-        schedules = Schedule.objects.filter(submitted=True)
-        context.update({'schedules': schedules})
 
         return render(request, 'schedule/schedule_submissions.html', context)
     else:
