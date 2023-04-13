@@ -30,24 +30,24 @@
                         </button>
                     </p>
                     <div class="collapse" id="schedule_courses_{{ forloop.counter }}">
-                        <table class="table table-striped">
+                        <table class="table table-striped table-sm">
                             <thead>
                             <tr>
-                                <th>Class Number</th>
                                 <th>Subject</th>
                                 <th>Catalog Number</th>
                                 <th>Instructor Name</th>
                                 <th>Title</th>
+                                <th>Units</th>
                             </tr>
                             </thead>
                             <tbody>
                             {% for course in schedule.courses %}
                                 <tr>
-                                    <td>{{ course.class_nbr }}</td>
                                     <td>{{ course.subject }}</td>
                                     <td>{{ course.catalog_nbr }}</td>
                                     <td>{{ course.instructor_name }}</td>
                                     <td>{{ course.title }}</td>
+                                    <td>{{ course.units }}</td>
                                 </tr>
                             {% endfor %}
                             </tbody>
