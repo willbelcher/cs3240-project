@@ -386,13 +386,24 @@ def add_to_schedule(request, course_id):
 # View for View Schedule Page
 @login_required
 def view_schedule(request):
+
     schedule = get_object_or_404(Schedule, user=request.user)
+    context = {'schedule': {'total_units': schedule.total_units, 'submitted':schedule.submitted, 'courses':[]}}
     schedule_items = ScheduleItem.objects.filter(schedule=schedule)
 
-    context = {
-        'schedule': schedule,
-        'schedule_items': schedule_items,
-    }
+    for item in schedule_items:
+        # course = Course.objects.get(course = item.course)
+        course = item.course
+        times = CourseTime.objects.filter(course = course)
+        all_times = []
+        for time in times:
+            all_times.append({'days':time.days, 'starting_time':time.starting_time, 'ending_time':time.ending_time})
+        context['schedule']['courses'].append({'course':course, 'all_times':all_times})
+
+    # context = {
+    #     'schedule': schedule,
+    #     'schedule_items': schedule_items,
+    # }
     return render(request, 'schedule/view_schedule.html', context)
 
 def remove_course_from_schedule(request, course_id):
