@@ -402,13 +402,21 @@ def remove_course_from_schedule(request, course_id):
     # course.delete()
     # messages.success(request, 'Course removed from cart.')
     # return redirect('schedule:view_cart')
-    print(course_id)
+    schedule = get_object_or_404(Schedule, user=request.user)
     course = get_object_or_404(Course, pk = course_id)
+    schedule.total_units = schedule.total_units - course.units
     course.delete()
+    schedule.save()
     # schedule_item = ScheduleItem.objects.get(course = course)
     # schedule_item.delete()
     messages.success(request, 'Removed Course from the Schedule')
     return redirect('schedule:view_schedule')
+
+def clear_schedule(request):
+    schedule = get_object_or_404(Schedule, user=request.user)
+    schedule_items = ScheduleItem.objects.filter(schedule=schedule)
+    for item in schedule_items:
+        item.delete()
 
 
 # Submits schedule to advisor
