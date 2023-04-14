@@ -33,7 +33,7 @@ def home(request):
     schedule = {"exists": has_schedule, "color": None, "status": None}
     if has_schedule:
         schedule['status'] = schedules[0]['status']
-        schedule['color'] = color_dict[schedule['status']]
+        schedule['color'] = color_dict[schedule['status'].lower()]
 
     return render(request, 'schedule/home.html', {'role': role, 'username': username, 'schedule': schedule})
 
