@@ -43,6 +43,9 @@ class Schedule(models.Model):
     total_units = models.IntegerField(default=0)
     submitted = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)
+    approved_date = models.DateTimeField(null=True, blank=True)
+    denied_date = models.DateTimeField(null=True, blank=True)
+    comment_date = models.DateTimeField(null=True, blank=True)
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
         ('Approved', 'Approved'),

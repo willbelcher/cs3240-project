@@ -32,6 +32,10 @@
                                 <button type="submit" class="btn btn-success">Approve</button>
                             </form>
                         {% endif %}
+
+                        {% if schedule.status != "Denied" and schedule.approved_date %}
+                            <p>Approved on: {{ schedule.approved_date|date:"F j, Y, g:i A" }}</p>
+                        {% endif %}
                     </td>
 
                     
@@ -41,6 +45,10 @@
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger">Deny</button>
                             </form>
+                        {% endif %}
+
+                        {% if schedule.status != "Approved" and schedule.denied_date %}
+                            <p>Denied on: {{ schedule.denied_date|date:"F j, Y, g:i A" }}</p>
                         {% endif %}
                     </td>
                     <td>
@@ -56,7 +64,6 @@
                                     </div>
                                     <form method="post" action="{% url 'schedule:deny_schedule' schedule.id %}">
                                         {% csrf_token %}
-
                                     </form>
 
                                     <form method="post" action="{% url 'schedule:add_comments' schedule.id %}">
@@ -73,6 +80,9 @@
                                 </div>
                             </div>
                         </div>
+                        {% if schedule.comment_date %}
+                            <p>Comment sent on: {{ schedule.comment_date|date:"F j, Y, g:i A" }}</p>
+                        {% endif %}
                     </td>
                 
 

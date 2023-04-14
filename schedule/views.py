@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from .models import Cart, Course, Schedule, ScheduleItem, User, CourseTime
 import requests
+from django.utils import timezone
 from django.http import HttpResponse
 
 
@@ -428,6 +429,7 @@ def approve_schedule(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
     print(f"Before approval: {schedule.status}")  # Add this line
     schedule.status = 'approved'
+    schedule.approved_date = timezone.now()
     schedule.save()
     schedule.refresh_from_db()  # Add this line
     print(f"After approval: {schedule.status}")  # Add this line
@@ -438,13 +440,10 @@ def approve_schedule(request, schedule_id):
 @user_passes_test(is_advisor)
 def deny_schedule(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
-    
     schedule.status = 'Denied'
+    schedule.denied_date = timezone.now()
     schedule.save()
-
-    # Clear the student's schedule by deleting all the ScheduleItem instances
     schedule.schedule_items.all().delete()
-
     messages.success(request, 'Schedule denied and cleared.')
     return redirect('schedule:submissions')
 
@@ -457,6 +456,7 @@ def add_comments(request, schedule_id):
     if request.method == 'POST':
         comments = request.POST.get('comments')
         schedule.comments = comments
+        schedule.comment_date = timezone.now()
         schedule.save()
         messages.success(request, 'Comments added to the schedule.')
         return redirect('schedule:submissions')
