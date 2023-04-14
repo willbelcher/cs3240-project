@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        
+        ('schedule', '0002_course_units_schedule_total_units_coursetime'),
     ]
 
     operations = [
