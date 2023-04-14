@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from .models import Cart, Course, Schedule, ScheduleItem, User, CourseTime
 import requests
 from django.http import HttpResponse
@@ -437,16 +438,16 @@ def approve_schedule(request, schedule_id):
 @user_passes_test(is_advisor)
 def deny_schedule(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
-    if request.method == 'POST':
-        comments = request.POST.get('comments')
-        schedule.status = 'denied'
-        schedule.comments = comments
-        schedule.save()
-        # Redirect to the submissions page
-        return redirect('schedule:submissions')
-    else:
-        # Render the deny schedule form
-        return render(request, 'deny_schedule.html', {'schedule': schedule})
+    
+    schedule.status = 'Denied'
+    schedule.save()
+
+    # Clear the student's schedule by deleting all the ScheduleItem instances
+    schedule.schedule_items.all().delete()
+
+    messages.success(request, 'Schedule denied and cleared.')
+    return redirect('schedule:submissions')
+
 
 @login_required
 @user_passes_test(is_advisor)

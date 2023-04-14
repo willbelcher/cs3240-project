@@ -48,9 +48,9 @@ class Schedule(models.Model):
         ('Approved', 'Approved'),
         ('Denied', 'Denied'),
     ]
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
     comments = models.TextField(blank=True, null=True)
 
 class ScheduleItem(models.Model):
-    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name='schedule_items')
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
