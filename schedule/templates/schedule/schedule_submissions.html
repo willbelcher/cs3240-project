@@ -56,6 +56,11 @@
                                     </div>
                                     <form method="post" action="{% url 'schedule:deny_schedule' schedule.id %}">
                                         {% csrf_token %}
+
+                                    </form>
+
+                                    <form method="post" action="{% url 'schedule:add_comments' schedule.id %}">
+                                        {% csrf_token %}
                                         <div class="modal-body">
                                             <label for="comments">Comments:</label>
                                             <textarea name="comments" id="comments" rows="5" cols="40" class="form-control"></textarea>

@@ -447,3 +447,17 @@ def deny_schedule(request, schedule_id):
     else:
         # Render the deny schedule form
         return render(request, 'deny_schedule.html', {'schedule': schedule})
+
+@login_required
+@user_passes_test(is_advisor)
+def add_comments(request, schedule_id):
+    schedule = get_object_or_404(Schedule, id=schedule_id)
+    
+    if request.method == 'POST':
+        comments = request.POST.get('comments')
+        schedule.comments = comments
+        schedule.save()
+        messages.success(request, 'Comments added to the schedule.')
+        return redirect('schedule:submissions')
+
+    return render(request, 'add_comments.html', {'schedule': schedule})
