@@ -3,7 +3,9 @@ from django.http.response import Http404
 from django.test import TestCase, RequestFactory
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.messages.storage.fallback import FallbackStorage
-from schedule.views import send_request, add_course, remove_course, add_to_schedule, view_schedule
+from schedule.views import send_request, add_course, remove_course, add_to_schedule, view_schedule, submissions, \
+    view_cart, remove_course_from_schedule, unsubmit_schedule, submit_schedule, is_advisor, approve_schedule, \
+    deny_schedule
 from schedule.models import Course, Schedule, ScheduleItem, User
 
 # Create your tests here.
@@ -41,7 +43,6 @@ class TestCourseSearch(TestCase):
         test_response = send_request(year, num_term, subject, instructor, base)
 
         self.assertEqual(test_response, [])
-
 
     def test_valid_instructor(self):
         field_pattern = "&{}={}"
@@ -144,3 +145,54 @@ class TestCourseSearch(TestCase):
         response = view_schedule(request)
 
         self.assertEqual(response.status_code, 200)
+
+    def test_view_cart(self):
+        factory = RequestFactory()
+        user = User.objects.create_superuser(username='foo', is_superuser=True)
+        addDummyCourse(factory, user)
+
+        self.assertEqual(1, Course.objects.all().count())
+
+        request = factory.get("/schedule/view_cart/")
+        setupRequest(request, user)
+        response = view_cart(request)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_remove_course_from_schedule(self):
+        pass
+
+    def test_unsubmit_schedule(self):
+        pass
+
+    def test_submit_schedule(self):
+        pass
+
+    def test_submissions(self):
+        factory = RequestFactory()
+        user = User.objects.create_superuser(username='foo', is_superuser=True)
+        course_id = addDummyCourse(factory, user)
+
+        request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
+        setupRequest(request, user)
+
+        add_to_schedule(request, course_id)
+        schedule = Schedule.objects.get(user = user)
+        schedule.submitted = True
+        schedule.save()
+
+        self.assertEqual(1, Schedule.objects.all().count())
+        self.assertEqual(1, ScheduleItem.objects.all().count())
+
+        request = factory.get("/schedule/submissions/")
+        setupRequest(request, user)
+        response = view_schedule(request)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_approve_schedule(self):
+        pass
+
+    def test_deny_schedule(self):
+        pass
+

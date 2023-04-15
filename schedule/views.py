@@ -51,8 +51,8 @@ def submissions(request):
 
             context['schedules'].append({'user': users, 'courses':[]})
             for item in items:
-                    course = Course.objects.get(pk=item['course_id'])
-                    context['schedules'][count]['courses'].append(course)
+                course = Course.objects.get(pk=item['course_id'])
+                context['schedules'][count]['courses'].append(course)
             count = count + 1
         schedules = Schedule.objects.filter(submitted=True)
         context.update({'schedules': schedules})
@@ -60,7 +60,7 @@ def submissions(request):
         return render(request, 'schedule/schedule_submissions.html', context)
     else:
         return HttpResponse("You are not authorized to view this page.")
-    
+
 
 # Logouts user and redirects them to the home page
 def logout_view(request):
@@ -137,7 +137,7 @@ def course_search_view(request):
             course_name = course_name.split(" ")[0]
             active_class_messages = True
             class_messages.append("Course Name Field has been reverted to a valid value")
-        
+
         for day in days.keys():
             days[day] = bool(fields.get(day))
 
@@ -166,13 +166,13 @@ def course_search_view(request):
             search_url += field_pattern.format("catalog_nbr", catalog_nbr)
         if only_open:
             search_url += field_pattern.format("enrl_stat", 'O')
-        
+
         if list(days.values()).count(True) != len(days): # Filter by days checked in form
             filter_days = ""
             for day, checked in days.items():
                 if checked:
                     filter_days += day
-            
+
             search_url += field_pattern.format("days", filter_days)
 
         if start_time != "00:00" or end_time != "23:59":
@@ -281,7 +281,7 @@ def add_course(request):
             else:
                 messages.error(request, 'Failed to fetch course data.')
 
-   #resest all the filters so the website doesn't break on a following course search
+    #resest all the filters so the website doesn't break on a following course search
     return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields':fields, 'days':days, 'active_class_messages':active_class_messages, 'class_messages':class_messages})
 
 
