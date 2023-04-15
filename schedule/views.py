@@ -411,8 +411,13 @@ def remove_course_from_schedule(request, course_id):
     # course.delete()
     # messages.success(request, 'Course removed from cart.')
     # return redirect('schedule:view_cart')
-    print(course_id)
     course = get_object_or_404(Course, pk = course_id)
+    print(course_id)
+
+    schedule = Schedule.objects.get(user=request.user)
+    schedule.total_units -= course.units
+    schedule.save()
+
     course.delete()
     # schedule_item = ScheduleItem.objects.get(course = course)
     # schedule_item.delete()
