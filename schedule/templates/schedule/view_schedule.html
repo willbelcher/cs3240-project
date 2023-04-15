@@ -34,15 +34,17 @@
                         <td>{{ schedule_item.course.catalog_nbr }}</td>
                         <td>{{ schedule_item.course.instructor_name }}</td>
                         <td>{{ schedule_item.course.title }}</td>
-                        <td>
-                            <form method="POST"
-                                  action="{% url 'schedule:remove_course_from_schedule' schedule_item.course.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn bg-danger" data-row-id="{{ schedule_item.course.id }}">
-                                    X
-                                </button>
-                            </form>
-                        </td>
+                        {% if not schedule.submitted %}
+                            <td>
+                                <form method="POST"
+                                      action="{% url 'schedule:remove_course_from_schedule' schedule_item.course.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn bg-danger" data-row-id="{{ schedule_item.course.id }}">
+                                        X
+                                    </button>
+                                </form>
+                            </td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -65,6 +67,11 @@
         {% elif schedule.submitted %}
             <div class="alert alert-success" role="alert">
                 <p>Your schedule has been submitted to the advisor.</p>
+
+                <form method="POST" action="{% url 'schedule:unsubmit_schedule' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Unsubmit</button>
+                </form>
             </div>
         {% endif %}
     </div>
