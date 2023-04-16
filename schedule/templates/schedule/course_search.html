@@ -12,42 +12,33 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static 'css/schedule.css' %}">
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <link rel="stylesheet" href="{% static 'css/schedule.css' %}">
-    <script>
-        function toggler(divId) {
-            console.log(divId);
-            if($("#"+divId).hasClass('invisible')){
-                $("#" + divId).removeClass('invisible').addClass('visible');
-                $("#" + divId + "_button").html("Less Info")
-            }
-            else{
-                $("#" + divId).removeClass('visible').addClass('invisible');
-                $("#" + divId + "_button").html("More Info")
-            }
-
-        }
-    </script>
+    
 </head>
 <body>
 <div>
+    <br>
+
     {% block content %}
-        <form class="container align-items-start justify-content-start" action="{% url 'schedule:course_search' %}"
-              method="post">
+
+        <!-- Filter For Course Form -->
+        <form class="container" action="{% url 'schedule:course_search' %}" method="post">
             {% csrf_token %}
-            <div class="row" id="form_div">
-                <div class="form-group col-sm-auto">
+
+            <!-- Main Filters -->
+            <div class="row">
+
+                <!-- Year Filter -->
+                <div class="col-md-3 mb-3">
                     <label for="year">Year:</label>
-                    <select class="custom-select my-1 mr-sm-2" name="year" id="year">
+                    <select class="form-control" name="year" id="year">
                         <option value="2023" selected>2023</option>
                     </select>
                 </div>
 
-                <div class="form-group col-sm-auto">
+                <!-- Term Filter -->
+                <div class="col-md-3 mb-3">
                     <label for="term">Term:</label>
-                    <select class="custom-select my-1 mr-sm-2" name="term" id="term">
+                    <select class="form-control" name="term" id="term">
                         <option value="Fall" {% if fields.term == "Fall" %} selected {% else %} {% endif %}>
                             Fall
                         </option>
@@ -57,9 +48,10 @@
                     </select>
                 </div>
 
-                <div class="form-group col-md-auto">
+                <!-- Subject Filter -->
+                <div class="col-md-3 mb-3">
                     <label for="subject">Subject:</label>
-                    <select class="custom-select my-1 mr-sm-2" name="subject" id="subject">
+                    <select class="form-control" name="subject" id="subject">
                         <option></option>
                         {% for subject in subjects %}
                             <option value={{ subject }} {% if fields.subject == subject %} selected {% else %} {% endif %}>{{ subject }}</option>
@@ -67,84 +59,108 @@
                     </select>
                 </div>
 
-                <div class="form-group col-md-auto">
+                <!-- Catalog Number Filter -->
+                <div class="col-md-3 mb-3">
                     <label for="subject">Catalog Number:</label>
-                    <input class="custom-control" type="text" name="catalog_nbr" id="catalog_nbr"
-                           value={{ fields.catalog_nbr }}>
+                    <input class="form-control" type="text" name="catalog_nbr" id="catalog_nbr"
+                        value={{ fields.catalog_nbr }}>
                 </div>
             </div>
-
+        
             <div class="row">
-                <div class="form-group col-sm-auto">
+
+                <!-- Instructor Name Filter -->
+                <div class="col-md-4 mb-3">
                     <label for="instructor">Instructor:</label>
-                    <input class="custom-control" type="text" name="instructor" id="instructor"
-                           value={{ fields.instructor }}>
+                    <input class="form-control" type="text" name="instructor" id="instructor"
+                        value={{ fields.instructor }}>
                 </div>
-                <div class="form-group col-sm-auto">
+
+                <!-- Course Name Filter -->
+                <div class="col-md-4 mb-3">
                     <label for="course_name">Course Name:</label>
-                    <input class="custom-control" type="text" name="course_name" id="course_name"
-                           value={{ fields.course_name }}>
+                    <input class="form-control" type="text" name="course_name" id="course_name"
+                        value={{ fields.course_name }}>
                 </div>
-                <div class="form-group col-sm-auto">
+
+                <!-- Course Number Filter -->
+                <div class="col-md-4 mb-3">
                     <label for="course_nmbr">Course Number:</label>
-                    <input class="custom-control" type="text" name="course_nmbr" id="course_nmbr"
-                           value={{ fields.course_nmbr }}>
+                    <input class="form-control" type="text" name="course_nmbr" id="course_nmbr"
+                        value={{ fields.course_nmbr }}>
                 </div>
             </div>
-
+        
+            <!-- Dropdown for Additional Filter -->
             <div>
-                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#extra_filters"
+                <button class="btn btn-primary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#extra_filters"
                         aria-expanded="false" aria-controls="filter_collapse_button">
                     See More Filters
                 </button>
             </div>
-            <div class="collapse" id="extra_filters">
-                <div>
-                    <!-- Change to another input type -->
-                    <div class="form-group col-sm-auto">
-                        <label for="start_time">Start time:</label>
-                        <input type="time" class="custom-select" name="start_time" id="start_time"
-                               value={{ fields.start_time }} step="1800">
-                        <label for="end_time">End time:</label>
-                        <input type="time" class="custom-select" name="end_time" id="end_time"
-                               value={{ fields.end_time }} step="1800">
-                        <label for="days">Days:</label>
-                        <div class="dropdown" style="display: inline-block;" name="days" id="days">
-                            <button class="dropdown-toggle" style="background-color: inherit" type="button"
-                                    data-toggle="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                Select...
-                            </button>
-                            <ul class="dropdown-menu">
-                                {% for day, checked in days.items %}
-                                    <li>
-                                        <div class="form-check"
-                                             style="margin-left: 0.5rem; margin-right: 0.5rem">
-                                            <label for={{ day }}>{{ day }}</label>
-                                            <input class="form-check-input" type="checkbox"
-                                                   name={{ day }} id={{ day }} {% if checked %}
-                                                   checked {% else %} {% endif %}>
-                                        </div>
-                                    </li>
-                                {% endfor %}
-                            </ul>
+
+            <hr>
+
+                <div class="collapse mb-3" id="extra_filters">
+                    <div class="row">
+
+                        <!-- Start Time Filter -->
+                        <div class="col-md-4 mb-3">
+                            <label for="start_time">Start time:</label>
+                            <input type="time" class="form-control" name="start_time" id="start_time"
+                            value={{ fields.start_time }} step="1800">
+                        </div>
+
+                        <!-- End Time Filter -->
+                        <div class="col-md-4 mb-3">
+                            <label for="end_time">End time:</label>
+                            <input type="time" class="form-control" name="end_time" id="end_time"
+                                value={{ fields.end_time }} step="1800">
+                        </div>
+
+                        <!-- Days Filter -->
+                        <div class="col-md-4 mb-3">
+                            <label for="days">Days:</label>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                                        data-toggle="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Select...
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% for day, checked in days.items %}
+                                        <li>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                    name={{ day }} id={{ day }} {% if checked %}
+                                                    checked {% else %} {% endif %}>
+                                                <label class="form-check-label" for={{ day }}>{{ day }}</label>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- "Only Show Open" Courses Filter -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="only_open"
+                                    id="only_open" {% if fields.only_open %} checked {% else %} {% endif %}>
+                                <label class="form-check-label" for="only_open">Only show open</label>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                
 
-            <div class="row">
-                <div class="form-group col-sm-auto">
-                    <button type="submit" class="btn btn-primary" name="official_search_button">Search</button>
-                </div>
-                <div class="form-check col-sm-auto">
-                    <label for="only_open">Only show open</label>
-                    <input class="form-check-input col-sm-auto" type="checkbox" name="only_open"
-                           id="only_open" {% if fields.only_open %} checked {% else %} {% endif %}>
-                </div>
+            <!-- Search Button -->
+            <div class="col-md-6 mb-3">
+                <button type="submit" class="btn btn-primary" name="official_search_button">Search</button>
             </div>
         </form>
 
         <hr>
+
         {% if active_class_messages %}
             {% for message in class_messages %}
             <div class="alert alert-warning" role="alert">
@@ -153,183 +169,175 @@
             {% endfor %}
         {% endif %}
 
-        {# NOTE!!! below is output of classes from sis#}
-        {% if courses %}
-            <div class="container card">
-                {% for course in courses %}
-                    <div class="row">
-                        <div class="col">
-                            <div class="card container m-1" id="class_card">
-                                <div class="card-header row">
-                                    <div class="col-sm-auto">
-                                        <p>{{ course.subject }} {{ course.catalog_nbr }}</p>
-                                        <p>{{ forloop.counter }}</p>
-                                    </div>
-                                    <div class="col">
-                                        <b>{{ course.descr }}</b>
-                                    </div>
-                                    <div class="col">
-                                        <button class="btn btn-primary" type="button" id="extra_info_{{ forloop.counter }}_button" onclick="toggler('extra_info_{{ forloop.counter }}')">
-                                            More Info
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="card-body row">
-                                    <div class="col-sm-auto">
-                                        <p>Instructor: {{ course.instructors.0.name }}</p>
-                                    </div>
-                                    <div class="col">
-                                        <p>
-                                            Capacity: {{ course.enrollment_total }}/{{ course.class_capacity }}
-                                        </p>
-                                        <p>
-                                            Wait List: {{ course.wait_tot }} / {{ course.wait_cap }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="card-body row">
-                                    <div class="col-sm-auto">
-                                        <p>{{ course.units }} Credits</p>
-                                    </div>
-                                    <div class="col">
+        <br>
+        <br>
 
-                                    </div>
-                                    {% if not perms.global_permissions.is_advisor %}
-                                    <div class="col">
-                                        <form method="post" action="{% url 'schedule:add_course' %}">
-                                            {% csrf_token %}
-                                            <input class="collapse" type="text" name="term" id="term
-"                                       value={{ course.strm }}>
-                                            <input class="collapse" type="text" name="class_nbr" id="class_nbr"
-                                                   value={{ course.class_nbr }}>
-                                            <button type="submit" class="btn btn-primary">Add Course</button>
-                                        </form>
-
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col">
-                            <div class="card container invisible m-1" id="extra_info_{{ forloop.counter }}" >
-                                <div class="card-header row">
-                                    <div class="col-sm-auto">
-                                        <p>{{ course.subject }} {{ course.catalog_nbr }}</p>
-                                        <p>{{ forloop.counter }}</p>
-                                    </div>
-                                    <div class="col">
-                                        <b>{{ course.descr }}</b>
-                                    </div>
-                                </div>
-                                <div class="card-body row">
-                                    <div class="col-sm-auto">
-                                        <p>Location: {{ course.location_descr }}</p>
-                                    </div>
-                                    <div class="col-sm-auto">
-                                        <p>Instruction: {{ course.instruction_mode_descr }}</p>
-                                    </div>
-                                </div>
-                                <div class="card-body row align-items-stretch">
-                                    <div class="col">
-                                        Days:
-                                    </div>
-                                    {% for days in course.meetings %}
-                                        <div class="col">
-                                            {{ days.days }} @ {{ days.facility_descr }} from {{ days.start_time|slice:"0:5"|to_colon|no_military }} to {{ days.end_time|slice:"0:5"|to_colon|no_military }}
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+        <!-- If filtered courses are found, display the courses -->
 
         {% if no_classes_found %}
             <section class="section-1">
                 <p>No results found</p>
             </section>
         {% endif %}
+        
+        {% if courses %}
+            <div class="container">
 
-        {#            <div class="container card">#}
-        {#                <div class="row">#}
-        {#                    <div class="col">#}
-        {#                        {% for course in courses %}#}
-        {#                            <div class="card container">#}
-        {#                                <div class="card-header row">#}
-        {#                                    <div class="col-sm-auto">#}
-        {#                                        <p>{{ course.subject }} {{ course.catalog_nbr }}</p>#}
-        {#                                        <p>{{ forloop.counter }}</p>#}
-        {#                                    </div>#}
-        {#                                    <div class="col">#}
-        {#                                        <b>{{ course.descr }}</b>#}
-        {#                                    </div>#}
-        {#                                    <div class="col">#}
-        {#                                        <button class="btn btn-primary" type="button" onclick="toggler('extra_info_{{ forloop.counter }}')">#}
-        {#                                            Click here#}
-        {#                                        </button>#}
-        {#                                    </div>#}
-        {#                                </div>#}
-        {#                                <div class="card-body row">#}
-        {#                                    <div class="col-sm-auto">#}
-        {#                                        <p>Instructor: {{ course.instructors.0.name }}</p>#}
-        {#                                    </div>#}
-        {#                                    <div class="col">#}
-        {#                                        <p>#}
-        {#                                            Capacity: {{ course.enrollment_total }}/{{ course.class_capacity }}#}
-        {#                                        </p>#}
-        {#                                    </div>#}
-        {#                                </div>#}
-        {#                                <div class="card-body row">#}
-        {#                                    <div class="col-sm-auto">#}
-        {#                                        <p>{{ course.units }} Credits</p>#}
-        {#                                    </div>#}
-        {#                                </div>#}
-        {#                            </div>#}
-        {#                        {% endfor %}#}
-        {#                    </div>#}
-        {#                    <div class="col" id="extra_info">#}
-        {#                        <div class="sticky-top" style="position: -webkit-sticky">#}
-        {#                            {% for course in courses %}#}
-        {#                                <div class="card container invisible" id="extra_info_{{ forloop.counter }}" >#}
-        {#                                    <div class="card-header row">#}
-        {#                                        <div class="col-sm-auto">#}
-        {#                                            <p>{{ course.subject }} {{ course.catalog_nbr }}</p>#}
-        {#                                            <p>{{ forloop.counter }}</p>#}
-        {#                                        </div>#}
-        {#                                        <div class="col">#}
-        {#                                            <b>{{ course.descr }}</b>#}
-        {#                                        </div>#}
-        {#                                    </div>#}
-        {#                                    <div class="card-body row">#}
-        {#                                        <div class="col-sm-auto">#}
-        {#                                            <p>Location: {{ course.location_descr }}</p>#}
-        {#                                        </div>#}
-        {#                                        <div class="col-sm-auto">#}
-        {#                                            <p>Instruction: {{ course.instruction_mode_descr }}</p>#}
-        {#                                        </div>#}
-        {#                                         <div class="col">#}
-        {#                                            Days:#}
-        {#                                        </div>#}
-        {#                                        {% for days in course.meetings %}#}
-        {#                                            <div class="col">#}
-        {#                                                {{ days.days }} @ {{ days.facility_descr }}#}
-        {#                                            </div>#}
-        {#                                        {% endfor %}#}
-        {#                                    </div>#}
-        {#                                    <div class="card-body row align-items-stretch">#}
-        {#                                       #}
-        {#                                    </div>#}
-        {#                                </div>#}
-        {#                            {% endfor %}#}
-        {#                        </div>#}
-        {#                    </div>#}
-        {#                </div>#}
-        {#            </div>#}
-        {#        {% endif %}#}
+                <!-- Display all courses that match filters -->
+                {% for course in courses %}
+                    <div class="card mb-3">
+                        <div class="card-header">
+
+                            <div class="row align-items-center">
+
+                                <!-- Course Subject (i.e. CS) and Catalog Number (i.e. 3100) -->
+                                <div class="col-sm-auto">
+                                    <h5 class="mb-0">{{ course.subject }} {{ course.catalog_nbr }}</h5>
+                                </div>
+                                
+                                <!-- Course Title (i.e. Data Structures and Algorithms 2)-->
+                                <div class="col">
+                                    <strong>{{ course.descr }}</strong>
+                                </div>
+
+                                <!-- Modal for More Info -->
+                                <div class="col-auto">
+                                    <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#extra_info_{{ forloop.counter }}">
+                                        More Info
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal that contains additional information -->
+                        <!-- Currently displays Location ()-->
+                        <div class="modal fade" id="extra_info_{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="extraInfoModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="extraInfoModalLabel">{{ course.subject }} {{ course.catalog_nbr }} - {{ course.descr }}</h5>
+                                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="col">
+                                            <div class="sticky-top" style="position: -webkit-sticky">
+                                                <div class="card container">
+                                                    <div class="card-header row">
+                                                        <div class="col-sm-auto">
+                                                            <p>{{ course.subject }} {{ course.catalog_nbr }}</p>
+                                                        </div>
+                                                        <div class="col">
+                                                            <b>{{ course.descr }}</b>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body row">
+                                                        
+                                                        <div class="col-sm-auto">
+
+                                                            <!-- Displays Location of a class -->
+                                                            {% for place in course.meetings %}
+                                                                <p><b>Location:</b> {{ course.location_descr }} @ {{ place.facility_descr }}</p>
+                                                            {% endfor %}
+                                                            <hr>
+                                                            
+                                                            <!-- Displays Instruction Type (i.e. On Grounds vs Off Grounds) of class-->
+                                                            <p><b>Instruction Type:</b> {{ course.instruction_mode_descr }}</p>
+                                                            <hr>
+                                                            
+                                                            <!-- Displays days a class takes place-->
+                                                            <p>
+                                                                <b>Days: </b>
+                                                                {% for days in course.meetings %}
+                                                                    {{days.days}}
+                                                                {% endfor %}
+                                                            </p>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
+            
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-auto">
+                                    <p><b>Instructor:</b> {{ course.instructors.0.name }}</p>
+                                </div>
+                                <div class="col-sm-auto">
+                                    <p>
+                                        <b>Capacity:</b> {{ course.enrollment_total }}/{{ course.class_capacity }}
+                                    </p>
+                                </div>
+                                <div class="col-sm-auto">
+                                    <p>
+                                        <b>Wait List:</b> {{ course.wait_tot }} / {{ course.wait_cap }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-auto">
+                                    <p><b>Credits:</b> {{ course.units }}</p>
+                                </div>
+                            </div>
+                        </div>
+            
+                        <div class="card-body collapse" id="extra_info_{{ forloop.counter }}">
+                            <div class="row">
+                                <div class="col-sm-auto">
+                                    <p>Location: {{ course.location_descr }}</p>
+                                </div>
+                                <div class="col-sm-auto">
+                                    <p>Instruction: {{ course.instruction_mode_descr }}</p>
+                                </div>
+                            </div>
+            
+                            <div class="row">
+                                <div class="col-sm-auto">
+                                    <strong>Days:</strong>
+                                </div>
+                                {% for days in course.meetings %}
+                                    <div class="col">
+                                        {{ days.days }} @ {{ days.facility_descr }} from {{ days.start_time|slice:"0:5"|to_colon }} to {{ days.end_time|slice:"0:5"|to_colon }}
+                                    </div>
+                                {% endfor %} 
+                            </div>
+                        </div>
+            
+                        <!-- Function to change color of "Add to Cart" button to green following it being clicked -->
+                        <script>
+                            function changeButtonColor(event) {
+                                event.target.classList.remove("btn-primary");
+                                event.target.classList.add("btn-success");
+                            }
+                        </script>
+
+                        <div class="card-footer">
+                            <form method="post" action="{% url 'schedule:add_course' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="term" id="term" value={{ course.strm }}>
+                                <input type="hidden" name="class_nbr" id="class_nbr" value={{ course.class_nbr }}>
+                                <button type="submit" class="btn btn-primary" onclick="changeButtonColor(event)">Add to Cart</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
     {% endblock %}
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 </body>
 </html>

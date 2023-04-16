@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from .models import Cart, Course, Schedule, ScheduleItem, User, CourseTime
 import requests
+from django.utils import timezone
 from django.http import HttpResponse
 
 
@@ -415,16 +417,22 @@ from django.contrib.auth.decorators import user_passes_test
 
 # Helper function to check if a user is an advisor
 def is_advisor(user):
-    is_advisor = user.groups.filter(name='glendonchin').exists()
+    #is_advisor = user.groups.filter(name='glendonchin').exists()
+    if user.has_perm('global_permissions.is_advisor'):
+        is_advisor=True
     print(f"User {user.username} is advisor: {is_advisor}")
-    return user.groups.filter(name='glendonchin').exists()
+    return is_advisor
 
 @login_required
 @user_passes_test(is_advisor)
 def approve_schedule(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
+    print(f"Before approval: {schedule.status}")  # Add this line
     schedule.status = 'approved'
+    schedule.approved_date = timezone.now()
     schedule.save()
+    schedule.refresh_from_db()  # Add this line
+    print(f"After approval: {schedule.status}")  # Add this line
     # Redirect to the submissions page
     return redirect('schedule:submissions')
 
@@ -432,13 +440,25 @@ def approve_schedule(request, schedule_id):
 @user_passes_test(is_advisor)
 def deny_schedule(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
+    schedule.status = 'Denied'
+    schedule.denied_date = timezone.now()
+    schedule.save()
+    schedule.schedule_items.all().delete()
+    messages.success(request, 'Schedule denied and cleared.')
+    return redirect('schedule:submissions')
+
+
+@login_required
+@user_passes_test(is_advisor)
+def add_comments(request, schedule_id):
+    schedule = get_object_or_404(Schedule, id=schedule_id)
+    
     if request.method == 'POST':
         comments = request.POST.get('comments')
-        schedule.status = 'denied'
         schedule.comments = comments
+        schedule.comment_date = timezone.now()
         schedule.save()
-        # Redirect to the submissions page
+        messages.success(request, 'Comments added to the schedule.')
         return redirect('schedule:submissions')
-    else:
-        # Render the deny schedule form
-        return render(request, 'deny_schedule.html', {'schedule': schedule})
+
+    return render(request, 'add_comments.html', {'schedule': schedule})
