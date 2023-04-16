@@ -300,7 +300,7 @@ def view_cart(request):
     courses = Course.objects.filter(cart=cart).exclude(scheduleitem__schedule=schedule)
 
     # Render the view_cart template with the courses
-    context = {'courses': courses}
+    context = {'courses': courses, 'schedule_submitted':schedule.submitted}
     return render(request, 'schedule/view_cart.html', context)
 
 # Removes a course from the user's cart
@@ -376,6 +376,8 @@ def add_to_schedule(request, course_id):
                    'class_messages': "Can not add this course, it will surpass the 19 credit limit."}
         return render(request, 'schedule/view_cart.html', context)
     schedule.total_units = total_units + course.units
+    if schedule.submitted:
+        schedule.submitted = False
     schedule.save()
 
     schedule_item = ScheduleItem(schedule=schedule, course=course)
@@ -398,6 +400,27 @@ def view_schedule(request):
         'schedule_items': schedule_items,
     }
     return render(request, 'schedule/view_schedule.html', context)
+
+def remove_course_from_schedule(request, course_id):
+    # course = get_object_or_404(Course, id=course_id, cart__user=request.user)
+    # course.delete()
+    # messages.success(request, 'Course removed from cart.')
+    # return redirect('schedule:view_cart')
+    schedule = get_object_or_404(Schedule, user=request.user)
+    course = get_object_or_404(Course, pk = course_id)
+    schedule.total_units = schedule.total_units - course.units
+    course.delete()
+    schedule.save()
+    # schedule_item = ScheduleItem.objects.get(course = course)
+    # schedule_item.delete()
+    messages.success(request, 'Removed Course from the Schedule')
+    return redirect('schedule:view_schedule')
+
+def unsubmit_schedule(request):
+    schedule = get_object_or_404(Schedule, user = request.user)
+    schedule.submitted = False
+    schedule.save()
+    return redirect('schedule:view_schedule')
 
 # Submits schedule to advisor
 @login_required

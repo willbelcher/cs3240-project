@@ -144,3 +144,28 @@ class TestCourseSearch(TestCase):
         response = view_schedule(request)
 
         self.assertEqual(response.status_code, 200)
+
+    def test_submissions(self):
+        pass
+
+    def test_view_cart(self):
+        pass
+
+    def test_remove_course_from_schedule(self):
+        pass
+
+    def test_unsubmit_schedule(self):
+        pass
+
+    def test_submit_schedule(self):
+        pass
+
+    def test_is_advisor(self):
+        pass
+
+    def test_approve_schedule(self):
+        pass
+
+    def test_deny_schedule(self):
+        pass
+

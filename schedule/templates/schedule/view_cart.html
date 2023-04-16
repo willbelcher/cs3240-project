@@ -13,22 +13,27 @@
 </head>
 <body>
 {% if active_class_messages %}
-            <div class="alert alert-warning" role="alert">
-                {{ class_messages }}
-            </div>
-        {% endif %}
-    {% block content %}
-        <br>
-        <div class="container">
+    <div class="alert alert-warning" role="alert">
+        {{ class_messages }}
+    </div>
+{% endif %}
+{% block content %}
+    <br>
+    <div class="container">
         <h2>Your Cart</h2>
         <hr>
-            {% if courses %}
+        {% if schedule_submitted %}
+            <div class="alert alert-danger" role="alert">
+                Your schedule is currently submitted. Adding another class will unsubmit your schedule
+            </div>
+        {% endif %}
+        {% if courses %}
 
             <!-- Displays courses added to the cart in a table -->
             <table class="table table-striped">
                 <thead>
                 <tr>
-                    
+
                     <!-- Table Header Fields -->
                     <th>Class Number</th>
                     <th>Subject</th>
@@ -38,9 +43,9 @@
                 </tr>
                 </thead>
                 <tbody>
-                    <!-- Course Data corresponding to Table Header Fields-->
-                    {% for course in courses %}
-                        <tr id="row_{{ course.id }}">
+                <!-- Course Data corresponding to Table Header Fields-->
+                {% for course in courses %}
+                    <tr id="row_{{ course.id }}">
                         <td>{{ course.class_nbr }}</td>
                         <td>{{ course.subject }}</td>
                         <td>{{ course.catalog_nbr }}</td>
@@ -59,21 +64,21 @@
                                 {% csrf_token %}
                                 <button type="submit" class="btn remove-course custom-remove-btn" data-row-id="{{ course.id }}">Remove from Cart</button>
                             </form>
-                            
-                        </td>
-                        </tr>
 
-                    {% endfor %}
+                        </td>
+                    </tr>
+
+                {% endfor %}
                 </tbody>
             </table>
 
             <!-- Notify user that the cart is currently empty -->
-            {% else %}
-                <p>Your cart is empty. <a href="{% url 'schedule:add_course' %}">Please add a course to continue.</a>.</p>
-            {% endif %}
-        </div>
-    {% endblock %}
-    
+        {% else %}
+            <p>Your cart is empty. <a href="{% url 'schedule:add_course' %}">Please add a course to continue.</a>.</p>
+        {% endif %}
+    </div>
+{% endblock %}
+
 {#    <!-- Javascript to add fade out effect when selecting buttons -->#}
 {#    <script>#}
 {##}
