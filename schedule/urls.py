@@ -19,4 +19,5 @@ urlpatterns = [
     path('submissions/', views.submissions, name='submissions'),
     path('approve-schedule/<int:schedule_id>/', views.approve_schedule, name='approve_schedule'),
     path('deny-schedule/<int:schedule_id>/', views.deny_schedule, name='deny_schedule'),
+    path('add_comments/<int:schedule_id>/', views.add_comments, name='add_comments'),
 ]

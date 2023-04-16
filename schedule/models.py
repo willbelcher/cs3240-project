@@ -43,14 +43,17 @@ class Schedule(models.Model):
     total_units = models.IntegerField(default=0)
     submitted = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)
+    approved_date = models.DateTimeField(null=True, blank=True)
+    denied_date = models.DateTimeField(null=True, blank=True)
+    comment_date = models.DateTimeField(null=True, blank=True)
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('approved', 'Approved'),
-        ('denied', 'Denied'),
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Denied', 'Denied'),
     ]
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
     comments = models.TextField(blank=True, null=True)
 
 class ScheduleItem(models.Model):
-    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name='schedule_items')
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
