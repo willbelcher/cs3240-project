@@ -249,7 +249,7 @@ class TestCourseSearch(TestCase):
 
     def test_approve_schedule(self):
         factory = RequestFactory()
-        user = User.objects.create_superuser(username='glendonchin', is_superuser=True)
+        user = User.objects.create_superuser(username='foo', is_superuser=True)
         course_id = addDummyCourse(factory, user)
 
         request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
@@ -275,7 +275,7 @@ class TestCourseSearch(TestCase):
 
     def test_deny_schedule(self):
         factory = RequestFactory()
-        user = User.objects.create_superuser(username='glendonchin', is_superuser=True)
+        user = User.objects.create_superuser(username='foo', is_superuser=True)
         course_id = addDummyCourse(factory, user)
 
         request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
