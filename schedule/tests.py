@@ -160,13 +160,70 @@ class TestCourseSearch(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_remove_course_from_schedule(self):
-        pass
+        factory = RequestFactory()
+        user = User.objects.create_superuser(username='foo', is_superuser=True)
+        course_id = addDummyCourse(factory, user)
 
-    def test_unsubmit_schedule(self):
-        pass
+        request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
+        setupRequest(request, user)
+
+        add_to_schedule(request, course_id)
+
+        self.assertEqual(1, Schedule.objects.all().count())
+        self.assertEqual(1, ScheduleItem.objects.all().count())
+
+        request = factory.delete('schedule/remove_schedule_course/1')
+        setupRequest(request, user)
+
+        remove_course_from_schedule(request, course_id)
+
+        self.assertEqual(0, ScheduleItem.objects.all().count())
 
     def test_submit_schedule(self):
-        pass
+        factory = RequestFactory()
+        user = User.objects.create_superuser(username='foo', is_superuser=True)
+        admin = User.objects.create_superuser(username='glendonchin', is_superuser=True)
+        course_id = addDummyCourse(factory, user)
+
+        request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
+        setupRequest(request, user)
+
+        add_to_schedule(request, course_id)
+
+        self.assertEqual(1, Schedule.objects.all().count())
+        self.assertEqual(1, ScheduleItem.objects.all().count())
+
+        request = factory.post('schedule/submit_schedule')
+        setupRequest(request, user)
+
+        submit_schedule(request)
+        schedule = Schedule.objects.get(pk=1)
+
+        self.assertTrue(schedule.submitted)
+
+    def test_unsubmit_schedule(self):
+        factory = RequestFactory()
+        user = User.objects.create_superuser(username='foo', is_superuser=True)
+        admin = User.objects.create_superuser(username='glendonchin', is_superuser=True)
+        course_id = addDummyCourse(factory, user)
+
+        request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
+        setupRequest(request, user)
+
+        add_to_schedule(request, course_id)
+
+        self.assertEqual(1, Schedule.objects.all().count())
+        self.assertEqual(1, ScheduleItem.objects.all().count())
+
+        request = factory.post('schedule/unsubmit_schedule')
+        setupRequest(request, user)
+
+        unsubmit_schedule(request)
+        schedule = Schedule.objects.get(pk=1)
+
+        self.assertFalse(schedule.submitted)
+
+
 
     def test_submissions(self):
         factory = RequestFactory()
@@ -191,8 +248,54 @@ class TestCourseSearch(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_approve_schedule(self):
-        pass
+        factory = RequestFactory()
+        user = User.objects.create_superuser(username='glendonchin', is_superuser=True)
+        course_id = addDummyCourse(factory, user)
+
+        request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
+        setupRequest(request, user)
+
+        add_to_schedule(request, course_id)
+
+        self.assertEqual(1, Schedule.objects.all().count())
+        self.assertEqual(1, ScheduleItem.objects.all().count())
+
+        schedule = Schedule.objects.get(pk=1)
+        schedule.submitted = True
+        schedule.save()
+
+        request = factory.post('schedule/approve-schedule/1')
+        setupRequest(request, user)
+
+        approve_schedule(request, 1)
+
+        self.assertTrue(schedule.submitted)
+        schedule = Schedule.objects.get(pk=1)
+        self.assertEqual('approved', schedule.status)
 
     def test_deny_schedule(self):
-        pass
+        factory = RequestFactory()
+        user = User.objects.create_superuser(username='glendonchin', is_superuser=True)
+        course_id = addDummyCourse(factory, user)
+
+        request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
+        setupRequest(request, user)
+
+        add_to_schedule(request, course_id)
+
+        self.assertEqual(1, Schedule.objects.all().count())
+        self.assertEqual(1, ScheduleItem.objects.all().count())
+
+        schedule = Schedule.objects.get(pk=1)
+        schedule.submitted = True
+        schedule.save()
+
+        request = factory.post('schedule/deny-schedule/1')
+        setupRequest(request, user)
+
+        deny_schedule(request, 1)
+
+        self.assertTrue(schedule.submitted)
+        schedule = Schedule.objects.get(pk=1)
+        self.assertEqual('denied', schedule.status)
 
