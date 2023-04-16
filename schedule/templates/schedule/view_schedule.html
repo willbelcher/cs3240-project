@@ -67,17 +67,17 @@
         {% if schedule.status != "Approved" and schedule.denied_date %}
             <p>Denied on: {{ schedule.denied_date|date:"F j, Y, g:i A" }}</p>
         {% endif %}
-
-        <!-- Comment Date -->
-        {% if schedule.comment_date %}
-            <p>Comment received on: {{ schedule.comment_date|date:"F j, Y, g:i A" }}</p>
-        {% endif %}
         
         <br>
 
         <!-- Display comment feedback -->
         <th>Comments: </th>
         <td>{{ schedule.comments }}</td>
+
+        <!-- Comment Date -->
+        {% if schedule.comment_date %}
+            <p>Comment received on: {{ schedule.comment_date|date:"F j, Y, g:i A" }}</p>
+        {% endif %}
     </div>
     {% endblock %}
 </body>
