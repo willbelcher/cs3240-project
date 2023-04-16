@@ -79,10 +79,44 @@
             </form>
         {% elif schedule.total_units < 12 and schedule.courses%}
             <button disabled class="btn btn-primary">Submit to Advisor</button>
-            <p>Your schedule needs more than 12 credits, or you will not be a full-time student!</p>
+            <div class="alert alert-warning" role="alert">
+                Your schedule needs more than 12 credits, or you will not be a full-time student!
+            </div>
         {% elif schedule.submitted %}
-            <p>Your schedule has been submitted to the advisor.</p>
+            <div class="alert alert-success" role="alert">
+                <p>Your schedule has been submitted to the advisor.</p>
+
+                <form method="POST" action="{% url 'schedule:unsubmit_schedule' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Unsubmit</button>
+                </form>
+            </div>
         {% endif %}
+
+        <!-- Schedule Status -->
+        <th>Submission Status: </th>
+        <td>{{ schedule.status }}</td>
+
+        <!-- Approval Date -->
+        {% if schedule.status != "Denied" and schedule.approved_date %}
+            <p>Approved on: {{ schedule.approved_date|date:"F j, Y, g:i A" }}</p>
+        {% endif %}
+
+        <!-- Denied Date -->
+        {% if schedule.status != "Approved" and schedule.denied_date %}
+            <p>Denied on: {{ schedule.denied_date|date:"F j, Y, g:i A" }}</p>
+        {% endif %}
+
+        <!-- Comment Date -->
+        {% if schedule.comment_date %}
+            <p>Comment received on: {{ schedule.comment_date|date:"F j, Y, g:i A" }}</p>
+        {% endif %}
+
+        <br>
+
+        <!-- Display comment feedback -->
+        <th>Comments: </th>
+        <td>{{ schedule.comments }}</td>
     </div>
 {% endblock %}
 </body>

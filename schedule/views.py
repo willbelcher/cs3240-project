@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from .models import Cart, Course, Schedule, ScheduleItem, User, CourseTime
 import requests
+from django.utils import timezone
 from django.http import HttpResponse
 
 
@@ -296,7 +298,7 @@ def view_cart(request):
     courses = Course.objects.filter(cart=cart).exclude(scheduleitem__schedule=schedule)
 
     # Render the view_cart template with the courses
-    context = {'courses': courses}
+    context = {'courses': courses, 'schedule_submitted':schedule.submitted}
     return render(request, 'schedule/view_cart.html', context)
 
 # Removes a course from the user's cart
@@ -372,6 +374,8 @@ def add_to_schedule(request, course_id):
                    'class_messages': "Can not add this course, it will surpass the 19 credit limit."}
         return render(request, 'schedule/view_cart.html', context)
     schedule.total_units = total_units + course.units
+    if schedule.submitted:
+        schedule.submitted = False
     schedule.save()
 
     schedule_item = ScheduleItem(schedule=schedule, course=course)
@@ -386,7 +390,6 @@ def add_to_schedule(request, course_id):
 # View for View Schedule Page
 @login_required
 def view_schedule(request):
-
     schedule = get_object_or_404(Schedule, user=request.user)
     context = {'schedule': {'total_units': schedule.total_units, 'submitted':schedule.submitted, 'courses':[]}}
     schedule_items = ScheduleItem.objects.filter(schedule=schedule)
@@ -411,19 +414,21 @@ def remove_course_from_schedule(request, course_id):
     # course.delete()
     # messages.success(request, 'Course removed from cart.')
     # return redirect('schedule:view_cart')
+    schedule = get_object_or_404(Schedule, user=request.user)
     course = get_object_or_404(Course, pk = course_id)
-    print(course_id)
-
-    schedule = Schedule.objects.get(user=request.user)
-    schedule.total_units -= course.units
-    schedule.save()
-
+    schedule.total_units = schedule.total_units - course.units
     course.delete()
+    schedule.save()
     # schedule_item = ScheduleItem.objects.get(course = course)
     # schedule_item.delete()
     messages.success(request, 'Removed Course from the Schedule')
     return redirect('schedule:view_schedule')
 
+def unsubmit_schedule(request):
+    schedule = get_object_or_404(Schedule, user = request.user)
+    schedule.submitted = False
+    schedule.save()
+    return redirect('schedule:view_schedule')
 
 # Submits schedule to advisor
 @login_required
@@ -443,16 +448,22 @@ from django.contrib.auth.decorators import user_passes_test
 
 # Helper function to check if a user is an advisor
 def is_advisor(user):
-    is_advisor = user.groups.filter(name='glendonchin').exists()
+    #is_advisor = user.groups.filter(name='glendonchin').exists()
+    if user.has_perm('global_permissions.is_advisor'):
+        is_advisor=True
     print(f"User {user.username} is advisor: {is_advisor}")
-    return user.groups.filter(name='glendonchin').exists()
+    return is_advisor
 
 @login_required
 @user_passes_test(is_advisor)
 def approve_schedule(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
+    print(f"Before approval: {schedule.status}")  # Add this line
     schedule.status = 'approved'
+    schedule.approved_date = timezone.now()
     schedule.save()
+    schedule.refresh_from_db()  # Add this line
+    print(f"After approval: {schedule.status}")  # Add this line
     # Redirect to the submissions page
     return redirect('schedule:submissions')
 
@@ -460,13 +471,25 @@ def approve_schedule(request, schedule_id):
 @user_passes_test(is_advisor)
 def deny_schedule(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
+    schedule.status = 'Denied'
+    schedule.denied_date = timezone.now()
+    schedule.save()
+    schedule.schedule_items.all().delete()
+    messages.success(request, 'Schedule denied and cleared.')
+    return redirect('schedule:submissions')
+
+
+@login_required
+@user_passes_test(is_advisor)
+def add_comments(request, schedule_id):
+    schedule = get_object_or_404(Schedule, id=schedule_id)
+
     if request.method == 'POST':
         comments = request.POST.get('comments')
-        schedule.status = 'denied'
         schedule.comments = comments
+        schedule.comment_date = timezone.now()
         schedule.save()
-        # Redirect to the submissions page
+        messages.success(request, 'Comments added to the schedule.')
         return redirect('schedule:submissions')
-    else:
-        # Render the deny schedule form
-        return render(request, 'deny_schedule.html', {'schedule': schedule})
+
+    return render(request, 'add_comments.html', {'schedule': schedule})
