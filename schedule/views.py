@@ -51,13 +51,11 @@ def submissions(request):
             users = User.objects.get(pk=schedule['user_id'])
             items = ScheduleItem.objects.filter(schedule=schedule['id']).values()
 
-            context['schedules'].append({'user': users, 'courses':[]})
+            context['schedules'].append({'id': schedule['id'],'user': users, 'courses':[], 'total_units':schedule['total_units']})
             for item in items:
                     course = Course.objects.get(pk=item['course_id'])
                     context['schedules'][count]['courses'].append(course)
             count = count + 1
-        schedules = Schedule.objects.filter(submitted=True)
-        context.update({'schedules': schedules})
 
         return render(request, 'schedule/schedule_submissions.html', context)
     else:
@@ -393,12 +391,22 @@ def add_to_schedule(request, course_id):
 @login_required
 def view_schedule(request):
     schedule = get_object_or_404(Schedule, user=request.user)
+    context = {'schedule': {'total_units': schedule.total_units, 'submitted':schedule.submitted, 'courses':[]}}
     schedule_items = ScheduleItem.objects.filter(schedule=schedule)
 
-    context = {
-        'schedule': schedule,
-        'schedule_items': schedule_items,
-    }
+    for item in schedule_items:
+        # course = Course.objects.get(course = item.course)
+        course = item.course
+        times = CourseTime.objects.filter(course = course)
+        all_times = []
+        for time in times:
+            all_times.append({'days':time.days, 'starting_time':time.starting_time, 'ending_time':time.ending_time})
+        context['schedule']['courses'].append({'course':course, 'all_times':all_times})
+
+    # context = {
+    #     'schedule': schedule,
+    #     'schedule_items': schedule_items,
+    # }
     return render(request, 'schedule/view_schedule.html', context)
 
 def remove_course_from_schedule(request, course_id):
@@ -475,7 +483,7 @@ def deny_schedule(request, schedule_id):
 @user_passes_test(is_advisor)
 def add_comments(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
-    
+
     if request.method == 'POST':
         comments = request.POST.get('comments')
         schedule.comments = comments
