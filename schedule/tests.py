@@ -297,5 +297,5 @@ class TestCourseSearch(TestCase):
 
         self.assertTrue(schedule.submitted)
         schedule = Schedule.objects.get(pk=1)
-        self.assertEqual('denied', schedule.status)
+        self.assertEqual('Denied', schedule.status)
 
