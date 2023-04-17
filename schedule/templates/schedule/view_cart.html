@@ -33,7 +33,7 @@
             <table class="table table-striped">
                 <thead>
                 <tr>
-
+                    
                     <!-- Table Header Fields -->
                     <th>Class Number</th>
                     <th>Subject</th>
@@ -64,9 +64,9 @@
                                 {% csrf_token %}
                                 <button type="submit" class="btn remove-course custom-remove-btn" data-row-id="{{ course.id }}">Remove from Cart</button>
                             </form>
-
+                            
                         </td>
-                    </tr>
+                        </tr>
 
                 {% endfor %}
                 </tbody>
