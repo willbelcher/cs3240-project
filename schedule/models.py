@@ -38,8 +38,9 @@ class CourseTime(models.Model):
     ending_time = models.CharField(default='00:00',max_length=10)
 
 class Schedule(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     advisor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='schedules_advised')
+    title = models.CharField(default='untitled', max_length=40)
     total_units = models.IntegerField(default=0)
     submitted = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)
