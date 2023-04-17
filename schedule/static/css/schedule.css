@@ -196,3 +196,14 @@ header .item-button a:hover{
     background-color: #ff0000;
     border-color: #ff0000;
 }
+
+.delete-btn {
+    background-color: #ffffff;
+    color: #ff0000;
+    border-color: #4e5053;
+}
+
+.delete-btn:hover {
+    color: #ffffff;
+    background-color: #ff0000;
+}

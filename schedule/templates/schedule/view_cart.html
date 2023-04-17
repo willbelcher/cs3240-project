@@ -22,11 +22,25 @@
     <div class="container">
         <h2>Your Cart</h2>
         <hr>
-        {% if schedule_submitted %}
-            <div class="alert alert-danger" role="alert">
-                Your schedule is currently submitted. Adding another class will unsubmit your schedule
+        {% for schedule in schedules %}  
+            {% if schedule.submitted %}
+                <div class="alert alert-danger" role="alert">
+                    Schedule {{ schedule.title }} is currently submitted. Adding another class will unsubmit this schedule
+                </div>
+            {% endif %}
+        {% endfor %}
+        <form class="row align-items-start" method="POST" action="{% url 'schedule:view_cart' %}">
+            {% csrf_token %}
+            <label class="col-md-auto" for="schedule_id">Schedule: </label>
+            <select class="form-control col-md-auto" style="width:fit-content" name="schedule_id" id="schedule_id">
+                {% for schedule in schedules %}
+                    <option value={{ schedule.id }} {% if current_id == schedule.id %} selected {% else %} {% endif %}>{{ schedule.title }}</option>
+                {% endfor %}
+            </select>
+            <div class="col-md-auto">
+                <button type="submit" class="btn custom-add-btn">Change Schedule</button>
             </div>
-        {% endif %}
+        </form> 
         {% if courses %}
 
             <!-- Displays courses added to the cart in a table -->
@@ -54,7 +68,7 @@
                         <td>
 
                             <!-- Add (from Cart) to Schedule Button -->
-                            <form method="POST" action="{% url 'schedule:add_to_schedule' course.id %}" class="d-inline-block mr-5">
+                            <form method="POST" action="{% url 'schedule:add_to_schedule' current_id course.id %}" class="d-inline-block mr-5">
                                 {% csrf_token %}
                                 <button type="submit" class="btn add-to-schedule custom-add-btn" data-row-id="{{ course.id }}">Add to Schedule</button>
                             </form>
