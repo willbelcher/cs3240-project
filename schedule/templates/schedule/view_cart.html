@@ -23,7 +23,7 @@
         <h2>Your Cart</h2>
         <hr>
         {% for schedule in schedules %}  
-            {% if schedule.submitted %}
+            {% if schedule.submitted and current_id == schedule.id %}
                 <div class="alert alert-danger" role="alert">
                     Schedule {{ schedule.title }} is currently submitted. Adding another class will unsubmit this schedule
                 </div>

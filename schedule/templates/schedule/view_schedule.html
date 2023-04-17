@@ -100,7 +100,7 @@
         {% endif %}
 
         {% if not schedule.submitted and schedule.total_units > 12 and schedule.courses %}
-            <form method="POST" action="{% url 'schedule:submit_schedule' %}">
+            <form method="POST" action="{% url 'schedule:submit_schedule' schedule.id %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">Submit to Advisor</button>
             </form>
@@ -113,7 +113,7 @@
             <div class="alert alert-success" role="alert">
                 <p>Your schedule has been submitted to the advisor.</p>
 
-                <form method="POST" action="{% url 'schedule:unsubmit_schedule' %}">
+                <form method="POST" action="{% url 'schedule:unsubmit_schedule' schedule.id %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary">Unsubmit</button>
                 </form>

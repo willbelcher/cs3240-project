@@ -460,16 +460,16 @@ def remove_course_from_schedule(request, schedule_id, course_id):
     messages.success(request, 'Removed Course from the Schedule')
     return redirect('schedule:view_schedule')
 
-def unsubmit_schedule(request):
-    schedule = get_object_or_404(Schedule, user = request.user)
+def unsubmit_schedule(request, schedule_id):
+    schedule = get_object_or_404(Schedule, id=schedule_id)
     schedule.submitted = False
     schedule.save()
     return redirect('schedule:view_schedule')
 
 # Submits schedule to advisor
 @login_required
-def submit_schedule(request):
-    schedule = get_object_or_404(Schedule, user=request.user)
+def submit_schedule(request, schedule_id):
+    schedule = get_object_or_404(Schedule, id=schedule_id)
 
     # Replace "advisor_username" with the username of the student's advisor username
     advisor = get_object_or_404(User, username="glendonchin")
