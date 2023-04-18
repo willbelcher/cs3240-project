@@ -302,7 +302,23 @@ def view_cart(request):
         schedule.save()
         schedules = Schedule.objects.filter(user=request.user)
 
+    context_courses = []
     courses = Course.objects.filter(cart=cart)
+    for course in courses:
+        times = CourseTime.objects.filter(course=course)
+        all_times = []
+        for time in times:
+            all_times.append({'days': time.days, 'starting_time': time.starting_time, 'ending_time': time.ending_time})
+        context_courses.append({'course': course, 'all_times': all_times})
+
+    # for item in schedule_items:
+    #     # course = Course.objects.get(course = item.course)
+    #     course = item.course
+    #     times = CourseTime.objects.filter(course=course)
+    #     all_times = []
+    #     for time in times:
+    #         all_times.append({'days': time.days, 'starting_time': time.starting_time, 'ending_time': time.ending_time})
+    #     context['schedule']['courses'].append({'course': course, 'all_times': all_times})
 
     current_id = schedules.first().id
     if request.method == "POST":
@@ -313,7 +329,7 @@ def view_cart(request):
         context_schedules.append({'id': schedule.id, 'title': schedule.title, 'submitted': schedule.submitted})
 
     # Render the view_cart template with the courses
-    context = {'courses': courses, 'schedules': context_schedules, 'current_id': current_id}
+    context = {'courses': context_courses, 'schedules': context_schedules, 'current_id': current_id}
     return render(request, 'schedule/view_cart.html', context)
 
 
