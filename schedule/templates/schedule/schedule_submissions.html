@@ -9,43 +9,70 @@
     <link rel="stylesheet" href="{% static 'css/schedule.css' %}">
 </head>
 <body>
-    <h1>Submission Page</h1>
-    <br>
-    <p>This will be where advisors can see student-submitted schedule and see if they want to approve or deny these schedules</p>
-    {% if schedules %}
-        <table class="table">
-            {% for schedule in schedules %}
+<h1>Submission Page</h1>
+<br>
+{% if schedules %}
+    <table class="table">
+        {% for schedule in schedules %}
+            <tr>
+                <td>
+                    <div class="row">
+                        <p>Schedule for {{ schedule.user }}
+                            <button class="btn" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#schedule_courses_{{ forloop.counter }}" aria-expanded="false"
+                                    aria-controls="filter_collapse_button">
+                                {# this makes a down arrow icon#}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-compact-down" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1.553 6.776a.5.5 0 0 1 .67-.223L8 9.44l5.776-2.888a.5.5 0 1 1 .448.894l-6 3a.5.5 0 0 1-.448 0l-6-3a.5.5 0 0 1-.223-.67z"></path>
+                                </svg>
+                            </button>
+                        </p>
+                        <p>Total Units: {{ schedule.total_units }}</p>
+                    </div>
+                    <div class="collapse" id="schedule_courses_{{ forloop.counter }}">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Catalog Number</th>
+                                <th>Instructor Name</th>
+                                <th>Title</th>
+                                <th>Units</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for course in schedule.courses %}
+                                <tr>
+                                    <td>{{ course.subject }}</td>
+                                    <td>{{ course.catalog_nbr }}</td>
+                                    <td>{{ course.instructor_name }}</td>
+                                    <td>{{ course.title }}</td>
+                                    <td>{{ course.units }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+                <td>
+                    {% if schedule.id %}
 
-            
-                <tr>
-                    <td>
-                        <p>Schedule for {{ schedule.user }}</p>
-                        {% for course in schedule.courses %}
-                            <p>{{ course.title }}</p>
-                        {% endfor %}
-                    </td>
-                    <td>
-                        {% if schedule.id %}
-                        
-                            <form method="POST" action="{% url 'schedule:approve_schedule' schedule.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-success">Approve</button>
-                            </form>
-                        {% endif %}
-
-                        {% if schedule.status != "Denied" and schedule.approved_date %}
-                            <p>Approved on: {{ schedule.approved_date|date:"F j, Y, g:i A" }}</p>
-                        {% endif %}
-                    </td>
-
-                    
-                    <td>
-                        {% if schedule.id %}
-                            <form method="POST" action="{% url 'schedule:deny_schedule' schedule.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-danger">Deny</button>
-                            </form>
-                        {% endif %}
+                        <form method="POST" action="{% url 'schedule:approve_schedule' schedule.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Approve</button>
+                        </form>
+                    {% endif %}
+                    {% if schedule.status != "Denied" and schedule.approved_date %}
+                        <p>Approved on: {{ schedule.approved_date|date:"F j, Y, g:i A" }}</p>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if schedule.id %}
+                        <form method="POST" action="{% url 'schedule:deny_schedule' schedule.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Deny</button>
+                        </form>
+                    {% endif %}
 
                         {% if schedule.status != "Approved" and schedule.denied_date %}
                             <p>Denied on: {{ schedule.denied_date|date:"F j, Y, g:i A" }}</p>
