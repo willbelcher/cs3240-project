@@ -462,10 +462,11 @@ from django.contrib.auth.decorators import user_passes_test
 # Helper function to check if a user is an advisor
 def is_advisor(user):
     #is_advisor = user.groups.filter(name='glendonchin').exists()
+    user_is_advisor = False
     if user.has_perm('global_permissions.is_advisor'):
-        is_advisor=True
+        user_is_advisor=True
     print(f"User {user.username} is advisor: {is_advisor}")
-    return is_advisor
+    return user_is_advisor
 
 @login_required
 @user_passes_test(is_advisor)
