@@ -281,7 +281,8 @@ def add_course(request):
                     end_time = json_days['end_time'][0:5].replace(".", ":")
                     all_days = json_days['days']
 
-                    time = CourseTime.objects.create(course=course, days=all_days, starting_time=start_time, ending_time=end_time)
+                    time = CourseTime.objects.create(course=course, days=all_days, starting_time=start_time,
+                                                     ending_time=end_time)
                     time.save()
 
                 active_class_messages = True
@@ -322,15 +323,6 @@ def view_cart(request):
         for time in times:
             all_times.append({'days': time.days, 'starting_time': time.starting_time, 'ending_time': time.ending_time})
         context_courses.append({'course': course, 'all_times': all_times})
-
-    # for item in schedule_items:
-    #     # course = Course.objects.get(course = item.course)
-    #     course = item.course
-    #     times = CourseTime.objects.filter(course=course)
-    #     all_times = []
-    #     for time in times:
-    #         all_times.append({'days': time.days, 'starting_time': time.starting_time, 'ending_time': time.ending_time})
-    #     context['schedule']['courses'].append({'course': course, 'all_times': all_times})
 
     current_id = schedules.first().id
     if request.method == "POST":
