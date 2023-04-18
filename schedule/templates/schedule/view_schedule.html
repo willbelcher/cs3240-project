@@ -107,7 +107,7 @@
                 <button type="submit" class="btn btn-primary">Submit to Advisor</button>
             </form>
         {% elif not schedule.submitted and schedule.total_units < 12 and schedule.courses %}
-            <form method="POST" action="{% url 'schedule:submit_schedule' %}">
+            <form method="POST" action="{% url 'schedule:submit_schedule' schedule.id %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">Submit to Advisor</button>
             </form>
