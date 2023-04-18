@@ -329,7 +329,7 @@ def get_context_schedules(user):
     context_schedules = []
     for schedule in Schedule.objects.filter(user=user):
         context_schedules.append({'id': schedule.id, 'title': schedule.title, 'submitted': schedule.submitted})
-    
+
     return context_schedules
 
 # Adds a course to the user's schedule from their cart
@@ -351,7 +351,7 @@ def add_to_schedule(request, schedule_id, course_id):
             courses = Course.objects.filter(cart=cart).exclude(scheduleitem__schedule=schedule)
 
             # Render the view_cart template with the courses
-            context = {'courses': courses, 'current_id': schedule_id, 'schedules': get_context_schedules(request.user), 
+            context = {'courses': courses, 'current_id': schedule_id, 'schedules': get_context_schedules(request.user),
                        'active_class_messages': True,
                        'class_messages': "Can not add this course, the same course is already added"}
             return render(request, 'schedule/view_cart.html', context)
@@ -388,8 +388,8 @@ def add_to_schedule(request, schedule_id, course_id):
                             courses = Course.objects.filter(cart=cart)
 
                             # Render the view_cart template with the courses
-                            context = {'courses': courses, 'current_id': schedule_id, 'schedules': get_context_schedules(request.user), 
-                                       'active_class_messages':True, 
+                            context = {'courses': courses, 'current_id': schedule_id, 'schedules': get_context_schedules(request.user),
+                                       'active_class_messages':True,
                                        'class_messages':"Can not add this course, it overlaps with a class already in your schedule."}
                             return render(request, 'schedule/view_cart.html', context)
 
@@ -437,10 +437,10 @@ def view_schedule(request):
     for s in schedules:
         titles.append(s.title)
 
-    context = {'schedule': {'id': schedule.id, 'title': schedule.title, 'total_units': schedule.total_units, 
-    'submitted':schedule.submitted, 'status': schedule.status, 'approved_date': schedule.approved_date,
-    'denied_date': schedule.denied_date,'comments': schedule.comments,'comment_date': schedule.comment_date, 
-    'courses':[]}, 'titles': titles}
+    context = {'schedule': {'id': schedule.id, 'title': schedule.title, 'total_units': schedule.total_units,
+                            'submitted':schedule.submitted, 'status': schedule.status, 'approved_date': schedule.approved_date,
+                            'denied_date': schedule.denied_date,'comments': schedule.comments,'comment_date': schedule.comment_date,
+                            'courses':[]}, 'titles': titles}
     schedule_items = ScheduleItem.objects.filter(schedule=schedule)
 
     for item in schedule_items:
@@ -451,8 +451,8 @@ def view_schedule(request):
         for time in times:
             all_times.append({'days':time.days, 'starting_time':time.starting_time, 'ending_time':time.ending_time})
         context['schedule']['courses'].append({'course':course, 'all_times':all_times})
-
     return render(request, 'schedule/view_schedule.html', context)
+
 
 def remove_course_from_schedule(request, schedule_id, course_id):
     # course = get_object_or_404(Course, id=course_id, cart__user=request.user)
@@ -593,5 +593,5 @@ def rename_schedule(request, schedule_id):
             schedule.title = title
             schedule.save()
             return redirect('schedule:view_schedule')
-    
+
     return render(request, 'schedule/rename_schedule.html', context)
