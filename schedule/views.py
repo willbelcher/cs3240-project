@@ -126,20 +126,20 @@ def course_search_view(request):
             fields['catalog_nbr'] = ""
             catalog_nbr=""
             active_class_messages = True
-            class_messages.append("Catalog Number Field returned to default value")
+            class_messages.append("Catalog Number Field has been cleared due to an Invalid Value")
         if not course_nmbr.isnumeric() and not course_nmbr == "":
             course_nmbr = ""
             fields['course_nmbr'] = ""
             active_class_messages = True
-            class_messages.append("Course Number Field returned to default value")
+            class_messages.append("Course Number Field has been cleared due to an Invalid Value")
         if " " in instructor:
             instructor = instructor.split(" ")[0]
             active_class_messages = True
-            class_messages.append("Instructor Field has been reverted to a valid value")
+            class_messages.append("Instructor Field has been reverted to a Valid Value")
         if " " in course_name:
             course_name = course_name.split(" ")[0]
             active_class_messages = True
-            class_messages.append("Course Name Field has been reverted to a valid value")
+            class_messages.append("Course Name Field has been reverted to a Valid Value")
 
         for day in days.keys():
             days[day] = bool(fields.get(day))
