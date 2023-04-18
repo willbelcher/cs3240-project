@@ -267,7 +267,8 @@
                                                             <p>
                                                                 <b>Days: </b>
                                                                 {% for days in course.meetings %}
-                                                                    {{days.days}}
+                                                                    {{days.days}} from {{ days.start_time|slice:"0:5"|to_colon|no_military }} to {{ days.end_time|slice:"0:5"|to_colon|no_military }}
+                                                                    <br>
                                                                 {% endfor %}
                                                             </p>
                                                             
