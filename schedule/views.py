@@ -363,6 +363,24 @@ def get_context_schedules(user):
     return context_schedules
 
 
+def get_context_courses(user):
+    # Get the user's cart
+    cart, _ = Cart.objects.get_or_create(user=user)
+
+    context_courses = []
+    courses = Course.objects.filter(cart=cart)
+
+    for course in courses:
+        times = CourseTime.objects.filter(course=course)
+        all_times = []
+
+        for time in times:
+            all_times.append({'days': time.days, 'starting_time': time.starting_time, 'ending_time': time.ending_time})
+        context_courses.append({'course': course, 'all_times': all_times})
+
+    return context_courses
+
+
 # Adds a course to the user's schedule from their cart
 @login_required
 def add_to_schedule(request, schedule_id, course_id):
@@ -382,7 +400,8 @@ def add_to_schedule(request, schedule_id, course_id):
             courses = Course.objects.filter(cart=cart).exclude(scheduleitem__schedule=schedule)
 
             # Render the view_cart template with the courses
-            context = {'courses': courses, 'current_id': schedule_id, 'schedules': get_context_schedules(request.user),
+            context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
+                       'schedules': get_context_schedules(request.user),
                        'active_class_messages': True,
                        'class_messages': "Can not add this course, the same course is already added"}
             return render(request, 'schedule/view_cart.html', context)
@@ -419,7 +438,7 @@ def add_to_schedule(request, schedule_id, course_id):
                             courses = Course.objects.filter(cart=cart)
 
                             # Render the view_cart template with the courses
-                            context = {'courses': courses, 'current_id': schedule_id,
+                            context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
                                        'schedules': get_context_schedules(request.user),
                                        'active_class_messages': True,
                                        'class_messages': "Can not add this course, it overlaps with a class already in your schedule."}
@@ -434,7 +453,9 @@ def add_to_schedule(request, schedule_id, course_id):
         courses = Course.objects.filter(cart=cart).exclude(scheduleitem__schedule=schedule)
 
         # Render the view_cart template with the courses
-        context = {'courses': courses, 'active_class_messages': True,
+        context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
+                   'schedules': get_context_schedules(request.user),
+                   'active_class_messages': True,
                    'class_messages': "Can not add this course, it will surpass the 19 credit limit."}
         return render(request, 'schedule/view_cart.html', context)
     schedule.total_units = total_units + course.units
@@ -448,8 +469,11 @@ def add_to_schedule(request, schedule_id, course_id):
     course.cart = None
     course.save()
 
-    messages.success(request, 'Course added to schedule.')
-    return redirect('schedule:view_cart')
+    context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
+               'schedules': get_context_schedules(request.user),
+               'active_class_messages': True, 'good_message': True,
+               'class_messages': "Course added to Schedule successfully."}
+    return render(request, 'schedule/view_cart.html', context)
 
 # View for View Schedule Page
 @login_required
