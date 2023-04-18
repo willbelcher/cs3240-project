@@ -11,14 +11,45 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static 'css/schedule.css' %}">
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+            integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+            integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+            crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 </head>
 <body>
 {% block content %}
     <div class="container">
-        <h2>Your Schedule</h2>
+        <h2>Your Schedules</h2>
+        <div class="row">
+            <!-- Schedule Options -->
+            <form class="col-md-5 row" action="{% url 'schedule:view_schedule' %}" method="POST">
+                {% csrf_token %}
+                <select class="form-control col-md-auto" style="width:fit-content" name="title" id="title">
+                    {% for title in titles %}
+                        <option value={{ title }} {% if schedule.title == title %} selected {% else %} {% endif %}>{{ title }}</option>
+                    {% endfor %}
+                </select>
+                <div class="col-md-auto">
+                    <button type="submit" class="btn btn-primary">View</button>
+                </div>
+            </form>
+            <form class="col-md-auto" method="GET" action="{% url 'schedule:rename_schedule' schedule.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Rename</button>
+            </form>
+            <form class="col-md-auto" method="GET" action="{% url 'schedule:create_schedule' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">New</button>
+            </form>
+            <form class="col-md-auto" method="GET" action="{% url 'schedule:delete_schedule' schedule.id %}">
+                {% csrf_token %}
+                <button type="submit" class="delete-btn btn btn-primary">Delete</button>
+            </form>
+        </div>
+
         {% if schedule.courses %}
             <table class="table table-striped">
                 <thead>
@@ -54,7 +85,7 @@
                         </td>
                         <td>
                             <form method="POST"
-                                  action="{% url 'schedule:remove_course_from_schedule' course.course.id %}">
+                                  action="{% url 'schedule:remove_course_from_schedule' schedule.id course.course.id %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn bg-danger" data-row-id="{{ course.course.id }}">
                                     X
@@ -71,11 +102,11 @@
         {% endif %}
 
         {% if not schedule.submitted and schedule.total_units >= 12 and schedule.courses %}
-            <form method="POST" action="{% url 'schedule:submit_schedule' %}">
+            <form method="POST" action="{% url 'schedule:submit_schedule' schedule.id %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">Submit to Advisor</button>
             </form>
-        {% elif not schedule.submitted and schedule.total_units < 12 and schedule.courses%}
+        {% elif not schedule.submitted and schedule.total_units < 12 and schedule.courses %}
             <form method="POST" action="{% url 'schedule:submit_schedule' %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">Submit to Advisor</button>
@@ -87,7 +118,7 @@
             <div class="alert alert-success" role="alert">
                 <p>Your schedule has been submitted to the advisor.</p>
 
-                <form method="POST" action="{% url 'schedule:unsubmit_schedule' %}">
+                <form method="POST" action="{% url 'schedule:unsubmit_schedule' schedule.id %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary">Unsubmit</button>
                 </form>
@@ -95,7 +126,7 @@
         {% endif %}
 
         <!-- Schedule Status -->
-        <th>Submission Status: </th>
+        <th>Submission Status:</th>
         <td>{{ schedule.status }}</td>
 
         <!-- Approval Date -->

@@ -295,14 +295,27 @@ def view_cart(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
 
     # Get the user's schedule
-    schedule, _ = Schedule.objects.get_or_create(user=request.user)
+    schedules = Schedule.objects.filter(user=request.user)
 
-    # Get the courses associated with the cart and exclude those in the user's schedule
-    courses = Course.objects.filter(cart=cart).exclude(scheduleitem__schedule=schedule)
+    if schedules.count() == 0:
+        schedule = Schedule.objects.create(user=request.user)
+        schedule.save()
+        schedules = Schedule.objects.filter(user=request.user)
+
+    courses = Course.objects.filter(cart=cart)
+
+    current_id = schedules.first().id
+    if request.method == "POST":
+        current_id = int(request.POST.get('schedule_id'))
+
+    context_schedules = []
+    for schedule in schedules:
+        context_schedules.append({'id': schedule.id, 'title': schedule.title, 'submitted': schedule.submitted})
 
     # Render the view_cart template with the courses
-    context = {'courses': courses, 'schedule_submitted':schedule.submitted}
+    context = {'courses': courses, 'schedules': context_schedules, 'current_id': current_id}
     return render(request, 'schedule/view_cart.html', context)
+
 
 # Removes a course from the user's cart
 @login_required
@@ -312,17 +325,27 @@ def remove_course(request, course_id):
     messages.success(request, 'Course removed from cart.')
     return redirect('schedule:view_cart')
 
+
+# Get schedules associated with the user for rerendering
+def get_context_schedules(user):
+    context_schedules = []
+    for schedule in Schedule.objects.filter(user=user):
+        context_schedules.append({'id': schedule.id, 'title': schedule.title, 'submitted': schedule.submitted})
+
+    return context_schedules
+
+
 # Adds a course to the user's schedule from their cart
 @login_required
-def add_to_schedule(request, course_id):
+def add_to_schedule(request, schedule_id, course_id):
     course = get_object_or_404(Course, id=course_id, cart__user=request.user)
-    schedule, _ = Schedule.objects.get_or_create(user=request.user)
+    schedule, _ = Schedule.objects.get_or_create(id=schedule_id, user=request.user)
     total_units = schedule.total_units
 
-    times = CourseTime.objects.filter(course = course) #get all meetings of course thats to be added
+    times = CourseTime.objects.filter(course=course)  # get all meetings of course thats to be added
     items = ScheduleItem.objects.filter(schedule=schedule.id)
     for item in items:
-        added_course = Course.objects.get(pk = item.course.id) #get all courses already in schedule
+        added_course = Course.objects.get(pk=item.course.id)  # get all courses already in schedule
 
         if added_course.subject == course.subject and added_course.catalog_nbr == course.catalog_nbr:
             cart, _ = Cart.objects.get_or_create(user=request.user)
@@ -331,7 +354,8 @@ def add_to_schedule(request, course_id):
             courses = Course.objects.filter(cart=cart).exclude(scheduleitem__schedule=schedule)
 
             # Render the view_cart template with the courses
-            context = {'courses': courses, 'active_class_messages': True,
+            context = {'courses': courses, 'current_id': schedule_id, 'schedules': get_context_schedules(request.user),
+                       'active_class_messages': True,
                        'class_messages': "Can not add this course, the same course is already added"}
             return render(request, 'schedule/view_cart.html', context)
 
@@ -363,11 +387,14 @@ def add_to_schedule(request, course_id):
                             # Get the user's cart
                             cart, _ = Cart.objects.get_or_create(user=request.user)
 
-                            # Get the courses associated with the cart and exclude those in the user's schedule
-                            courses = Course.objects.filter(cart=cart).exclude(scheduleitem__schedule=schedule)
+                            # Get the courses associated with the cart
+                            courses = Course.objects.filter(cart=cart)
 
                             # Render the view_cart template with the courses
-                            context = {'courses': courses, 'active_class_messages':True, 'class_messages':"Can not add this course, it overlaps with a class already in your schedule."}
+                            context = {'courses': courses, 'current_id': schedule_id,
+                                       'schedules': get_context_schedules(request.user),
+                                       'active_class_messages': True,
+                                       'class_messages': "Can not add this course, it overlaps with a class already in your schedule."}
                             return render(request, 'schedule/view_cart.html', context)
 
     if schedule.total_units + course.units > 19:
@@ -399,31 +426,47 @@ def add_to_schedule(request, course_id):
 # View for View Schedule Page
 @login_required
 def view_schedule(request):
-    schedule = get_object_or_404(Schedule, user=request.user)
-    context = {'schedule': {'total_units': schedule.total_units, 'submitted': schedule.submitted,
-                            'status': schedule.status, 'approved_date': schedule.approved_date,
-                            'denied_date': schedule.denied_date,'comments': schedule.comments,
-                            'comment_date': schedule.comment_date,'courses': []}}
+    schedules = Schedule.objects.filter(user=request.user)
+
+    schedule = None
+    if request.method == "POST":
+        schedule = schedules.get(title=request.POST.get('title'))
+    elif schedules.count() != 0:
+        schedule = schedules.first()
+    else:
+        schedule = Schedule.objects.create(user=request.user)
+        schedule.save()
+
+    titles = []
+    for s in schedules:
+        titles.append(s.title)
+
+    context = {'schedule': {'id': schedule.id, 'title': schedule.title, 'total_units': schedule.total_units,
+                            'submitted': schedule.submitted, 'status': schedule.status,
+                            'approved_date': schedule.approved_date,
+                            'denied_date': schedule.denied_date, 'comments': schedule.comments,
+                            'comment_date': schedule.comment_date,
+                            'courses': []}, 'titles': titles}
     schedule_items = ScheduleItem.objects.filter(schedule=schedule)
 
     for item in schedule_items:
         # course = Course.objects.get(course = item.course)
         course = item.course
-        times = CourseTime.objects.filter(course = course)
+        times = CourseTime.objects.filter(course=course)
         all_times = []
         for time in times:
-            all_times.append({'days':time.days, 'starting_time':time.starting_time, 'ending_time':time.ending_time})
-        context['schedule']['courses'].append({'course':course, 'all_times':all_times})
-
+            all_times.append({'days': time.days, 'starting_time': time.starting_time, 'ending_time': time.ending_time})
+        context['schedule']['courses'].append({'course': course, 'all_times': all_times})
     return render(request, 'schedule/view_schedule.html', context)
 
-def remove_course_from_schedule(request, course_id):
+
+def remove_course_from_schedule(request, schedule_id, course_id):
     # course = get_object_or_404(Course, id=course_id, cart__user=request.user)
     # course.delete()
     # messages.success(request, 'Course removed from cart.')
     # return redirect('schedule:view_cart')
-    schedule = get_object_or_404(Schedule, user=request.user)
-    course = get_object_or_404(Course, pk = course_id)
+    schedule = get_object_or_404(Schedule, pk=schedule_id, user=request.user)
+    course = get_object_or_404(Course, pk=course_id)
     schedule.total_units = schedule.total_units - course.units
     course.delete()
     schedule.save()
@@ -432,22 +475,23 @@ def remove_course_from_schedule(request, course_id):
     messages.success(request, 'Removed Course from the Schedule')
     return redirect('schedule:view_schedule')
 
-def unsubmit_schedule(request):
-    schedule = get_object_or_404(Schedule, user = request.user)
+
+def unsubmit_schedule(request, schedule_id):
+    schedule = get_object_or_404(Schedule, id=schedule_id)
     schedule.submitted = False
     schedule.save()
     return redirect('schedule:view_schedule')
 
 # Submits schedule to advisor
 @login_required
-def submit_schedule(request):
-    schedule = get_object_or_404(Schedule, user=request.user)
+def submit_schedule(request, schedule_id):
+    schedule = get_object_or_404(Schedule, id=schedule_id)
 
     # Replace "advisor_username" with the username of the student's advisor username
     advisor = get_object_or_404(User, username="glendonchin")
     schedule.advisor = advisor
     schedule.submitted = True
-    schedule.status="Pending"
+    schedule.status = "Pending"
     schedule.comments = None
     schedule.approved_date = None
     schedule.denied_date = None
@@ -462,10 +506,11 @@ from django.contrib.auth.decorators import user_passes_test
 # Helper function to check if a user is an advisor
 def is_advisor(user):
     #is_advisor = user.groups.filter(name='glendonchin').exists()
+    user_is_advisor = False
     if user.has_perm('global_permissions.is_advisor'):
-        is_advisor=True
+        user_is_advisor = True
     print(f"User {user.username} is advisor: {is_advisor}")
-    return is_advisor
+    return user_is_advisor
 
 @login_required
 @user_passes_test(is_advisor)
@@ -512,3 +557,51 @@ def add_comments(request, schedule_id):
         return redirect('schedule:submissions')
 
     return render(request, 'add_comments.html', {'schedule': schedule})
+
+
+@login_required
+def delete_schedule(request, schedule_id):
+    schedule = get_object_or_404(Schedule, id=schedule_id)
+    schedule.delete()
+
+    # ensure user always has one schedule
+    if Schedule.objects.filter(user=request.user).count() == 0:
+        Schedule.objects.create(user=request.user).save()
+
+    return redirect('schedule:view_schedule')
+
+
+@login_required
+def create_schedule(request):
+    context = {}
+    if request.method == "POST":
+        title = request.POST.get('title')
+
+        if Schedule.objects.filter(user=request.user, title=title).count() != 0:
+            context['is_error'] = True
+            context['error_message'] = 'A schedule with that name already exists, please choose another.'
+        else:
+            schedule = Schedule.objects.create(user=request.user, title=title)
+            schedule.save()
+            return redirect('schedule:view_schedule')
+
+    return render(request, 'schedule/create_schedule.html', context)
+
+
+@login_required
+def rename_schedule(request, schedule_id):
+    schedule = get_object_or_404(Schedule, id=schedule_id)
+    context = {'schedule': {'id': schedule_id, 'title': schedule.title}}
+
+    if request.method == "POST":
+        title = request.POST.get('title')
+
+        if Schedule.objects.filter(user=request.user, title=title).count() != 0:
+            context['is_error'] = True
+            context['error_message'] = 'A schedule with that name already exists, please choose another.'
+        else:
+            schedule.title = title
+            schedule.save()
+            return redirect('schedule:view_schedule')
+
+    return render(request, 'schedule/rename_schedule.html', context)
