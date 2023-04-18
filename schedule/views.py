@@ -469,6 +469,7 @@ def approve_schedule(request, schedule_id):
 @user_passes_test(is_advisor)
 def deny_schedule(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
+    schedule.submitted = False
     schedule.status = 'Denied'
     schedule.denied_date = timezone.now()
     schedule.save()
