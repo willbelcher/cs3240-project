@@ -1,5 +1,6 @@
 {% include "nav.html" %}
 {% load static %}
+{% load no_military %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,21 +56,36 @@
                     <th>Catalog Number</th>
                     <th>Instructor Name</th>
                     <th>Title</th>
+                    <th>Units</th>
+                    <th>Days</th>
+                    <th>Times</th>
                 </tr>
                 </thead>
                 <tbody>
                 <!-- Course Data corresponding to Table Header Fields-->
                 {% for course in courses %}
                     <tr id="row_{{ course.id }}">
-                        <td>{{ course.class_nbr }}</td>
-                        <td>{{ course.subject }}</td>
-                        <td>{{ course.catalog_nbr }}</td>
-                        <td>{{ course.instructor_name }}</td>
-                        <td>{{ course.title }}</td>
+                        <td>{{ course.course.class_nbr }}</td>
+                        <td>{{ course.course.subject }}</td>
+                        <td>{{ course.course.catalog_nbr }}</td>
+                        <td>{{ course.course.instructor_name }}</td>
+                        <td>{{ course.course.title }}</td>
+                        <td>{{ course.course.units }}</td>
+                        <td>
+                            {% for time in course.all_times %}
+                                {{ time.days }}<br>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for time in course.all_times %}
+                                {{ time.starting_time|no_military }} to {{ time.ending_time|no_military }}<br>
+                            {% endfor %}
+                        </td>
                         <td>
 
                             <!-- Add (from Cart) to Schedule Button -->
-                            <form method="POST" action="{% url 'schedule:add_to_schedule' current_id course.id %}"
+                            <form method="POST"
+                                  action="{% url 'schedule:add_to_schedule' current_id course.course.id %}"
                                   class="d-inline-block mr-5">
                                 {% csrf_token %}
                                 <button type="submit" class="btn add-to-schedule custom-add-btn"
@@ -78,7 +94,7 @@
                             </form>
 
                             <!-- Remove (from Cart) Button -->
-                            <form method="POST" action="{% url 'schedule:remove_course' course.id %}"
+                            <form method="POST" action="{% url 'schedule:remove_course' course.course.id %}"
                                   class="d-inline-block">
                                 {% csrf_token %}
                                 <button type="submit" class="btn remove-course custom-remove-btn"
@@ -87,7 +103,7 @@
                             </form>
 
                         </td>
-                        </tr>
+                    </tr>
 
                 {% endfor %}
                 </tbody>
