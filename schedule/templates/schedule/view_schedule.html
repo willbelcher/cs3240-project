@@ -20,59 +20,57 @@
     <div class="container">
         <h2>Your Schedule</h2>
         {% if schedule.courses %}
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Class Number</th>
+                    <th>Subject</th>
+                    <th>Catalog Number</th>
+                    <th>Instructor Name</th>
+                    <th>Title</th>
+                    <th>Units</th>
+                    <th>Days</th>
+                    <th>Times</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for course in schedule.courses %}
                     <tr>
-                        <th>Class Number</th>
-                        <th>Subject</th>
-                        <th>Catalog Number</th>
-                        <th>Instructor Name</th>
-                        <th>Title</th>
-                        <th>Units</th>
-                        <th>Days</th>
-                        <th>Times</th>
+                        <td>{{ course.course.class_nbr }}</td>
+                        <td>{{ course.course.subject }}</td>
+                        <td>{{ course.course.catalog_nbr }}</td>
+                        <td>{{ course.course.instructor_name }}</td>
+                        <td>{{ course.course.title }}</td>
+                        <td>{{ course.course.units }}</td>
+                        <td>
+                            {% for time in course.all_times %}
+                                {{ time.days }}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for time in course.all_times %}
+                                {{ time.starting_time|no_military }} to {{ time.ending_time|no_military }}<br>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <form method="POST"
+                                  action="{% url 'schedule:remove_course_from_schedule' course.course.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn bg-danger" data-row-id="{{ course.course.id }}">
+                                    X
+                                </button>
+                            </form>
+                        </td>
                     </tr>
-                    </thead>
-                    <tbody>
-                    {% for course in schedule.courses %}
-                        <tr>
-                            <td>{{ course.course.class_nbr }}</td>
-                            <td>{{ course.course.subject }}</td>
-                            <td>{{ course.course.catalog_nbr }}</td>
-                            <td>{{ course.course.instructor_name }}</td>
-                            <td>{{ course.course.title }}</td>
-                            <td>{{ course.course.units }}</td>
-                            <td>
-                                {% for time in course.all_times %}
-                                    {{ time.days }}
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% for time in course.all_times %}
-                                    {{ time.starting_time|no_military }} to {{ time.ending_time|no_military }}<br>
-                                {% endfor %}
-                            </td>
-                            <td>
-                                <form method="POST"
-                                      action="{% url 'schedule:remove_course_from_schedule' course.course.id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn bg-danger" data-row-id="{{ course.course.id }}">
-                                        X
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                {% endfor %}
+                </tbody>
+            </table>
             <h3>Total Units: {{ schedule.total_units }}</h3>
         {% else %}
             <p>Your schedule is empty. <a href="{% url 'schedule:view_cart' %}">Add a course from the cart</a>.</p>
         {% endif %}
 
-        {% if not schedule.submitted and schedule.total_units > 12 and schedule.courses %}
+        {% if not schedule.submitted and schedule.total_units >= 12 and schedule.courses %}
             <form method="POST" action="{% url 'schedule:submit_schedule' %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">Submit to Advisor</button>

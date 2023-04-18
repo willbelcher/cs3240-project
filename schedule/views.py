@@ -50,17 +50,20 @@ def submissions(request):
         for schedule in schedules:
             users = User.objects.get(pk=schedule['user_id'])
             items = ScheduleItem.objects.filter(schedule=schedule['id']).values()
+            context['schedules'].append({'id': schedule['id'],'user': users, 'courses':[], 'status': schedule['status'],
+                                         'approved_date': schedule['approved_date'], 'denied_date': schedule['denied_date'],
+                                         'comments': schedule['comments'], 'comment_date': schedule['comment_date'],
+                                         'total_units':schedule['total_units']})
 
-            context['schedules'].append({'id': schedule['id'],'user': users, 'courses':[], 'total_units':schedule['total_units']})
             for item in items:
-                    course = Course.objects.get(pk=item['course_id'])
-                    context['schedules'][count]['courses'].append(course)
+                course = Course.objects.get(pk=item['course_id'])
+                context['schedules'][count]['courses'].append(course)
             count = count + 1
 
         return render(request, 'schedule/schedule_submissions.html', context)
     else:
         return HttpResponse("You are not authorized to view this page.")
-    
+
 
 # Logouts user and redirects them to the home page
 def logout_view(request):
@@ -137,7 +140,7 @@ def course_search_view(request):
             course_name = course_name.split(" ")[0]
             active_class_messages = True
             class_messages.append("Course Name Field has been reverted to a valid value")
-        
+
         for day in days.keys():
             days[day] = bool(fields.get(day))
 
@@ -166,13 +169,13 @@ def course_search_view(request):
             search_url += field_pattern.format("catalog_nbr", catalog_nbr)
         if only_open:
             search_url += field_pattern.format("enrl_stat", 'O')
-        
+
         if list(days.values()).count(True) != len(days): # Filter by days checked in form
             filter_days = ""
             for day, checked in days.items():
                 if checked:
                     filter_days += day
-            
+
             search_url += field_pattern.format("days", filter_days)
 
         if start_time != "00:00" or end_time != "23:59":
@@ -281,7 +284,7 @@ def add_course(request):
             else:
                 messages.error(request, 'Failed to fetch course data.')
 
-   #resest all the filters so the website doesn't break on a following course search
+    #resest all the filters so the website doesn't break on a following course search
     return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields':fields, 'days':days, 'active_class_messages':active_class_messages, 'class_messages':class_messages})
 
 
@@ -347,8 +350,14 @@ def add_to_schedule(request, course_id):
                         added_course_starting_hour = int(added_course_time.starting_time.split(":")[0])
                         added_course_ending_time = int(added_course_time.ending_time.split(":")[0])
 
-                        if added_course_starting_hour <= time_starting_hour <= added_course_ending_time or \
-                                time_starting_hour <= added_course_starting_hour <= time_ending_hour:
+                        added_course_starting_minutes = int(added_course_time.starting_time.split(":")[1])
+                        added_course_ending_minutes = int(added_course_time.ending_time.split(":")[1])
+                        time_starting_minutes = int(time.starting_time.split(":")[1])
+                        time_ending_minutes = int(time.ending_time.split(":")[1])
+                        if (added_course_starting_hour <= time_starting_hour <= added_course_ending_time and
+                            time_starting_minutes<added_course_ending_minutes) or \
+                                (time_starting_hour <= added_course_starting_hour <= time_ending_hour and
+                                 time_ending_minutes > added_course_starting_minutes):
                             messages.error(request, 'Courses overlap!')
                             course.save()
                             # Get the user's cart
@@ -391,7 +400,10 @@ def add_to_schedule(request, course_id):
 @login_required
 def view_schedule(request):
     schedule = get_object_or_404(Schedule, user=request.user)
-    context = {'schedule': {'total_units': schedule.total_units, 'submitted':schedule.submitted, 'courses':[]}}
+    context = {'schedule': {'total_units': schedule.total_units, 'submitted': schedule.submitted,
+                            'status': schedule.status, 'approved_date': schedule.approved_date,
+                            'denied_date': schedule.denied_date,'comments': schedule.comments,
+                            'comment_date': schedule.comment_date,'courses': []}}
     schedule_items = ScheduleItem.objects.filter(schedule=schedule)
 
     for item in schedule_items:
@@ -403,10 +415,6 @@ def view_schedule(request):
             all_times.append({'days':time.days, 'starting_time':time.starting_time, 'ending_time':time.ending_time})
         context['schedule']['courses'].append({'course':course, 'all_times':all_times})
 
-    # context = {
-    #     'schedule': schedule,
-    #     'schedule_items': schedule_items,
-    # }
     return render(request, 'schedule/view_schedule.html', context)
 
 def remove_course_from_schedule(request, course_id):
@@ -439,6 +447,11 @@ def submit_schedule(request):
     advisor = get_object_or_404(User, username="glendonchin")
     schedule.advisor = advisor
     schedule.submitted = True
+    schedule.status="Pending"
+    schedule.comments = None
+    schedule.approved_date = None
+    schedule.denied_date = None
+    schedule.comment_date = None
     schedule.save()
     messages.success(request, 'Schedule submitted to advisor.')
     return redirect('schedule:view_schedule')
@@ -459,8 +472,10 @@ def is_advisor(user):
 def approve_schedule(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
     print(f"Before approval: {schedule.status}")  # Add this line
-    schedule.status = 'approved'
+    schedule.status = 'Approved'
+    schedule.approved = True
     schedule.approved_date = timezone.now()
+    schedule.denied_date = None
     schedule.save()
     schedule.refresh_from_db()  # Add this line
     print(f"After approval: {schedule.status}")  # Add this line
@@ -472,7 +487,11 @@ def approve_schedule(request, schedule_id):
 def deny_schedule(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
     schedule.status = 'Denied'
+    schedule.approved = False
     schedule.denied_date = timezone.now()
+    schedule.submitted = False
+    schedule.approved_date = None
+    schedule.total_units = 0
     schedule.save()
     schedule.schedule_items.all().delete()
     messages.success(request, 'Schedule denied and cleared.')
