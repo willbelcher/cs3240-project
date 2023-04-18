@@ -437,7 +437,7 @@ def view_schedule(request):
         titles.append(s.title)
 
     context = {'schedule': {'id': schedule.id, 'title': schedule.title, 'total_units': schedule.total_units, 
-    'submitted':schedule.submitted, status': schedule.status, 'approved_date': schedule.approved_date,
+    'submitted':schedule.submitted, 'status': schedule.status, 'approved_date': schedule.approved_date,
     'denied_date': schedule.denied_date,'comments': schedule.comments,'comment_date': schedule.comment_date, 
     'courses':[]}, 'titles': titles}
     schedule_items = ScheduleItem.objects.filter(schedule=schedule)
