@@ -106,7 +106,7 @@ class TestCourseSearch(TestCase):
         request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
         setupRequest(request, user)
 
-        add_to_schedule(request, course_id)
+        add_to_schedule(request, 1, course_id)
 
         self.assertEqual(1, Schedule.objects.all().count())
         self.assertEqual(1, ScheduleItem.objects.all().count())
@@ -122,7 +122,7 @@ class TestCourseSearch(TestCase):
         setupRequest(request, user)
 
         with self.assertRaises(Http404):
-            add_to_schedule(request, 2) #pass incorrect course_id
+            add_to_schedule(request, 1, 2) #pass incorrect course_id
 
         self.assertEqual(0, Schedule.objects.all().count())
         self.assertEqual(0, ScheduleItem.objects.all().count())
@@ -135,7 +135,7 @@ class TestCourseSearch(TestCase):
         request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
         setupRequest(request, user)
 
-        add_to_schedule(request, course_id)
+        add_to_schedule(request, 1, course_id)
 
         self.assertEqual(1, Schedule.objects.all().count())
         self.assertEqual(1, ScheduleItem.objects.all().count())
@@ -167,7 +167,7 @@ class TestCourseSearch(TestCase):
         request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
         setupRequest(request, user)
 
-        add_to_schedule(request, course_id)
+        add_to_schedule(request, 1, course_id)
 
         self.assertEqual(1, Schedule.objects.all().count())
         self.assertEqual(1, ScheduleItem.objects.all().count())
@@ -175,7 +175,7 @@ class TestCourseSearch(TestCase):
         request = factory.delete('schedule/remove_schedule_course/1')
         setupRequest(request, user)
 
-        remove_course_from_schedule(request, course_id)
+        remove_course_from_schedule(request, 1, course_id)
 
         self.assertEqual(0, ScheduleItem.objects.all().count())
 
@@ -188,7 +188,7 @@ class TestCourseSearch(TestCase):
         request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
         setupRequest(request, user)
 
-        add_to_schedule(request, course_id)
+        add_to_schedule(request, 1, course_id)
 
         self.assertEqual(1, Schedule.objects.all().count())
         self.assertEqual(1, ScheduleItem.objects.all().count())
@@ -196,7 +196,7 @@ class TestCourseSearch(TestCase):
         request = factory.post('schedule/submit_schedule')
         setupRequest(request, user)
 
-        submit_schedule(request)
+        submit_schedule(request, 1)
         schedule = Schedule.objects.get(pk=1)
 
         self.assertTrue(schedule.submitted)
@@ -210,7 +210,7 @@ class TestCourseSearch(TestCase):
         request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
         setupRequest(request, user)
 
-        add_to_schedule(request, course_id)
+        add_to_schedule(request, 1, course_id)
 
         self.assertEqual(1, Schedule.objects.all().count())
         self.assertEqual(1, ScheduleItem.objects.all().count())
@@ -218,7 +218,7 @@ class TestCourseSearch(TestCase):
         request = factory.post('schedule/unsubmit_schedule')
         setupRequest(request, user)
 
-        unsubmit_schedule(request)
+        unsubmit_schedule(request, 1)
         schedule = Schedule.objects.get(pk=1)
 
         self.assertFalse(schedule.submitted)
@@ -233,7 +233,7 @@ class TestCourseSearch(TestCase):
         request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
         setupRequest(request, user)
 
-        add_to_schedule(request, course_id)
+        add_to_schedule(request, 1, course_id)
         schedule = Schedule.objects.get(user = user)
         schedule.submitted = True
         schedule.save()
@@ -255,7 +255,7 @@ class TestCourseSearch(TestCase):
         request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
         setupRequest(request, user)
 
-        add_to_schedule(request, course_id)
+        add_to_schedule(request, 1, course_id)
 
         self.assertEqual(1, Schedule.objects.all().count())
         self.assertEqual(1, ScheduleItem.objects.all().count())
@@ -271,7 +271,7 @@ class TestCourseSearch(TestCase):
 
         self.assertTrue(schedule.submitted)
         schedule = Schedule.objects.get(pk=1)
-        self.assertEqual('approved', schedule.status)
+        self.assertEqual('Approved', schedule.status)
 
     def test_deny_schedule(self):
         factory = RequestFactory()
@@ -281,7 +281,7 @@ class TestCourseSearch(TestCase):
         request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
         setupRequest(request, user)
 
-        add_to_schedule(request, course_id)
+        add_to_schedule(request, 1, course_id)
 
         self.assertEqual(1, Schedule.objects.all().count())
         self.assertEqual(1, ScheduleItem.objects.all().count())
