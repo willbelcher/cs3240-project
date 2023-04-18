@@ -298,8 +298,9 @@ def view_cart(request):
     schedules = Schedule.objects.filter(user=request.user)
 
     if schedules.count() == 0:
-        schedules.create(user=request.user)
-        schedules.save()
+        schedule = Schedule.objects.create(user = request.user)
+        schedule.save()
+        schedules = Schedule.objects.filter(user=request.user)
 
     courses = Course.objects.filter(cart=cart)
 
