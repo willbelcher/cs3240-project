@@ -81,7 +81,7 @@
                         </td>
                         <td>
                             <form method="POST"
-                                  action="{% url 'schedule:remove_course_from_schedule' course.course.id %}">
+                                  action="{% url 'schedule:remove_course_from_schedule' schedule.id course.course.id %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn bg-danger" data-row-id="{{ course.course.id }}">
                                     X
@@ -98,12 +98,12 @@
         {% endif %}
 
         {% if not schedule.submitted and schedule.total_units >= 12 and schedule.courses %}
-            <form method="POST" action="{% url 'schedule:submit_schedule' %}">
+            <form method="POST" action="{% url 'schedule:submit_schedule' schedule.id%}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">Submit to Advisor</button>
             </form>
-        {% elif schedule.total_units < 12 and schedule.courses%}
-            <button disabled class="btn btn-primary">Submit to Advisor</button>
+        {% elif not schedule.submitted and schedule.total_units < 12 and schedule.courses%}
+            <button type="submit" disabled class="btn btn-primary">Submit to Advisor</button>
             <div class="alert alert-warning" role="alert">
                 Your schedule needs more than 12 credits, or you will not be a full-time student!
             </div>
