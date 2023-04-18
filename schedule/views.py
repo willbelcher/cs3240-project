@@ -253,6 +253,14 @@ def add_course(request):
                 instructor_name = course_data['instructors'][0]['name']
                 units = int(course_data['units'])
 
+                # to isolate the last digit (2 or 8)
+                # saves the term of the search when the add_course page is rerendered
+                term = term[-1]
+                if term == "8":
+                    fields['term'] = "Fall"
+                elif term == "2":
+                    fields['term'] = "Spring"
+
                 # Save the course to the user's cart
                 cart, _ = Cart.objects.get_or_create(user=request.user)
 
@@ -277,10 +285,14 @@ def add_course(request):
                     time.save()
 
                 active_class_messages = True
+                good_message = True
                 class_messages.append("Course added successfully!")
                 messages.success(request, 'Course added successfully!')
-
-                return redirect('schedule:add_course_success')
+                return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields,
+                                                                       'days': days,
+                                                                       'active_class_messages': active_class_messages,
+                                                                       'good_message': good_message,
+                                                                       'class_messages': class_messages})
             else:
                 messages.error(request, 'Failed to fetch course data.')
 

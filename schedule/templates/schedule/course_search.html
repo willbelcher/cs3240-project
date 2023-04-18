@@ -80,7 +80,7 @@
                 <div class="col-md-3 mb-3">
                     <label for="subject">Catalog Number:</label>
                     <input class="form-control" type="text" name="catalog_nbr" id="catalog_nbr"
-                        value={{ fields.catalog_nbr }}>
+                           value={{ fields.catalog_nbr }}>
                 </div>
             </div>
 
@@ -90,27 +90,28 @@
                 <div class="col-md-4 mb-3">
                     <label for="instructor">Instructor:</label>
                     <input class="form-control" type="text" name="instructor" id="instructor"
-                        value={{ fields.instructor }}>
+                           value={{ fields.instructor }}>
                 </div>
 
                 <!-- Course Name Filter -->
                 <div class="col-md-4 mb-3">
                     <label for="course_name">Course Name:</label>
                     <input class="form-control" type="text" name="course_name" id="course_name"
-                        value={{ fields.course_name }}>
+                           value={{ fields.course_name }}>
                 </div>
 
                 <!-- Course Number Filter -->
                 <div class="col-md-4 mb-3">
                     <label for="course_nmbr">Course Number:</label>
                     <input class="form-control" type="text" name="course_nmbr" id="course_nmbr"
-                        value={{ fields.course_nmbr }}>
+                           value={{ fields.course_nmbr }}>
                 </div>
             </div>
-        
+
             <!-- Dropdown for Additional Filter -->
             <div>
-                <button class="btn btn-primary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#extra_filters"
+                <button class="btn btn-primary mb-3" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#extra_filters"
                         aria-expanded="false" aria-controls="filter_collapse_button">
                     See More Filters
                 </button>
@@ -118,57 +119,57 @@
 
             <hr>
 
-                <div class="collapse mb-3" id="extra_filters">
-                    <div class="row">
+            <div class="collapse mb-3" id="extra_filters">
+                <div class="row">
 
-                        <!-- Start Time Filter -->
-                        <div class="col-md-4 mb-3">
-                            <label for="start_time">Start time:</label>
-                            <input type="time" class="form-control" name="start_time" id="start_time"
-                            value={{ fields.start_time }} step="1800">
+                    <!-- Start Time Filter -->
+                    <div class="col-md-4 mb-3">
+                        <label for="start_time">Start time:</label>
+                        <input type="time" class="form-control" name="start_time" id="start_time"
+                               value={{ fields.start_time }} step="1800">
+                    </div>
+
+                    <!-- End Time Filter -->
+                    <div class="col-md-4 mb-3">
+                        <label for="end_time">End time:</label>
+                        <input type="time" class="form-control" name="end_time" id="end_time"
+                               value={{ fields.end_time }} step="1800">
+                    </div>
+
+                    <!-- Days Filter -->
+                    <div class="col-md-4 mb-3">
+                        <label for="days">Days:</label>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                                    data-toggle="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Select...
+                            </button>
+                            <ul class="dropdown-menu">
+                                {% for day, checked in days.items %}
+                                    <li>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                   name={{ day }} id={{ day }} {% if checked %}
+                                                   checked {% else %} {% endif %}>
+                                            <label class="form-check-label" for={{ day }}>{{ day }}</label>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </div>
+                    </div>
 
-                        <!-- End Time Filter -->
-                        <div class="col-md-4 mb-3">
-                            <label for="end_time">End time:</label>
-                            <input type="time" class="form-control" name="end_time" id="end_time"
-                                value={{ fields.end_time }} step="1800">
-                        </div>
-
-                        <!-- Days Filter -->
-                        <div class="col-md-4 mb-3">
-                            <label for="days">Days:</label>
-                            <div class="dropdown">
-                                <button class="btn btn-outline-secondary dropdown-toggle" type="button"
-                                        data-toggle="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Select...
-                                </button>
-                                <ul class="dropdown-menu">
-                                    {% for day, checked in days.items %}
-                                        <li>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox"
-                                                    name={{ day }} id={{ day }} {% if checked %}
-                                                    checked {% else %} {% endif %}>
-                                                <label class="form-check-label" for={{ day }}>{{ day }}</label>
-                                            </div>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- "Only Show Open" Courses Filter -->
-                        <div class="col-md-6 mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="only_open"
-                                    id="only_open" {% if fields.only_open %} checked {% else %} {% endif %}>
-                                <label class="form-check-label" for="only_open">Only show open</label>
-                            </div>
+                    <!-- "Only Show Open" Courses Filter -->
+                    <div class="col-md-6 mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="only_open"
+                                   id="only_open" {% if fields.only_open %} checked {% else %} {% endif %}>
+                            <label class="form-check-label" for="only_open">Only show open</label>
                         </div>
                     </div>
                 </div>
-                
+            </div>
+
 
             <!-- Search Button -->
             <div class="col-md-6 mb-3">
@@ -178,11 +179,17 @@
 
         <hr>
 
-        {% if active_class_messages %}
+        {% if active_class_messages and not good_message %}
             {% for message in class_messages %}
-            <div class="alert alert-danger" role="alert">
-                {{ message }}
-            </div>
+                <div class="alert alert-danger" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% elif active_class_messages and good_message %}
+            {% for message in class_messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
             {% endfor %}
         {% endif %}
 
@@ -196,7 +203,7 @@
                 <p>No results found</p>
             </section>
         {% endif %}
-        
+
         {% if courses %}
             <div class="container">
 
@@ -211,7 +218,7 @@
                                 <div class="col-sm-auto">
                                     <h5 class="mb-0">{{ course.subject }} {{ course.catalog_nbr }}</h5>
                                 </div>
-                                
+
                                 <!-- Course Title (i.e. Data Structures and Algorithms 2)-->
                                 <div class="col">
                                     <strong>{{ course.descr }}</strong>
@@ -250,7 +257,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="card-body row">
-                                                        
+
                                                         <div class="col-sm-auto">
 
                                                             <!-- Displays Location of a class -->
@@ -258,11 +265,11 @@
                                                                 <p><b>Location:</b> {{ course.location_descr }} @ {{ place.facility_descr }}</p>
                                                             {% endfor %}
                                                             <hr>
-                                                            
+
                                                             <!-- Displays Instruction Type (i.e. On Grounds vs Off Grounds) of class-->
                                                             <p><b>Instruction Type:</b> {{ course.instruction_mode_descr }}</p>
                                                             <hr>
-                                                            
+
                                                             <!-- Displays days a class takes place-->
                                                             <p>
                                                                 <b>Days: </b>
@@ -271,7 +278,7 @@
                                                                     <br>
                                                                 {% endfor %}
                                                             </p>
-                                                            
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -279,13 +286,14 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    
-            
+
+
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-sm-auto">
@@ -308,7 +316,7 @@
                                 </div>
                             </div>
                         </div>
-            
+
                         <div class="card-body collapse" id="extra_info_{{ forloop.counter }}">
                             <div class="row">
                                 <div class="col-sm-auto">
@@ -318,7 +326,7 @@
                                     <p>Instruction: {{ course.instruction_mode_descr }}</p>
                                 </div>
                             </div>
-            
+
                             <div class="row">
                                 <div class="col-sm-auto">
                                     <strong>Days:</strong>
@@ -327,10 +335,10 @@
                                     <div class="col">
                                         {{ days.days }} @ {{ days.facility_descr }} from {{ days.start_time|slice:"0:5"|to_colon }} to {{ days.end_time|slice:"0:5"|to_colon }}
                                     </div>
-                                {% endfor %} 
+                                {% endfor %}
                             </div>
                         </div>
-            
+
                         <!-- Function to change color of "Add to Cart" button to green following it being clicked -->
                         <script>
                             function changeButtonColor(event) {
