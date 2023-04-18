@@ -105,7 +105,7 @@ class TestCourseSearch(TestCase):
         request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
         setupRequest(request, user)
 
-        add_to_schedule(request, course_id)
+        add_to_schedule(request, 1, course_id)
 
         self.assertEqual(1, Schedule.objects.all().count())
         self.assertEqual(1, ScheduleItem.objects.all().count())
@@ -121,7 +121,7 @@ class TestCourseSearch(TestCase):
         setupRequest(request, user)
 
         with self.assertRaises(Http404):
-            add_to_schedule(request, 2) #pass incorrect course_id
+            add_to_schedule(request, 1, 2) #pass incorrect course_id
 
         self.assertEqual(0, Schedule.objects.all().count())
         self.assertEqual(0, ScheduleItem.objects.all().count())
@@ -134,7 +134,7 @@ class TestCourseSearch(TestCase):
         request = factory.get("/schedule/add-to-schedule/<int:course_id>/")
         setupRequest(request, user)
 
-        add_to_schedule(request, course_id)
+        add_to_schedule(request, 1, course_id)
 
         self.assertEqual(1, Schedule.objects.all().count())
         self.assertEqual(1, ScheduleItem.objects.all().count())
