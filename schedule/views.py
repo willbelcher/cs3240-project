@@ -349,8 +349,14 @@ def add_to_schedule(request, course_id):
                         added_course_starting_hour = int(added_course_time.starting_time.split(":")[0])
                         added_course_ending_time = int(added_course_time.ending_time.split(":")[0])
 
-                        if added_course_starting_hour <= time_starting_hour <= added_course_ending_time or \
-                                time_starting_hour <= added_course_starting_hour <= time_ending_hour:
+                        added_course_starting_minutes = int(added_course_time.starting_time.split(":")[1])
+                        added_course_ending_minutes = int(added_course_time.ending_time.split(":")[1])
+                        time_starting_minutes = int(time.starting_time.split(":")[1])
+                        time_ending_minutes = int(time.ending_time.split(":")[1])
+                        if (added_course_starting_hour <= time_starting_hour <= added_course_ending_time and
+                            time_starting_minutes<added_course_ending_minutes) or \
+                                (time_starting_hour <= added_course_starting_hour <= time_ending_hour and
+                                 time_ending_minutes > added_course_starting_minutes):
                             messages.error(request, 'Courses overlap!')
                             course.save()
                             # Get the user's cart
