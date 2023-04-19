@@ -227,6 +227,7 @@ def add_course(request):
     if request.method == 'POST':
         term = request.POST.get('term', '').strip()
         class_nbr = request.POST.get('class_nbr', '').strip()
+        course_credits = request.POST.get('units_selector')
 
         # Validate input
         if not term:
@@ -251,7 +252,7 @@ def add_course(request):
                 catalog_nbr = course_data['catalog_nbr']
                 title = course_data['descr']
                 instructor_name = course_data['instructors'][0]['name']
-                units = int(course_data['units'])
+                units = course_credits
 
                 # to isolate the last digit (2 or 8)
                 # saves the term of the search when the add_course page is rerendered

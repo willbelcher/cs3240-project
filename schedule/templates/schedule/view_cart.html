@@ -78,12 +78,16 @@
                         <td>{{ course.course.units }}</td>
                         <td>
                             {% for time in course.all_times %}
-                                {{ time.days }}<br>
+                                {% if time %}
+                                    {{ time.days }}<br>
+                                {% endif %}
                             {% endfor %}
                         </td>
                         <td>
                             {% for time in course.all_times %}
-                                {{ time.starting_time|no_military }} to {{ time.ending_time|no_military }}<br>
+                                {% if time %}
+                                    {{ time.starting_time|no_military }} to {{ time.ending_time|no_military }}<br>
+                                {% endif %}
                             {% endfor %}
                         </td>
                         <td>
