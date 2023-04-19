@@ -14,11 +14,11 @@ from pathlib import Path
 import os
 import sys
 
-# import environ
-#
-# env = environ.Env()
-# environ.Env.read_env()
-# SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=True)
+import environ
+
+env = environ.Env()
+environ.Env.read_env()
+SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
