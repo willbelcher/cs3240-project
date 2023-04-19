@@ -14,20 +14,26 @@ from pathlib import Path
 import os
 import sys
 
+# import environ
+#
+# env = environ.Env()
+# environ.Env.read_env()
+# SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=True)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOGIN_REDIRECT_URL = 'schedule:home'
 LOGOUT_REDIRECT_URL = '/logout'
-SOCIALACCOUNT_LOGIN_ON_GET=True
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-0nktx!34np*xo)2k^^hzs*at2f3n78#z=ts(6+z3_an_*2i_3j'
+SECRET_KEY = 'ee1cfac9d1a8b94ec1ef6bb7122e57d5e83adc0ace273fb8ac'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'cs3240-b15.herokuapp.com']
 
@@ -165,6 +171,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_SSL_REDIRECT = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_HSTS_PRELOAD = True
 
 try:
     if 'HEROKU' in os.environ:
