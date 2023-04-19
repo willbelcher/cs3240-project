@@ -13,17 +13,18 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 import sys
-import environ
 
-env = environ.Env()
-environ.Env.read_env()
-SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=True)
+# import environ
+#
+# env = environ.Env()
+# environ.Env.read_env()
+# SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOGIN_REDIRECT_URL = 'schedule:home'
 LOGOUT_REDIRECT_URL = '/logout'
-SOCIALACCOUNT_LOGIN_ON_GET=True
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/

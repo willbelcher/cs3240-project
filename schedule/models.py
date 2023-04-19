@@ -30,6 +30,7 @@ class Course(models.Model):
     instructor_name = models.CharField(max_length=50)
     title = models.CharField(max_length=200)
     units = models.IntegerField(default=3)
+    term = models.IntegerField(default=8)
 
 class CourseTime(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
