@@ -247,13 +247,6 @@ def add_course(request):
                 json_data = response.json()
                 course_data = json_data[0]  # Assuming the course data is in the first element of the list
 
-                # Extract course information
-                subject = course_data['subject']
-                catalog_nbr = course_data['catalog_nbr']
-                title = course_data['descr']
-                instructor_name = course_data['instructors'][0]['name']
-                units = course_credits
-
                 # to isolate the last digit (2 or 8)
                 # saves the term of the search when the add_course page is rerendered
                 term = term[-1]
@@ -261,6 +254,18 @@ def add_course(request):
                     fields['term'] = "Fall"
                 elif term == "2":
                     fields['term'] = "Spring"
+
+                # Extract course information
+                subject = course_data['subject']
+                catalog_nbr = course_data['catalog_nbr']
+                title = course_data['descr']
+                instructor_name = course_data['instructors'][0]['name']
+                term = int(term)
+                units = 0
+                if course_credits is None:
+                    units = int(course_data['units'])
+                else:
+                    units = course_credits
 
                 # Save the course to the user's cart
                 cart, _ = Cart.objects.get_or_create(user=request.user)
@@ -274,7 +279,8 @@ def add_course(request):
                             class_messages.append("Can not add an identical course to Cart")
                             return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days, 'active_class_messages':active_class_messages, 'class_messages':class_messages})
 
-                course = Course(cart=cart, class_nbr=class_nbr, subject=subject, catalog_nbr=catalog_nbr, title=title, instructor_name=instructor_name, units=units)
+                course = Course(cart=cart, class_nbr=class_nbr, subject=subject, catalog_nbr=catalog_nbr, title=title,
+                                instructor_name=instructor_name, units=units, term=term)
                 course.save()
 
                 for json_days in course_data['meetings']:
@@ -387,19 +393,20 @@ def add_to_schedule(request, schedule_id, course_id):
         added_course = Course.objects.get(pk=item.course.id)  # get all courses already in schedule
 
         if added_course.subject == course.subject and added_course.catalog_nbr == course.catalog_nbr:
-            cart, _ = Cart.objects.get_or_create(user=request.user)
-
-            # Get the courses associated with the cart and exclude those in the user's schedule
-            courses = Course.objects.filter(cart=cart).exclude(scheduleitem__schedule=schedule)
-
-            # Render the view_cart template with the courses
             context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
                        'schedules': get_context_schedules(request.user),
                        'active_class_messages': True,
                        'class_messages': "Can not add this course, the same course is already added"}
             return render(request, 'schedule/view_cart.html', context)
+        if added_course.term != course.term:
+            messages.error(request, "Can not add course from a different Term to Cart")
+            context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
+                       'schedules': get_context_schedules(request.user),
+                       'active_class_messages': True,
+                       'class_messages': "Can't add a Course from a different term to this schedule. Use another schedule, or remove all courses from this schedule before adding this Course"}
+            return render(request, 'schedule/view_cart.html', context)
 
-        added_course_times = CourseTime.objects.filter(course = added_course) #get these already-added course times
+        added_course_times = CourseTime.objects.filter(course=added_course)  # get these already-added course times
         for time in times:
             time_starting_hour = int(time.starting_time.split(":")[0])
             time_ending_hour = int(time.ending_time.split(":")[0])
