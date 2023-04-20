@@ -432,6 +432,7 @@ def view_schedule(request):
     else:
         schedule = Schedule.objects.create(user=request.user)
         schedule.save()
+    schedules = Schedule.objects.filter(user=request.user)
 
     titles = []
     for s in schedules:
