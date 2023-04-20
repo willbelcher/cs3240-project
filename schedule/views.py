@@ -426,7 +426,8 @@ def view_schedule(request):
 
     schedule = None
     if request.method == "POST":
-        schedule = schedules.get(title=request.POST.get('title'))
+        # schedule = schedules.get(title=request.POST.get('title'))
+        schedule = Schedule.objects.get(user=request.user, title=request.POST.get('title').strip())
     elif schedules.count() != 0:
         schedule = schedules.first()
     else:
