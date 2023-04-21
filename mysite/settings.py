@@ -198,6 +198,10 @@ CSP_STYLE_SRC = [
     "https://unpkg.com"
 ]
 
+CSP_FONT_SRC = [
+    "https://fonts.googleapis.com",
+]
+
 CSP_INCLUDE_NONCE_IN = ["script-src"]
 
 CSP_IMG_SRC = ["'self'"]
