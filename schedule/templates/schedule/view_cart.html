@@ -32,9 +32,9 @@
         <form class="row align-items-start" method="POST" action="{% url 'schedule:view_cart' %}">
             {% csrf_token %}
             <label class="col-md-auto" for="schedule_id">Schedule: </label>
-            <select class="form-control col-md-auto" style="width:fit-content" name="schedule_id" id="schedule_id">
+            <select class="fit-form form-control col-md-auto" name="schedule_id" id="schedule_id">
                 {% for schedule in schedules %}
-                    <option value={{ schedule.id }} {% if current_id == schedule.id %} selected {% else %} {% endif %}>{{ schedule.title }}</option>
+                    <option value="{{ schedule.id }}" {% if current_id == schedule.id %} selected {% else %} {% endif %}>{{ schedule.title }}</option>
                 {% endfor %}
             </select>
             <div class="col-md-auto">

@@ -207,3 +207,7 @@ header .item-button a:hover{
     color: #ffffff;
     background-color: #ff0000;
 }
+
+.fit-form {
+    width: fit-content;
+}
