@@ -179,9 +179,10 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_HSTS_PRELOAD = True
 
-SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_BROWSER_XSS_FILTER = True
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+# Django-csp settings
+# https://django-csp.readthedocs.io/en/latest/
+
+CSP_DEFAULT_SRC = ["'self'"]
 
 try:
     if 'HEROKU' in os.environ:
