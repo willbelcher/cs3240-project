@@ -1,5 +1,6 @@
 {% include "nav.html" %}
 {% load static %}
+{% load no_military %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,8 +13,12 @@
     <script nonce="{{request.csp_nonce}}" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-{% if active_class_messages %}
+{% if active_class_messages and not good_message %}
     <div class="alert alert-warning" role="alert">
+        {{ class_messages }}
+    </div>
+{% elif active_class_messages and good_message %}
+    <div class="alert alert-success" role="alert">
         {{ class_messages }}
     </div>
 {% endif %}
@@ -22,10 +27,11 @@
     <div class="container">
         <h2>Your Cart</h2>
         <hr>
-        {% for schedule in schedules %}  
+        {% for schedule in schedules %}
             {% if schedule.submitted and current_id == schedule.id %}
                 <div class="alert alert-danger" role="alert">
-                    Schedule {{ schedule.title }} is currently submitted. Adding another class will unsubmit this schedule
+                    Schedule {{ schedule.title }} is currently submitted. Adding another class will unsubmit this
+                    schedule
                 </div>
             {% endif %}
         {% endfor %}
@@ -40,47 +46,72 @@
             <div class="col-md-auto">
                 <button type="submit" class="btn custom-add-btn">Change Schedule</button>
             </div>
-        </form> 
+        </form>
         {% if courses %}
 
             <!-- Displays courses added to the cart in a table -->
             <table class="table table-striped">
                 <thead>
                 <tr>
-                    
+
                     <!-- Table Header Fields -->
                     <th>Class Number</th>
                     <th>Subject</th>
                     <th>Catalog Number</th>
                     <th>Instructor Name</th>
                     <th>Title</th>
+                    <th>Units</th>
+                    <th>Days</th>
+                    <th>Times</th>
                 </tr>
                 </thead>
                 <tbody>
                 <!-- Course Data corresponding to Table Header Fields-->
                 {% for course in courses %}
                     <tr id="row_{{ course.id }}">
-                        <td>{{ course.class_nbr }}</td>
-                        <td>{{ course.subject }}</td>
-                        <td>{{ course.catalog_nbr }}</td>
-                        <td>{{ course.instructor_name }}</td>
-                        <td>{{ course.title }}</td>
+                        <td>{{ course.course.class_nbr }}</td>
+                        <td>{{ course.course.subject }}</td>
+                        <td>{{ course.course.catalog_nbr }}</td>
+                        <td>{{ course.course.instructor_name }}</td>
+                        <td>{{ course.course.title }}</td>
+                        <td>{{ course.course.units }}</td>
+                        <td>
+                            {% for time in course.all_times %}
+                                {% if time %}
+                                    {{ time.days }}<br>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for time in course.all_times %}
+                                {% if time %}
+                                    {{ time.starting_time|no_military }} to {{ time.ending_time|no_military }}<br>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
                         <td>
 
                             <!-- Add (from Cart) to Schedule Button -->
-                            <form method="POST" action="{% url 'schedule:add_to_schedule' current_id course.id %}" class="d-inline-block mr-5">
+                            <form method="POST"
+                                  action="{% url 'schedule:add_to_schedule' current_id course.course.id %}"
+                                  class="d-inline-block mr-5">
                                 {% csrf_token %}
-                                <button type="submit" class="btn add-to-schedule custom-add-btn" data-row-id="{{ course.id }}">Add to Schedule</button>
+                                <button type="submit" class="btn add-to-schedule custom-add-btn"
+                                        data-row-id="{{ course.id }}">Add to Schedule
+                                </button>
                             </form>
 
                             <!-- Remove (from Cart) Button -->
-                            <form method="POST" action="{% url 'schedule:remove_course' course.id %}" class="d-inline-block">
+                            <form method="POST" action="{% url 'schedule:remove_course' course.course.id %}"
+                                  class="d-inline-block">
                                 {% csrf_token %}
-                                <button type="submit" class="btn remove-course custom-remove-btn" data-row-id="{{ course.id }}">Remove from Cart</button>
+                                <button type="submit" class="btn remove-course custom-remove-btn"
+                                        data-row-id="{{ course.id }}">Remove from Cart
+                                </button>
                             </form>
-                            
+
                         </td>
-                        </tr>
+                    </tr>
 
                 {% endfor %}
                 </tbody>

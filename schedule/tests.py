@@ -122,7 +122,7 @@ class TestCourseSearch(TestCase):
         setupRequest(request, user)
 
         with self.assertRaises(Http404):
-            add_to_schedule(request, 1, 2) #pass incorrect course_id
+            add_to_schedule(request, 1, 2)  # pass incorrect course_id
 
         self.assertEqual(0, Schedule.objects.all().count())
         self.assertEqual(0, ScheduleItem.objects.all().count())
@@ -223,8 +223,6 @@ class TestCourseSearch(TestCase):
 
         self.assertFalse(schedule.submitted)
 
-
-
     def test_submissions(self):
         factory = RequestFactory()
         user = User.objects.create_superuser(username='foo', is_superuser=True)
@@ -234,7 +232,7 @@ class TestCourseSearch(TestCase):
         setupRequest(request, user)
 
         add_to_schedule(request, 1, course_id)
-        schedule = Schedule.objects.get(user = user)
+        schedule = Schedule.objects.get(user=user)
         schedule.submitted = True
         schedule.save()
 
@@ -298,4 +296,3 @@ class TestCourseSearch(TestCase):
         self.assertTrue(schedule.submitted)
         schedule = Schedule.objects.get(pk=1)
         self.assertEqual('Denied', schedule.status)
-

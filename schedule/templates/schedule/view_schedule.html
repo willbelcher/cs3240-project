@@ -19,7 +19,7 @@
     <div class="container">
         <h2>Your Schedules</h2>
         <div class="row">
-        <!-- Schedule Options -->
+            <!-- Schedule Options -->
             <form class="col-md-5 row" action="{% url 'schedule:view_schedule' %}" method="POST">
                 {% csrf_token %}
                 <select class="fit-form form-control col-md-auto" name="title" id="title">
@@ -70,7 +70,7 @@
                         <td>{{ course.course.units }}</td>
                         <td>
                             {% for time in course.all_times %}
-                                {{ time.days }}
+                                {{ time.days }}<br>
                             {% endfor %}
                         </td>
                         <td>
@@ -97,12 +97,15 @@
         {% endif %}
 
         {% if not schedule.submitted and schedule.total_units >= 12 and schedule.courses %}
-            <form method="POST" action="{% url 'schedule:submit_schedule' schedule.id%}">
+            <form method="POST" action="{% url 'schedule:submit_schedule' schedule.id %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">Submit to Advisor</button>
             </form>
-        {% elif not schedule.submitted and schedule.total_units < 12 and schedule.courses%}
-            <button type="submit" disabled class="btn btn-primary">Submit to Advisor</button>
+        {% elif not schedule.submitted and schedule.total_units < 12 and schedule.courses %}
+            <form method="POST" action="{% url 'schedule:submit_schedule' schedule.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Submit to Advisor</button>
+            </form>
             <div class="alert alert-warning" role="alert">
                 Your schedule needs more than 12 credits, or you will not be a full-time student!
             </div>
@@ -118,7 +121,7 @@
         {% endif %}
 
         <!-- Schedule Status -->
-        <th>Submission Status: </th>
+        <th>Submission Status:</th>
         <td>{{ schedule.status }}</td>
 
         <!-- Approval Date -->

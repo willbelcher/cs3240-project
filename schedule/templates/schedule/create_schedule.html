@@ -11,13 +11,13 @@
   <link rel="stylesheet" href="{% static 'css/schedule.css' %}">
 </head>
 <body>
-    {% block content %}
+{% block content %}
     <h2>Create New Schedule</h2>
     <hr/>
     {% if is_error %}
-    <div class="alert alert-warning" role="alert">
-        {{ error_message }}
-    </div>
+        <div class="alert alert-warning" role="alert">
+            {{ error_message }}
+        </div>
     {% endif %}
     <form class="container row" method="POST" action="{% url 'schedule:create_schedule' %}">
         {% csrf_token %}
@@ -26,7 +26,7 @@
         </div>
         <button type="submit" class="btn btn-primary col-sm-auto">Create</button>
     </form>
-    {% endblock %}
+{% endblock %}
 </body>
 </html>
 

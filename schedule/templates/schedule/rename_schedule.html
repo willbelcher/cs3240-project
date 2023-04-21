@@ -11,16 +11,17 @@
   <link rel="stylesheet" href="{% static 'css/schedule.css' %}">
 </head>
 <body>
-    {% block content %}
+{% block content %}
     <h2>Rename Schedule</h2>
     <hr/>
     {% if is_error %}
-    <div class="alert alert-warning" role="alert">
-        {{ error_message }}
-    </div>
+        <div class="alert alert-warning" role="alert">
+            {{ error_message }}
+        </div>
     {% endif %}
     <div class="container">
-        <form class="container justify-content-start" method="POST" action="{% url 'schedule:rename_schedule' schedule.id %}">
+        <form class="container justify-content-start" method="POST"
+              action="{% url 'schedule:rename_schedule' schedule.id %}">
             {% csrf_token %}
             <p class="row">Current Title: {{ schedule.title }}</p>
             <div class="row">
@@ -30,7 +31,7 @@
             <button type="submit" class="btn btn-primary row">Rename</button>
         </form>
     </div>
-    {% endblock %}
+{% endblock %}
 </body>
 </html>
 

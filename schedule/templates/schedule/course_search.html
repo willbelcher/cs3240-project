@@ -2,6 +2,7 @@
 {% load static %}
 {% load to_colon %}
 {% load no_military %}
+{% load to_int_range %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -107,10 +108,11 @@
                         value="{{ fields.course_nmbr }}">
                 </div>
             </div>
-        
+
             <!-- Dropdown for Additional Filter -->
             <div>
-                <button class="btn btn-primary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#extra_filters"
+                <button class="btn btn-primary mb-3" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#extra_filters"
                         aria-expanded="false" aria-controls="filter_collapse_button">
                     See More Filters
                 </button>
@@ -118,8 +120,8 @@
 
             <hr>
 
-                <div class="collapse mb-3" id="extra_filters">
-                    <div class="row">
+            <div class="collapse mb-3" id="extra_filters">
+                <div class="row">
 
                         <!-- Start Time Filter -->
                         <div class="col-md-4 mb-3">
@@ -157,18 +159,19 @@
                                 </ul>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- "Only Show Open" Courses Filter -->
-                        <div class="col-md-6 mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="only_open"
-                                    id="only_open" {% if fields.only_open %} checked {% else %} {% endif %}>
-                                <label class="form-check-label" for="only_open">Only show open</label>
-                            </div>
+                    <!-- "Only Show Open" Courses Filter -->
+                    <div class="col-md-6 mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="only_open"
+                                   id="only_open" {% if fields.only_open %} checked {% else %} {% endif %}>
+                            <label class="form-check-label" for="only_open">Only show open</label>
                         </div>
                     </div>
                 </div>
-                
+            </div>
+
 
             <!-- Search Button -->
             <div class="col-md-6 mb-3">
@@ -178,11 +181,17 @@
 
         <hr>
 
-        {% if active_class_messages %}
+        {% if active_class_messages and not good_message %}
             {% for message in class_messages %}
-            <div class="alert alert-warning" role="alert">
-                {{ message }}
-            </div>
+                <div class="alert alert-danger" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% elif active_class_messages and good_message %}
+            {% for message in class_messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
             {% endfor %}
         {% endif %}
 
@@ -192,11 +201,11 @@
         <!-- If filtered courses are found, display the courses -->
 
         {% if no_classes_found %}
-            <section class="section-1">
+            <section class="section-2">
                 <p>No results found</p>
             </section>
         {% endif %}
-        
+
         {% if courses %}
             <div class="container">
 
@@ -211,7 +220,7 @@
                                 <div class="col-sm-auto">
                                     <h5 class="mb-0">{{ course.subject }} {{ course.catalog_nbr }}</h5>
                                 </div>
-                                
+
                                 <!-- Course Title (i.e. Data Structures and Algorithms 2)-->
                                 <div class="col">
                                     <strong>{{ course.descr }}</strong>
@@ -250,7 +259,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="card-body row">
-                                                        
+
                                                         <div class="col-sm-auto">
 
                                                             <!-- Displays Location of a class -->
@@ -258,11 +267,11 @@
                                                                 <p><b>Location:</b> {{ course.location_descr }} @ {{ place.facility_descr }}</p>
                                                             {% endfor %}
                                                             <hr>
-                                                            
+
                                                             <!-- Displays Instruction Type (i.e. On Grounds vs Off Grounds) of class-->
                                                             <p><b>Instruction Type:</b> {{ course.instruction_mode_descr }}</p>
                                                             <hr>
-                                                            
+
                                                             <!-- Displays days a class takes place-->
                                                             <p>
                                                                 <b>Days: </b>
@@ -271,7 +280,7 @@
                                                                     <br>
                                                                 {% endfor %}
                                                             </p>
-                                                            
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -279,13 +288,14 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    
-            
+
+
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-sm-auto">
@@ -304,11 +314,13 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-auto">
-                                    <p><b>Credits:</b> {{ course.units }}</p>
+                                    {% if '-' not in course.units %}
+                                        <p><b>Credits:</b> {{ course.units }}</p>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
-            
+
                         <div class="card-body collapse" id="extra_info_{{ forloop.counter }}">
                             <div class="row">
                                 <div class="col-sm-auto">
@@ -318,7 +330,7 @@
                                     <p>Instruction: {{ course.instruction_mode_descr }}</p>
                                 </div>
                             </div>
-            
+
                             <div class="row">
                                 <div class="col-sm-auto">
                                     <strong>Days:</strong>
@@ -327,15 +339,25 @@
                                     <div class="col">
                                         {{ days.days }} @ {{ days.facility_descr }} from {{ days.start_time|slice:"0:5"|to_colon }} to {{ days.end_time|slice:"0:5"|to_colon }}
                                     </div>
-                                {% endfor %} 
+                                {% endfor %}
                             </div>
                         </div>
-            
+
                         <!-- Function to change color of "Add to Cart" button to green following it being clicked -->
                         <script>
                             function changeButtonColor(event) {
                                 event.target.classList.remove("btn-primary");
                                 event.target.classList.add("btn-success");
+                            }
+
+                            {#This function disables all add course buttons until a specific credit value is chosen#}
+
+                            function disableButtonIfNoChosenUnits(index) {
+                                if ($("#units_selector_" + index).val() == "") {
+                                    $("#add_to_cart_button_" + index).attr('disabled', true)
+                                } else {
+                                    $("#add_to_cart_button_" + index).attr('disabled', false)
+                                }
                             }
                         </script>
 
@@ -344,96 +366,41 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="term" id="term" value={{ course.strm }}>
                                 <input type="hidden" name="class_nbr" id="class_nbr" value={{ course.class_nbr }}>
-                                <button type="submit" class="btn btn-primary" onclick="changeButtonColor(event)">Add to Cart</button>
+                                {% if '-' in course.units %}
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <button disabled="disabled" type="submit"
+                                                    id="add_to_cart_button_{{ forloop.counter }}"
+                                                    class="btn btn-primary" on onclick="changeButtonColor(event)">Add to
+                                                Cart
+                                            </button>
+                                        </div>
+                                        <div class="col-2">
+                                            <label>Required Credits</label>
+                                            <select class="form-select"
+                                                    onchange="disableButtonIfNoChosenUnits({{ forloop.counter }})"
+                                                    name="units_selector" id="units_selector_{{ forloop.counter }}">
+                                                <option selected></option>
+                                                {% for i in course.units|to_int_range %}
+                                                    <option value={{ i }}>
+                                                        {{ i }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <button type="submit" id="add_to_cart_button_{{ forloop.counter }}"
+                                            class="btn btn-primary" on onclick="changeButtonColor(event)">Add to Cart
+                                    </button>
+                                {% endif %}
                             </form>
                         </div>
                     </div>
                 {% endfor %}
             </div>
         {% endif %}
-
-        {% if no_classes_found %}
-            <section class="section-1">
-                <p>No results found</p>
-            </section>
-        {% endif %}
-
-        {#            <div class="container card">#}
-        {#                <div class="row">#}
-        {#                    <div class="col">#}
-        {#                        {% for course in courses %}#}
-        {#                            <div class="card container">#}
-        {#                                <div class="card-header row">#}
-        {#                                    <div class="col-sm-auto">#}
-        {#                                        <p>{{ course.subject }} {{ course.catalog_nbr }}</p>#}
-        {#                                        <p>{{ forloop.counter }}</p>#}
-        {#                                    </div>#}
-        {#                                    <div class="col">#}
-        {#                                        <b>{{ course.descr }}</b>#}
-        {#                                    </div>#}
-        {#                                    <div class="col">#}
-        {#                                        <button class="btn btn-primary" type="button" onclick="toggler('extra_info_{{ forloop.counter }}')">#}
-        {#                                            Click here#}
-        {#                                        </button>#}
-        {#                                    </div>#}
-        {#                                </div>#}
-        {#                                <div class="card-body row">#}
-        {#                                    <div class="col-sm-auto">#}
-        {#                                        <p>Instructor: {{ course.instructors.0.name }}</p>#}
-        {#                                    </div>#}
-        {#                                    <div class="col">#}
-        {#                                        <p>#}
-        {#                                            Capacity: {{ course.enrollment_total }}/{{ course.class_capacity }}#}
-        {#                                        </p>#}
-        {#                                    </div>#}
-        {#                                </div>#}
-        {#                                <div class="card-body row">#}
-        {#                                    <div class="col-sm-auto">#}
-        {#                                        <p>{{ course.units }} Credits</p>#}
-        {#                                    </div>#}
-        {#                                </div>#}
-        {#                            </div>#}
-        {#                        {% endfor %}#}
-        {#                    </div>#}
-        {#                    <div class="col" id="extra_info">#}
-        {#                        <div class="sticky-top" style="position: -webkit-sticky">#}
-        {#                            {% for course in courses %}#}
-        {#                                <div class="card container invisible" id="extra_info_{{ forloop.counter }}" >#}
-        {#                                    <div class="card-header row">#}
-        {#                                        <div class="col-sm-auto">#}
-        {#                                            <p>{{ course.subject }} {{ course.catalog_nbr }}</p>#}
-        {#                                            <p>{{ forloop.counter }}</p>#}
-        {#                                        </div>#}
-        {#                                        <div class="col">#}
-        {#                                            <b>{{ course.descr }}</b>#}
-        {#                                        </div>#}
-        {#                                    </div>#}
-        {#                                    <div class="card-body row">#}
-        {#                                        <div class="col-sm-auto">#}
-        {#                                            <p>Location: {{ course.location_descr }}</p>#}
-        {#                                        </div>#}
-        {#                                        <div class="col-sm-auto">#}
-        {#                                            <p>Instruction: {{ course.instruction_mode_descr }}</p>#}
-        {#                                        </div>#}
-        {#                                         <div class="col">#}
-        {#                                            Days:#}
-        {#                                        </div>#}
-        {#                                        {% for days in course.meetings %}#}
-        {#                                            <div class="col">#}
-        {#                                                {{ days.days }} @ {{ days.facility_descr }}#}
-        {#                                            </div>#}
-        {#                                        {% endfor %}#}
-        {#                                    </div>#}
-        {#                                    <div class="card-body row align-items-stretch">#}
-        {#                                       #}
-        {#                                    </div>#}
-        {#                                </div>#}
-        {#                            {% endfor %}#}
-        {#                        </div>#}
-        {#                    </div>#}
-        {#                </div>#}
-        {#            </div>#}
-        {#        {% endif %}#}
     {% endblock %}
 </div>
 </body>

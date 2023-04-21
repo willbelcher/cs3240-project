@@ -126,20 +126,20 @@ def course_search_view(request):
             fields['catalog_nbr'] = ""
             catalog_nbr=""
             active_class_messages = True
-            class_messages.append("Catalog Number Field returned to default value")
+            class_messages.append("Catalog Number Field has been cleared due to an Invalid Value")
         if not course_nmbr.isnumeric() and not course_nmbr == "":
             course_nmbr = ""
             fields['course_nmbr'] = ""
             active_class_messages = True
-            class_messages.append("Course Number Field returned to default value")
+            class_messages.append("Course Number Field has been cleared due to an Invalid Value")
         if " " in instructor:
             instructor = instructor.split(" ")[0]
             active_class_messages = True
-            class_messages.append("Instructor Field has been reverted to a valid value")
+            class_messages.append("Instructor Field has been reverted to a Valid Value")
         if " " in course_name:
             course_name = course_name.split(" ")[0]
             active_class_messages = True
-            class_messages.append("Course Name Field has been reverted to a valid value")
+            class_messages.append("Course Name Field has been reverted to a Valid Value")
 
         for day in days.keys():
             days[day] = bool(fields.get(day))
@@ -227,6 +227,7 @@ def add_course(request):
     if request.method == 'POST':
         term = request.POST.get('term', '').strip()
         class_nbr = request.POST.get('class_nbr', '').strip()
+        course_credits = request.POST.get('units_selector')
 
         # Validate input
         if not term:
@@ -246,12 +247,25 @@ def add_course(request):
                 json_data = response.json()
                 course_data = json_data[0]  # Assuming the course data is in the first element of the list
 
+                # to isolate the last digit (2 or 8)
+                # saves the term of the search when the add_course page is rerendered
+                term = term[-1]
+                if term == "8":
+                    fields['term'] = "Fall"
+                elif term == "2":
+                    fields['term'] = "Spring"
+
                 # Extract course information
                 subject = course_data['subject']
                 catalog_nbr = course_data['catalog_nbr']
                 title = course_data['descr']
                 instructor_name = course_data['instructors'][0]['name']
-                units = int(course_data['units'])
+                term = int(term)
+                units = 0
+                if course_credits is None:
+                    units = int(course_data['units'])
+                else:
+                    units = course_credits
 
                 # Save the course to the user's cart
                 cart, _ = Cart.objects.get_or_create(user=request.user)
@@ -265,7 +279,8 @@ def add_course(request):
                             class_messages.append("Can not add an identical course to Cart")
                             return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days, 'active_class_messages':active_class_messages, 'class_messages':class_messages})
 
-                course = Course(cart=cart, class_nbr=class_nbr, subject=subject, catalog_nbr=catalog_nbr, title=title, instructor_name=instructor_name, units=units)
+                course = Course(cart=cart, class_nbr=class_nbr, subject=subject, catalog_nbr=catalog_nbr, title=title,
+                                instructor_name=instructor_name, units=units, term=term)
                 course.save()
 
                 for json_days in course_data['meetings']:
@@ -273,14 +288,19 @@ def add_course(request):
                     end_time = json_days['end_time'][0:5].replace(".", ":")
                     all_days = json_days['days']
 
-                    time = CourseTime.objects.create(course=course, days=all_days, starting_time=start_time, ending_time=end_time)
+                    time = CourseTime.objects.create(course=course, days=all_days, starting_time=start_time,
+                                                     ending_time=end_time)
                     time.save()
 
                 active_class_messages = True
+                good_message = True
                 class_messages.append("Course added successfully!")
                 messages.success(request, 'Course added successfully!')
-
-                return redirect('schedule:add_course_success')
+                return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields,
+                                                                       'days': days,
+                                                                       'active_class_messages': active_class_messages,
+                                                                       'good_message': good_message,
+                                                                       'class_messages': class_messages})
             else:
                 messages.error(request, 'Failed to fetch course data.')
 
@@ -298,11 +318,18 @@ def view_cart(request):
     schedules = Schedule.objects.filter(user=request.user)
 
     if schedules.count() == 0:
-        schedule = Schedule.objects.create(user = request.user)
+        schedule = Schedule.objects.create(user=request.user)
         schedule.save()
         schedules = Schedule.objects.filter(user=request.user)
 
+    context_courses = []
     courses = Course.objects.filter(cart=cart)
+    for course in courses:
+        times = CourseTime.objects.filter(course=course)
+        all_times = []
+        for time in times:
+            all_times.append({'days': time.days, 'starting_time': time.starting_time, 'ending_time': time.ending_time})
+        context_courses.append({'course': course, 'all_times': all_times})
 
     current_id = schedules.first().id
     if request.method == "POST":
@@ -313,8 +340,9 @@ def view_cart(request):
         context_schedules.append({'id': schedule.id, 'title': schedule.title, 'submitted': schedule.submitted})
 
     # Render the view_cart template with the courses
-    context = {'courses': courses, 'schedules': context_schedules, 'current_id': current_id}
+    context = {'courses': context_courses, 'schedules': context_schedules, 'current_id': current_id}
     return render(request, 'schedule/view_cart.html', context)
+
 
 # Removes a course from the user's cart
 @login_required
@@ -324,13 +352,33 @@ def remove_course(request, course_id):
     messages.success(request, 'Course removed from cart.')
     return redirect('schedule:view_cart')
 
-# Get schedules associated with the user for rerendering 
+
+# Get schedules associated with the user for rerendering
 def get_context_schedules(user):
     context_schedules = []
     for schedule in Schedule.objects.filter(user=user):
         context_schedules.append({'id': schedule.id, 'title': schedule.title, 'submitted': schedule.submitted})
 
     return context_schedules
+
+
+def get_context_courses(user):
+    # Get the user's cart
+    cart, _ = Cart.objects.get_or_create(user=user)
+
+    context_courses = []
+    courses = Course.objects.filter(cart=cart)
+
+    for course in courses:
+        times = CourseTime.objects.filter(course=course)
+        all_times = []
+
+        for time in times:
+            all_times.append({'days': time.days, 'starting_time': time.starting_time, 'ending_time': time.ending_time})
+        context_courses.append({'course': course, 'all_times': all_times})
+
+    return context_courses
+
 
 # Adds a course to the user's schedule from their cart
 @login_required
@@ -339,24 +387,26 @@ def add_to_schedule(request, schedule_id, course_id):
     schedule, _ = Schedule.objects.get_or_create(id=schedule_id, user=request.user)
     total_units = schedule.total_units
 
-    times = CourseTime.objects.filter(course = course) #get all meetings of course thats to be added
+    times = CourseTime.objects.filter(course=course)  # get all meetings of course thats to be added
     items = ScheduleItem.objects.filter(schedule=schedule.id)
     for item in items:
-        added_course = Course.objects.get(pk = item.course.id) #get all courses already in schedule
+        added_course = Course.objects.get(pk=item.course.id)  # get all courses already in schedule
 
         if added_course.subject == course.subject and added_course.catalog_nbr == course.catalog_nbr:
-            cart, _ = Cart.objects.get_or_create(user=request.user)
-
-            # Get the courses associated with the cart and exclude those in the user's schedule
-            courses = Course.objects.filter(cart=cart).exclude(scheduleitem__schedule=schedule)
-
-            # Render the view_cart template with the courses
-            context = {'courses': courses, 'current_id': schedule_id, 'schedules': get_context_schedules(request.user),
+            context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
+                       'schedules': get_context_schedules(request.user),
                        'active_class_messages': True,
                        'class_messages': "Can not add this course, the same course is already added"}
             return render(request, 'schedule/view_cart.html', context)
+        if added_course.term != course.term:
+            messages.error(request, "Can not add course from a different Term to Cart")
+            context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
+                       'schedules': get_context_schedules(request.user),
+                       'active_class_messages': True,
+                       'class_messages': "Can't add a Course from a different term to this schedule. Use another schedule, or remove all courses from this schedule before adding this Course"}
+            return render(request, 'schedule/view_cart.html', context)
 
-        added_course_times = CourseTime.objects.filter(course = added_course) #get these already-added course times
+        added_course_times = CourseTime.objects.filter(course=added_course)  # get these already-added course times
         for time in times:
             time_starting_hour = int(time.starting_time.split(":")[0])
             time_ending_hour = int(time.ending_time.split(":")[0])
@@ -388,9 +438,10 @@ def add_to_schedule(request, schedule_id, course_id):
                             courses = Course.objects.filter(cart=cart)
 
                             # Render the view_cart template with the courses
-                            context = {'courses': courses, 'current_id': schedule_id, 'schedules': get_context_schedules(request.user),
-                                       'active_class_messages':True,
-                                       'class_messages':"Can not add this course, it overlaps with a class already in your schedule."}
+                            context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
+                                       'schedules': get_context_schedules(request.user),
+                                       'active_class_messages': True,
+                                       'class_messages': "Can not add this course, it overlaps with a class already in your schedule."}
                             return render(request, 'schedule/view_cart.html', context)
 
     if schedule.total_units + course.units > 19:
@@ -402,7 +453,9 @@ def add_to_schedule(request, schedule_id, course_id):
         courses = Course.objects.filter(cart=cart).exclude(scheduleitem__schedule=schedule)
 
         # Render the view_cart template with the courses
-        context = {'courses': courses, 'active_class_messages': True,
+        context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
+                   'schedules': get_context_schedules(request.user),
+                   'active_class_messages': True,
                    'class_messages': "Can not add this course, it will surpass the 19 credit limit."}
         return render(request, 'schedule/view_cart.html', context)
     schedule.total_units = total_units + course.units
@@ -416,8 +469,11 @@ def add_to_schedule(request, schedule_id, course_id):
     course.cart = None
     course.save()
 
-    messages.success(request, 'Course added to schedule.')
-    return redirect('schedule:view_cart')
+    context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
+               'schedules': get_context_schedules(request.user),
+               'active_class_messages': True, 'good_message': True,
+               'class_messages': "Course added to Schedule successfully."}
+    return render(request, 'schedule/view_cart.html', context)
 
 # View for View Schedule Page
 @login_required
@@ -439,19 +495,21 @@ def view_schedule(request):
         titles.append(s.title)
 
     context = {'schedule': {'id': schedule.id, 'title': schedule.title, 'total_units': schedule.total_units,
-                            'submitted':schedule.submitted, 'status': schedule.status, 'approved_date': schedule.approved_date,
-                            'denied_date': schedule.denied_date,'comments': schedule.comments,'comment_date': schedule.comment_date,
-                            'courses':[]}, 'titles': titles}
+                            'submitted': schedule.submitted, 'status': schedule.status,
+                            'approved_date': schedule.approved_date,
+                            'denied_date': schedule.denied_date, 'comments': schedule.comments,
+                            'comment_date': schedule.comment_date,
+                            'courses': []}, 'titles': titles}
     schedule_items = ScheduleItem.objects.filter(schedule=schedule)
 
     for item in schedule_items:
         # course = Course.objects.get(course = item.course)
         course = item.course
-        times = CourseTime.objects.filter(course = course)
+        times = CourseTime.objects.filter(course=course)
         all_times = []
         for time in times:
-            all_times.append({'days':time.days, 'starting_time':time.starting_time, 'ending_time':time.ending_time})
-        context['schedule']['courses'].append({'course':course, 'all_times':all_times})
+            all_times.append({'days': time.days, 'starting_time': time.starting_time, 'ending_time': time.ending_time})
+        context['schedule']['courses'].append({'course': course, 'all_times': all_times})
     return render(request, 'schedule/view_schedule.html', context)
 
 
@@ -461,7 +519,7 @@ def remove_course_from_schedule(request, schedule_id, course_id):
     # messages.success(request, 'Course removed from cart.')
     # return redirect('schedule:view_cart')
     schedule = get_object_or_404(Schedule, pk=schedule_id, user=request.user)
-    course = get_object_or_404(Course, pk = course_id)
+    course = get_object_or_404(Course, pk=course_id)
     schedule.total_units = schedule.total_units - course.units
     course.delete()
     schedule.save()
@@ -469,6 +527,7 @@ def remove_course_from_schedule(request, schedule_id, course_id):
     # schedule_item.delete()
     messages.success(request, 'Removed Course from the Schedule')
     return redirect('schedule:view_schedule')
+
 
 def unsubmit_schedule(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
@@ -485,7 +544,7 @@ def submit_schedule(request, schedule_id):
     advisor = get_object_or_404(User, username="glendonchin")
     schedule.advisor = advisor
     schedule.submitted = True
-    schedule.status="Pending"
+    schedule.status = "Pending"
     schedule.comments = None
     schedule.approved_date = None
     schedule.denied_date = None
@@ -502,7 +561,7 @@ def is_advisor(user):
     #is_advisor = user.groups.filter(name='glendonchin').exists()
     user_is_advisor = False
     if user.has_perm('global_permissions.is_advisor'):
-        user_is_advisor=True
+        user_is_advisor = True
     print(f"User {user.username} is advisor: {is_advisor}")
     return user_is_advisor
 
@@ -552,9 +611,10 @@ def add_comments(request, schedule_id):
 
     return render(request, 'add_comments.html', {'schedule': schedule})
 
+
 @login_required
 def delete_schedule(request, schedule_id):
-    schedule = get_object_or_404(Schedule, id = schedule_id)
+    schedule = get_object_or_404(Schedule, id=schedule_id)
     schedule.delete()
 
     # ensure user always has one schedule
@@ -562,6 +622,7 @@ def delete_schedule(request, schedule_id):
         Schedule.objects.create(user=request.user).save()
 
     return redirect('schedule:view_schedule')
+
 
 @login_required
 def create_schedule(request):
@@ -581,6 +642,7 @@ def create_schedule(request):
             return redirect('schedule:view_schedule')
 
     return render(request, 'schedule/create_schedule.html', context)
+
 
 @login_required
 def rename_schedule(request, schedule_id):
