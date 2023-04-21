@@ -61,6 +61,7 @@ SITE_ID = 1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    'csp.middleware.CSPMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -178,6 +179,33 @@ SECURE_SSL_REDIRECT = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_HSTS_PRELOAD = True
+
+# Django-csp settings
+# https://django-csp.readthedocs.io/en/latest/
+
+CSP_DEFAULT_SRC = ["'none'"]
+CSP_SCRIPT_SRC = [
+    "'self'",
+    "https://cdn.jsdelivr.net", 
+    "https://ajax.googleapis.com",
+    "https://code.jquery.com"
+]
+
+CSP_STYLE_SRC = [
+    "'self'", 
+    "https://cdn.jsdelivr.net",
+    "https://fonts.googleapis.com",
+    "https://unpkg.com"
+]
+
+CSP_FONT_SRC = [
+    "https://fonts.googleapis.com",
+    "https://fonts.gstatic.com"
+]
+
+CSP_INCLUDE_NONCE_IN = ["script-src", "style-src"]
+
+CSP_IMG_SRC = ["'self'"]
 
 try:
     if 'HEROKU' in os.environ:

@@ -488,6 +488,7 @@ def view_schedule(request):
     else:
         schedule = Schedule.objects.create(user=request.user)
         schedule.save()
+    schedules = Schedule.objects.filter(user=request.user)
 
     titles = []
     for s in schedules:
@@ -629,7 +630,10 @@ def create_schedule(request):
     if request.method == "POST":
         title = request.POST.get('title')
 
-        if Schedule.objects.filter(user=request.user, title=title).count() != 0:
+        if " " in title:
+            context['is_error'] = True
+            context['error_message'] = 'Can not have a space in your schedule title, please try again'
+        elif Schedule.objects.filter(user=request.user, title=title).count() != 0:
             context['is_error'] = True
             context['error_message'] = 'A schedule with that name already exists, please choose another.'
         else:
@@ -648,7 +652,10 @@ def rename_schedule(request, schedule_id):
     if request.method == "POST":
         title = request.POST.get('title')
 
-        if Schedule.objects.filter(user=request.user, title=title).count() != 0:
+        if " " in title:
+            context['is_error'] = True
+            context['error_message'] = 'Can not have a space in your schedule title, please try again'
+        elif Schedule.objects.filter(user=request.user, title=title).count() != 0:
             context['is_error'] = True
             context['error_message'] = 'A schedule with that name already exists, please choose another.'
         else:

@@ -11,13 +11,13 @@
 
     <title>Plan-it Pal</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link nonce="{{request.csp_nonce}}" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static 'css/schedule.css' %}">
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <link rel="stylesheet" href="{% static 'css/schedule.css' %}">
-    <script>
+    <script nonce="{{request.csp_nonce}}" src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script nonce="{{request.csp_nonce}}" src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script nonce="{{request.csp_nonce}}" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <link nonce="{{request.csp_nonce}}" rel="stylesheet" href="{% static 'css/schedule.css' %}">
+    <script nonce="{{request.csp_nonce}}">
         function toggler(divId) {
             console.log(divId);
             if($("#"+divId).hasClass('invisible')){
@@ -72,7 +72,7 @@
                     <select class="form-control" name="subject" id="subject">
                         <option></option>
                         {% for subject in subjects %}
-                            <option value={{ subject }} {% if fields.subject == subject %} selected {% else %} {% endif %}>{{ subject }}</option>
+                            <option value="{{ subject }}" {% if fields.subject == subject %} selected {% else %} {% endif %}>{{ subject }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -81,7 +81,7 @@
                 <div class="col-md-3 mb-3">
                     <label for="subject">Catalog Number:</label>
                     <input class="form-control" type="text" name="catalog_nbr" id="catalog_nbr"
-                           value={{ fields.catalog_nbr }}>
+                        value="{{ fields.catalog_nbr }}">
                 </div>
             </div>
 
@@ -91,21 +91,21 @@
                 <div class="col-md-4 mb-3">
                     <label for="instructor">Instructor:</label>
                     <input class="form-control" type="text" name="instructor" id="instructor"
-                           value={{ fields.instructor }}>
+                        value="{{ fields.instructor }}">
                 </div>
 
                 <!-- Course Name Filter -->
                 <div class="col-md-4 mb-3">
                     <label for="course_name">Course Name:</label>
                     <input class="form-control" type="text" name="course_name" id="course_name"
-                           value={{ fields.course_name }}>
+                        value="{{ fields.course_name }}">
                 </div>
 
                 <!-- Course Number Filter -->
                 <div class="col-md-4 mb-3">
                     <label for="course_nmbr">Course Number:</label>
                     <input class="form-control" type="text" name="course_nmbr" id="course_nmbr"
-                           value={{ fields.course_nmbr }}>
+                        value="{{ fields.course_nmbr }}">
                 </div>
             </div>
 
@@ -123,40 +123,41 @@
             <div class="collapse mb-3" id="extra_filters">
                 <div class="row">
 
-                    <!-- Start Time Filter -->
-                    <div class="col-md-4 mb-3">
-                        <label for="start_time">Start time:</label>
-                        <input type="time" class="form-control" name="start_time" id="start_time"
-                               value={{ fields.start_time }} step="1800">
-                    </div>
+                        <!-- Start Time Filter -->
+                        <div class="col-md-4 mb-3">
+                            <label for="start_time">Start time:</label>
+                            <input type="time" class="form-control" name="start_time" id="start_time"
+                            value="{{ fields.start_time }}" step="1800">
+                        </div>
 
-                    <!-- End Time Filter -->
-                    <div class="col-md-4 mb-3">
-                        <label for="end_time">End time:</label>
-                        <input type="time" class="form-control" name="end_time" id="end_time"
-                               value={{ fields.end_time }} step="1800">
-                    </div>
+                        <!-- End Time Filter -->
+                        <div class="col-md-4 mb-3">
+                            <label for="end_time">End time:</label>
+                            <input type="time" class="form-control" name="end_time" id="end_time"
+                                value="{{ fields.end_time }}" step="1800">
+                        </div>
 
-                    <!-- Days Filter -->
-                    <div class="col-md-4 mb-3">
-                        <label for="days">Days:</label>
-                        <div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button"
-                                    data-toggle="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                Select...
-                            </button>
-                            <ul class="dropdown-menu">
-                                {% for day, checked in days.items %}
-                                    <li>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox"
-                                                   name={{ day }} id={{ day }} {% if checked %}
-                                                   checked {% else %} {% endif %}>
-                                            <label class="form-check-label" for={{ day }}>{{ day }}</label>
-                                        </div>
-                                    </li>
-                                {% endfor %}
-                            </ul>
+                        <!-- Days Filter -->
+                        <div class="col-md-4 mb-3">
+                            <label for="days">Days:</label>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                                        data-toggle="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Select...
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% for day, checked in days.items %}
+                                        <li>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                    name="{{ day }}" id="{{ day }}" {% if checked %}
+                                                    checked {% else %} {% endif %}>
+                                                <label class="form-check-label" for="{{ day }}">{{ day }}</label>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
