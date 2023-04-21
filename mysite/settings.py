@@ -184,8 +184,20 @@ SECURE_HSTS_PRELOAD = True
 # https://django-csp.readthedocs.io/en/latest/
 
 CSP_DEFAULT_SRC = ["'none'"]
-CSP_SCRIPT_SRC = ["https://cdn.jsdelivr.net"]
-CSP_STYLE_SRC = ["'self'", "https://cdn.jsdelivr.net"]
+CSP_SCRIPT_SRC = [
+    "'self'",
+    "https://cdn.jsdelivr.net", 
+    "https://ajax.googleapis.com",
+    "https://code.jquery.com"
+]
+
+CSP_STYLE_SRC = [
+    "'self'", 
+    "https://cdn.jsdelivr.net",
+    "https://fonts.googleapis.com",
+    "https://unpkg.com"
+]
+
 CSP_IMG_SRC = ["'self'"]
 
 try:
