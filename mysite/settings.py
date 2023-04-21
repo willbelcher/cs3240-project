@@ -200,9 +200,10 @@ CSP_STYLE_SRC = [
 
 CSP_FONT_SRC = [
     "https://fonts.googleapis.com",
+    "https://fonts.gstatic.com"
 ]
 
-CSP_INCLUDE_NONCE_IN = ["script-src"]
+CSP_INCLUDE_NONCE_IN = ["script-src", "style-src"]
 
 CSP_IMG_SRC = ["'self'"]
 
