@@ -9,16 +9,18 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
+# LINES TO CHANGE TO RUN LOCALLY
+# 38 - 40 (Debug Line) and 180 - 184 (SECURE HEADINGS AND STUFF)
 
 from pathlib import Path
 import os
 import sys
 
-# import environ
-#
-# env = environ.Env()
-# environ.Env.read_env()
-# SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=True)
+import environ
+
+env = environ.Env()
+environ.Env.read_env()
+SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,7 +35,9 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 SECRET_KEY = 'ee1cfac9d1a8b94ec1ef6bb7122e57d5e83adc0ace273fb8ac'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# TURN THIS TO FALSE TO RUN LOCAL
+DEBUG = True
+# END FALSE
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'cs3240-b15.herokuapp.com']
 
@@ -171,36 +175,49 @@ STATIC_ROOT = BASE_DIR / 'static'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'schedule/static')
 
+# COMMENT THIS
 SECURE_HSTS_SECONDS = 31536000
+# END COMMENT
+
+# TURN ALL OF THESE TO FALSE
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_SSL_REDIRECT = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_HSTS_PRELOAD = True
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+# SECURE_SSL_REDIRECT = False
+# CSRF_COOKIE_SECURE = False
+# SESSION_COOKIE_SECURE = False
+# SECURE_HSTS_PRELOAD = False
+# END FALSE
 
 # Django-csp settings
 # https://django-csp.readthedocs.io/en/latest/
 
-CSP_DEFAULT_SRC = ["'none'"]
+CSP_DEFAULT_SRC = ["'self'"]
+
 CSP_SCRIPT_SRC = [
     "'self'",
-    "https://cdn.jsdelivr.net", 
+    "https://cdn.jsdelivr.net",
     "https://ajax.googleapis.com",
     "https://code.jquery.com"
 ]
 
 CSP_STYLE_SRC = [
-    "'self'", 
+    "'self'",
     "https://cdn.jsdelivr.net",
     "https://fonts.googleapis.com",
-    "https://unpkg.com"
+    "https://unpkg.com",
 ]
 
 CSP_FONT_SRC = [
+    "'self'",
     "https://fonts.googleapis.com",
-    "https://fonts.gstatic.com"
+    "https://fonts.gstatic.com",
+    "https://unpkg.com/"
 ]
 
 CSP_INCLUDE_NONCE_IN = ["script-src", "style-src"]
