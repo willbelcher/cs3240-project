@@ -72,7 +72,7 @@
                     <select class="form-control" name="subject" id="subject">
                         <option></option>
                         {% for subject in subjects %}
-                            <option value={{ subject }} {% if fields.subject == subject %} selected {% else %} {% endif %}>{{ subject }}</option>
+                            <option value="{{ subject }}" {% if fields.subject == subject %} selected {% else %} {% endif %}>{{ subject }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -81,7 +81,7 @@
                 <div class="col-md-3 mb-3">
                     <label for="subject">Catalog Number:</label>
                     <input class="form-control" type="text" name="catalog_nbr" id="catalog_nbr"
-                        value={{ fields.catalog_nbr }}>
+                        value="{{ fields.catalog_nbr }}">
                 </div>
             </div>
 
@@ -91,21 +91,21 @@
                 <div class="col-md-4 mb-3">
                     <label for="instructor">Instructor:</label>
                     <input class="form-control" type="text" name="instructor" id="instructor"
-                        value={{ fields.instructor }}>
+                        value="{{ fields.instructor }}">
                 </div>
 
                 <!-- Course Name Filter -->
                 <div class="col-md-4 mb-3">
                     <label for="course_name">Course Name:</label>
                     <input class="form-control" type="text" name="course_name" id="course_name"
-                        value={{ fields.course_name }}>
+                        value="{{ fields.course_name }}">
                 </div>
 
                 <!-- Course Number Filter -->
                 <div class="col-md-4 mb-3">
                     <label for="course_nmbr">Course Number:</label>
                     <input class="form-control" type="text" name="course_nmbr" id="course_nmbr"
-                        value={{ fields.course_nmbr }}>
+                        value="{{ fields.course_nmbr }}">
                 </div>
             </div>
 
@@ -127,14 +127,14 @@
                         <div class="col-md-4 mb-3">
                             <label for="start_time">Start time:</label>
                             <input type="time" class="form-control" name="start_time" id="start_time"
-                            value={{ fields.start_time }} step="1800">
+                            value="{{ fields.start_time }}" step="1800">
                         </div>
 
                         <!-- End Time Filter -->
                         <div class="col-md-4 mb-3">
                             <label for="end_time">End time:</label>
                             <input type="time" class="form-control" name="end_time" id="end_time"
-                                value={{ fields.end_time }} step="1800">
+                                value="{{ fields.end_time }}" step="1800">
                         </div>
 
                         <!-- Days Filter -->
@@ -150,9 +150,9 @@
                                         <li>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox"
-                                                    name={{ day }} id={{ day }} {% if checked %}
+                                                    name="{{ day }}" id="{{ day }}" {% if checked %}
                                                     checked {% else %} {% endif %}>
-                                                <label class="form-check-label" for={{ day }}>{{ day }}</label>
+                                                <label class="form-check-label" for="{{ day }}">{{ day }}</label>
                                             </div>
                                         </li>
                                     {% endfor %}

@@ -22,9 +22,9 @@
             <!-- Schedule Options -->
             <form class="col-md-5 row" action="{% url 'schedule:view_schedule' %}" method="POST">
                 {% csrf_token %}
-                <select class="form-control col-md-auto" style="width:fit-content" name="title" id="title">
+                <select class="fit-form form-control col-md-auto" name="title" id="title">
                     {% for title in titles %}
-                        <option value={{ title }} {% if schedule.title == title %} selected {% else %} {% endif %}>{{ title }}</option>
+                        <option value="{{ title }}" {% if schedule.title == title %} selected {% else %} {% endif %}>{{ title }}</option>
                     {% endfor %}
                 </select>
                 <div class="col-md-auto">
