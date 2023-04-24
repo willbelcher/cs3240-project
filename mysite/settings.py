@@ -14,11 +14,13 @@ from pathlib import Path
 import os
 import sys
 
-# import environ
-#
-# env = environ.Env()
-# environ.Env.read_env()
-# SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=True)
+# COMMENT THIS OUT ===========================================================
+import environ
+
+env = environ.Env()
+environ.Env.read_env()
+SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=True)
+# END COMMENT ================================================================
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,7 +35,12 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 SECRET_KEY = 'ee1cfac9d1a8b94ec1ef6bb7122e57d5e83adc0ace273fb8ac'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
+# SWAP FALSE FOR TRUE ================================================================
 DEBUG = False
+# DEBUG = True
+# END SWAP ===========================================================================
+
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'cs3240-b15.herokuapp.com']
 
@@ -172,16 +179,27 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+# COMMENT THIS OUT ================================================================
 SECURE_HSTS_SECONDS = 31536000
+# END COMMENT THIS OUT ================================================================
+
+# SWAP TRUE FOR FALSE ================================================================
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_SSL_REDIRECT = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_HSTS_PRELOAD = True
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+# SECURE_SSL_REDIRECT = False
+# CSRF_COOKIE_SECURE = False
+# SESSION_COOKIE_SECURE = False
+# SECURE_HSTS_PRELOAD = False
+# END SWAP================================================================
 
 try:
     if 'HEROKU' in os.environ:
         import django_heroku
+
         django_heroku.settings(locals())
 except ImportError:
     found = False
