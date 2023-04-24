@@ -185,7 +185,7 @@ SECURE_HSTS_PRELOAD = True
 
 CSP_DEFAULT_SRC = ["'none'"]
 CSP_SCRIPT_SRC = ["https://cdn.jsdelivr.net"]
-CSP_STYLE_SRC = ["'self'", "https://cdn.jsdelivr.net"]
+CSP_STYLE_SRC = ["https://cdn.jsdelivr.net"]
 CSP_IMG_SRC = ["'self'"]
 
 try:
