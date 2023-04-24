@@ -72,7 +72,8 @@
                     <select class="form-control" name="subject" id="subject">
                         <option></option>
                         {% for subject in subjects %}
-                            <option value="{{ subject }}" {% if fields.subject == subject %} selected {% else %} {% endif %}>{{ subject }}</option>
+                            <option value="{{ subject }}" {% if fields.subject == subject %}
+                                    selected {% else %} {% endif %}>{{ subject }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -81,7 +82,7 @@
                 <div class="col-md-3 mb-3">
                     <label for="subject">Catalog Number:</label>
                     <input class="form-control" type="text" name="catalog_nbr" id="catalog_nbr"
-                        value="{{ fields.catalog_nbr }}">
+                           value="{{ fields.catalog_nbr }}">
                 </div>
             </div>
 
@@ -91,21 +92,21 @@
                 <div class="col-md-4 mb-3">
                     <label for="instructor">Instructor:</label>
                     <input class="form-control" type="text" name="instructor" id="instructor"
-                        value="{{ fields.instructor }}">
+                           value="{{ fields.instructor }}">
                 </div>
 
                 <!-- Course Name Filter -->
                 <div class="col-md-4 mb-3">
                     <label for="course_name">Course Name:</label>
                     <input class="form-control" type="text" name="course_name" id="course_name"
-                        value="{{ fields.course_name }}">
+                           value="{{ fields.course_name }}">
                 </div>
 
                 <!-- Course Number Filter -->
                 <div class="col-md-4 mb-3">
                     <label for="course_nmbr">Course Number:</label>
                     <input class="form-control" type="text" name="course_nmbr" id="course_nmbr"
-                        value="{{ fields.course_nmbr }}">
+                           value="{{ fields.course_nmbr }}">
                 </div>
             </div>
 
@@ -123,51 +124,50 @@
             <div class="collapse mb-3" id="extra_filters">
                 <div class="row">
 
-                        <!-- Start Time Filter -->
-                        <div class="col-md-4 mb-3">
-                            <label for="start_time">Start time:</label>
-                            <input type="time" class="form-control" name="start_time" id="start_time"
-                            value="{{ fields.start_time }}" step="1800">
-                        </div>
-
-                        <!-- End Time Filter -->
-                        <div class="col-md-4 mb-3">
-                            <label for="end_time">End time:</label>
-                            <input type="time" class="form-control" name="end_time" id="end_time"
-                                value="{{ fields.end_time }}" step="1800">
-                        </div>
-
-                        <!-- Days Filter -->
-                        <div class="col-md-4 mb-3">
-                            <label for="days">Days:</label>
-                            <div class="dropdown">
-                                <button class="btn btn-outline-secondary dropdown-toggle" type="button"
-                                        data-toggle="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Select...
-                                </button>
-                                <ul class="dropdown-menu">
-                                    {% for day, checked in days.items %}
-                                        <li>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox"
-                                                    name="{{ day }}" id="{{ day }}" {% if checked %}
-                                                    checked {% else %} {% endif %}>
-                                                <label class="form-check-label" for="{{ day }}">{{ day }}</label>
-                                            </div>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </div>
+                    <!-- Start Time Filter -->
+                    <div class="col-md-4 mb-3">
+                        <label for="start_time">Start time:</label>
+                        <input type="time" class="form-control" name="start_time" id="start_time"
+                               value="{{ fields.start_time }}" step="1800">
                     </div>
 
-                    <!-- "Only Show Open" Courses Filter -->
-                    <div class="col-md-6 mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="only_open"
-                                   id="only_open" {% if fields.only_open %} checked {% else %} {% endif %}>
-                            <label class="form-check-label" for="only_open">Only show open</label>
+                    <!-- End Time Filter -->
+                    <div class="col-md-4 mb-3">
+                        <label for="end_time">End time:</label>
+                        <input type="time" class="form-control" name="end_time" id="end_time"
+                               value="{{ fields.end_time }}" step="1800">
+                    </div>
+
+                    <!-- Days Filter -->
+                    <div class="col-md-4 mb-3">
+                        <label for="days">Days:</label>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                                    data-toggle="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Select...
+                            </button>
+                            <ul class="dropdown-menu">
+                                {% for day, checked in days.items %}
+                                    <li>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                   name="{{ day }}" id="{{ day }}" {% if checked %}
+                                                   checked {% else %} {% endif %}>
+                                            <label class="form-check-label" for="{{ day }}">{{ day }}</label>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </div>
+                    </div>
+                </div>
+
+                <!-- "Only Show Open" Courses Filter -->
+                <div class="col-md-6 mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="only_open"
+                               id="only_open" {% if fields.only_open %} checked {% else %} {% endif %}>
+                        <label class="form-check-label" for="only_open">Only show open</label>
                     </div>
                 </div>
             </div>
