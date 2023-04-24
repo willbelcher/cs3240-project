@@ -10,11 +10,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
-
+    
     <title>Login</title>
 
     <!-- Background Image -->
-    <style nonce="{{ request.csp_nonce }}">
+    <style>
         body {
             background-image: url('{% static "img/uva.jpg" %}');
         }
@@ -23,8 +23,8 @@
 <body>
 
 
-<div class="box">
-    <div class="container">
+    <div class="box">
+        <div class="container">
     
             <div class="top">
                 <header>Plan-it Pal</header>
@@ -35,34 +35,34 @@
                 <input type="text" class="input" placeholder="email address or username" id="">
                 <i class='bx bx-user' ></i>
             </div>
+    
+            <!-- Password Field -->
+            <div class="input-field">
+                <input type="Password" class="input" placeholder="password" id="">
+                <i class='bx bx-lock-alt'></i>
+            </div>
+    
 
-        <!-- Password Field -->
-        <div class="input-field">
-            <input type="Password" class="input" placeholder="password" id="">
-            <i class='bx bx-lock-alt'></i>
-        </div>
+            <!-- Login Logo -->
+            <style>
+                .regular-login {
+                    background-image: url('{% static "img/login_logo.png" %}');
+                }
+            </style>
 
 
-        <!-- Login Logo -->
-        <style nonce="{{ request.csp_nonce }}">
-            .regular-login {
-                background-image: url('{% static "img/login_logo.png" %}');
-            }
-        </style>
+            <!-- Google Logo -->
+            <style>
+                .google-login {
+                    background-image: url('{% static "img/google.png" %}'); /* Add your image path and background color here */
+                }
+            </style>
 
-
-        <!-- Google Logo -->
-        <style nonce="{{ request.csp_nonce }}">
-            .google-login {
-                background-image: url('{% static "img/google.png" %}'); /* Add your image path and background color here */
-            }
-        </style>
-
-        <!-- Login Buttons -->
-        {% load socialaccount %}
-        {% get_providers as socialaccount_providers %}
-        <div class="input-field">
-            <input type="submit" class="regular-login" value="Login" id="">
+            <!-- Login Buttons -->
+            {% load socialaccount %}
+            {% get_providers as socialaccount_providers %}
+            <div class="input-field">
+                <input type="submit" class="regular-login" value="Login" id="">
                 {% for provider in socialaccount_providers %}
                     <a class="google-login" href="{% provider_login_url provider.id process="login" scope=scope auth_params=auth_params %}">Log In With Google</a>
                 {% endfor %}
