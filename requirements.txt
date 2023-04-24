@@ -5,4 +5,3 @@ requests~=2.28.2
 django-allauth
 django-global-permissions
 django-environ
-django-csp
