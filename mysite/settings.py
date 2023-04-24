@@ -16,11 +16,13 @@ from pathlib import Path
 import os
 import sys
 
+# COMMENT
 import environ
 
 env = environ.Env()
 environ.Env.read_env()
 SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=True)
+#END COMMENT
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -36,7 +38,8 @@ SECRET_KEY = 'ee1cfac9d1a8b94ec1ef6bb7122e57d5e83adc0ace273fb8ac'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # TURN THIS TO FALSE TO RUN LOCAL
-DEBUG = True
+# DEBUG = True
+DEBUG = False
 # END FALSE
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'cs3240-b15.herokuapp.com']
@@ -179,20 +182,18 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'schedule/static')
 
 # COMMENT THIS
 SECURE_HSTS_SECONDS = 31536000
-# END COMMENT
-
-# TURN ALL OF THESE TO FALSE
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_SSL_REDIRECT = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_HSTS_PRELOAD = True
+# SWAP ABOVE WITH BELOW
 # SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 # SECURE_SSL_REDIRECT = False
 # CSRF_COOKIE_SECURE = False
 # SESSION_COOKIE_SECURE = False
 # SECURE_HSTS_PRELOAD = False
-# END FALSE
+# END COMMENT
 
 # Django-csp settings
 # https://django-csp.readthedocs.io/en/latest/
