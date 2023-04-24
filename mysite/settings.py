@@ -182,10 +182,7 @@ SECURE_HSTS_PRELOAD = True
 # Django-csp settings
 # https://django-csp.readthedocs.io/en/latest/
 
-CSP_DEFAULT_SRC = ["'none'"]
-CSP_SCRIPT_SRC = ["https://cdn.jsdelivr.net"]
-CSP_STYLE_SRC = ["https://cdn.jsdelivr.net"]
-CSP_IMG_SRC = ["'self'"]
+CSP_DEFAULT_SRC = ["'self'"]
 
 try:
     if 'HEROKU' in os.environ:
