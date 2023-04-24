@@ -165,7 +165,7 @@ header .item-button a:hover{
 }
 
 .animated-text {
-    animation: fadeIn 2s ease-in-out;
+    animation: fadeIn 5s ease-in-out;
 }
     
 .dropdown-menu {
