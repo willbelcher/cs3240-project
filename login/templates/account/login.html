@@ -50,6 +50,12 @@
                 }
             </style>
 
+            <!-- Signin Logo -->
+            <style>
+                .regular-login {
+                    background-image: url('{% static "img/login_logo.png" %}');
+                }
+            </style>
 
             <!-- Google Logo -->
             <style>
@@ -63,12 +69,13 @@
             {% get_providers as socialaccount_providers %}
             <div class="input-field">
                 <input type="submit" class="regular-login" value="Login" id="">
+                <a class="regular-login" href="{%url 'account_signup' %}">Sign up</a>
                 {% for provider in socialaccount_providers %}
                     <a class="google-login" href="{% provider_login_url provider.id process="login" scope=scope auth_params=auth_params %}">Log In With Google</a>
                 {% endfor %}
             </div>
 
-
+           
             <div class="two-col">
                 <div class="one">
                    <input type="checkbox" name="" id="check">

@@ -15,11 +15,11 @@ import os
 import sys
 
 # COMMENT THIS OUT ===========================================================
-import environ
+#import environ
 
-env = environ.Env()
-environ.Env.read_env()
-SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=True)
+#env = environ.Env()
+#environ.Env.read_env()
+#SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=True)
 # END COMMENT ================================================================
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,8 +37,8 @@ SECRET_KEY = 'ee1cfac9d1a8b94ec1ef6bb7122e57d5e83adc0ace273fb8ac'
 # SECURITY WARNING: don't run with debug turned on in production!
 
 # SWAP FALSE FOR TRUE ================================================================
-DEBUG = False
-# DEBUG = True
+#DEBUG = False
+DEBUG = True
 # END SWAP ===========================================================================
 
 
@@ -180,20 +180,20 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # COMMENT THIS OUT ================================================================
-SECURE_HSTS_SECONDS = 31536000
+#SECURE_HSTS_SECONDS = 31536000
 # END COMMENT THIS OUT ================================================================
 
 # SWAP TRUE FOR FALSE ================================================================
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_SSL_REDIRECT = True
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
-SECURE_HSTS_PRELOAD = True
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-# SECURE_SSL_REDIRECT = False
-# CSRF_COOKIE_SECURE = False
-# SESSION_COOKIE_SECURE = False
-# SECURE_HSTS_PRELOAD = False
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# #SECURE_SSL_REDIRECT = True
+# CSRF_COOKIE_SECURE = True
+# SESSION_COOKIE_SECURE = True
+# SECURE_HSTS_PRELOAD = True
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_SSL_REDIRECT = False
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+SECURE_HSTS_PRELOAD = False
 # END SWAP================================================================
 
 try:
