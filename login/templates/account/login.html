@@ -32,6 +32,10 @@
             
             <form class="login" method="POST" action="{% url 'account_login' %}">
                 {% csrf_token %}
+                {{ form.as_p }}
+                {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                {% endif %}
 
                 <!-- Email/Username Field -->
                 <div class="input-field">
@@ -53,12 +57,12 @@
                     }
                 </style>
 
-            <!-- Signin Logo -->
-            <style>
-                .regular-login {
-                    background-image: url('{% static "img/login_logo.png" %}');
-                }
-            </style>
+                <!-- Signin Logo -->
+                <style>
+                    .regular-login {
+                        background-image: url('{% static "img/login_logo.png" %}');
+                    }
+                </style>
 
                 <!-- Google Logo -->
                 <style>
@@ -67,27 +71,28 @@
                     }
                 </style>
 
-            <!-- Login Buttons -->
-            {% load socialaccount %}
-            {% get_providers as socialaccount_providers %}
-            <div class="input-field">
-                <input type="submit" class="regular-login" value="Login" id="">
-                <a class="regular-login" href="{%url 'account_signup' %}">Sign up</a>
-                {% for provider in socialaccount_providers %}
-                    <a class="google-login" href="{% provider_login_url provider.id process="login" scope=scope auth_params=auth_params %}">Log In With Google</a>
-                {% endfor %}
-            </div>
+                <!-- Login Buttons -->
+                {% load socialaccount %}
+                {% get_providers as socialaccount_providers %}
+                <div class="input-field">
+                    <input type="submit" class="regular-login" value="Login" id="">
+                    <a class="regular-login" href="{%url 'account_signup' %}">Sign up</a>
+                    {% for provider in socialaccount_providers %}
+                        <a class="google-login" href="{% provider_login_url provider.id process="login" scope=scope auth_params=auth_params %}">Log In With Google</a>
+                    {% endfor %}
+                </div>
 
-           
-            <div class="two-col">
-                <div class="one">
-                   <input type="checkbox" name="" id="check">
-                   <label for="check">Remember Me</label>
+            
+                <div class="two-col">
+                    <div class="one">
+                    <input type="checkbox" name="remember" id="id_remember">
+                    <label for="check">Remember Me</label>
+                    </div>
+                    <div class="two">
+                        <label><a href="{%url 'account_reset_password'%}">Forgot password?</a></label>
+                    </div>
                 </div>
-                <div class="two">
-                    <label><a href="{%url 'account_reset_password'%}">Forgot password?</a></label>
-                </div>
-            </div>
-        </div>    
+            </div>  
+        </form>  
 </body>
 </html>
