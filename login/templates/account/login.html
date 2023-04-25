@@ -30,25 +30,28 @@
                 <header>Plan-it Pal</header>
             </div>
             
-            <!-- Email/Username Field -->
-            <div class="input-field">
-                <input type="text" class="input" placeholder="email address or username" id="">
-                <i class='bx bx-user' ></i>
-            </div>
-    
-            <!-- Password Field -->
-            <div class="input-field">
-                <input type="Password" class="input" placeholder="password" id="">
-                <i class='bx bx-lock-alt'></i>
-            </div>
-    
+            <form class="login" method="POST" action="{% url 'account_login' %}">
+                {% csrf_token %}
 
-            <!-- Login Logo -->
-            <style>
-                .regular-login {
-                    background-image: url('{% static "img/login_logo.png" %}');
-                }
-            </style>
+                <!-- Email/Username Field -->
+                <div class="input-field">
+                    <input type="text" class="input" name="login" required placeholder="email address or username" id="id_login">
+                    <i class='bx bx-user' ></i>
+                </div>
+        
+                <!-- Password Field -->
+                <div class="input-field">
+                    <input type="Password" class="input" name="password" required placeholder="password" id="id_password">
+                    <i class='bx bx-lock-alt'></i>
+                </div>
+        
+
+                <!-- Login Logo -->
+                <style>
+                    .regular-login {
+                        background-image: url('{% static "img/login_logo.png" %}');
+                    }
+                </style>
 
             <!-- Signin Logo -->
             <style>
@@ -57,12 +60,12 @@
                 }
             </style>
 
-            <!-- Google Logo -->
-            <style>
-                .google-login {
-                    background-image: url('{% static "img/google.png" %}'); /* Add your image path and background color here */
-                }
-            </style>
+                <!-- Google Logo -->
+                <style>
+                    .google-login {
+                        background-image: url('{% static "img/google.png" %}'); /* Add your image path and background color here */
+                    }
+                </style>
 
             <!-- Login Buttons -->
             {% load socialaccount %}
