@@ -44,7 +44,12 @@
                     <input type="Password" class="input" name="password" required placeholder="password" id="id_password">
                     <i class='bx bx-lock-alt'></i>
                 </div>
-        
+
+                <div style="color: red;">
+                {% for error in form.errors.values %}
+                    {{ error }}
+                {% endfor %}
+                </div>
 
                 <!-- Login Logo -->
                 <style>
