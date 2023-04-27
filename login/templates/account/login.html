@@ -30,52 +30,67 @@
                 <header>Plan-it Pal</header>
             </div>
             
-            <!-- Email/Username Field -->
-            <div class="input-field">
-                <input type="text" class="input" placeholder="email address or username" id="">
-                <i class='bx bx-user' ></i>
-            </div>
-    
-            <!-- Password Field -->
-            <div class="input-field">
-                <input type="Password" class="input" placeholder="password" id="">
-                <i class='bx bx-lock-alt'></i>
-            </div>
-    
+            <form class="login" method="POST" action="{% url 'account_login' %}">
+                {% csrf_token %}
 
-            <!-- Login Logo -->
+                <!-- Email/Username Field -->
+                <div class="input-field">
+                    <input type="text" class="input" name="login" required placeholder="email address or username" id="id_login">
+                    <i class='bx bx-user' ></i>
+                </div>
+        
+                <!-- Password Field -->
+                <div class="input-field">
+                    <input type="Password" class="input" name="password" required placeholder="password" id="id_password">
+                    <i class='bx bx-lock-alt'></i>
+                </div>
+
+                <div style="color: red;">
+                {% for error in form.errors.values %}
+                    {{ error }}
+                {% endfor %}
+                </div>
+
+                <!-- Login Logo -->
+                <style>
+                    .regular-login {
+                        background-image: url('{% static "img/login_logo.png" %}');
+                    }
+                </style>
+
+            <!-- Signin Logo -->
             <style>
                 .regular-login {
                     background-image: url('{% static "img/login_logo.png" %}');
                 }
             </style>
 
-
-            <!-- Google Logo -->
-            <style>
-                .google-login {
-                    background-image: url('{% static "img/google.png" %}'); /* Add your image path and background color here */
-                }
-            </style>
+                <!-- Google Logo -->
+                <style>
+                    .google-login {
+                        background-image: url('{% static "img/google.png" %}'); /* Add your image path and background color here */
+                    }
+                </style>
 
             <!-- Login Buttons -->
             {% load socialaccount %}
             {% get_providers as socialaccount_providers %}
             <div class="input-field">
                 <input type="submit" class="regular-login" value="Login" id="">
+                <a class="regular-login" href="{%url 'account_signup' %}">Sign up</a>
                 {% for provider in socialaccount_providers %}
                     <a class="google-login" href="{% provider_login_url provider.id process="login" scope=scope auth_params=auth_params %}">Log In With Google</a>
                 {% endfor %}
             </div>
 
-
+           
             <div class="two-col">
                 <div class="one">
                    <input type="checkbox" name="" id="check">
                    <label for="check">Remember Me</label>
                 </div>
                 <div class="two">
-                    <label><a href="#">Forgot password?</a></label>
+                    <label><a href="{%url 'account_reset_password'%}">Forgot password?</a></label>
                 </div>
             </div>
         </div>    
