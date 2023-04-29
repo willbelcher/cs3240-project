@@ -28,21 +28,19 @@ header{
 }
 
 header .container-fluid{
-
-    width: 100%;
-    padding: 0 60px;
-    display: flex;
+    width: 100vw;
+    padding: 10px 60px;
     align-items: center;
     justify-content: space-between;
 }
 
-@media(max-width:992px){
+/* @media(max-width:992px){
 
     header .container-fluid{
 
         padding: 0 5%;
     }
-}
+} */
 
 header .navb-logo img{
 
@@ -51,15 +49,14 @@ header .navb-logo img{
 }
 
 header .navb-items {
-    display: flex;
     align-items: center;
-    justify-content: flex-end;
     letter-spacing: 3px;
 }
 
 header .item{
     text-align: center;
-    margin-inline: 15%;
+    width: min-content;
+    overflow-wrap: normal;
     font-size: 20px;
     letter-spacing: 3px;
     color: #102447;
