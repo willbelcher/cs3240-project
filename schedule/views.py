@@ -330,7 +330,7 @@ def add_course(request):
                 courses_in_cart = Course.objects.filter(cart=cart)
                 if courses_in_cart:
                     for cart_course in courses_in_cart:
-                        if cart_course.subject == subject and cart_course.catalog_nbr == catalog_nbr:
+                        if cart_course.subject == subject and cart_course.catalog_nbr == catalog_nbr and cart_course.units == units:
                             messages.error(request, "Can not add identical course to Cart")
                             active_class_messages = True
                             class_messages.append("Can not add an identical course to Cart")
@@ -455,8 +455,8 @@ def add_to_schedule(request, schedule_id, course_id):
     items = ScheduleItem.objects.filter(schedule=schedule.id)
     for item in items:
         added_course = Course.objects.get(pk=item.course.id)  # get all courses already in schedule
-
-        if added_course.subject == course.subject and added_course.catalog_nbr == course.catalog_nbr:
+        if added_course.subject == course.subject and added_course.catalog_nbr == course.catalog_nbr \
+                and added_course.units == course.units:
             context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
                        'schedules': get_context_schedules(request.user),
                        'active_class_messages': True,
