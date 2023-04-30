@@ -132,6 +132,7 @@ def course_search_view(request):
             messages.error(request, "Please enter a more specific search")
             active_class_messages = True
             class_messages.append("A Subject or Specific Time range is required")
+            no_classes_found = True
             return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days,
                                                                    'active_class_messages':active_class_messages,
                                                                    'class_messages': class_messages})
@@ -141,19 +142,60 @@ def course_search_view(request):
             catalog_nbr = ""
             active_class_messages = True
             class_messages.append("Catalog Number Field has been cleared due to an Invalid Value")
+            no_classes_found = True
+            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days,
+                                                                   'active_class_messages': active_class_messages,
+                                                                   'class_messages': class_messages,
+                                                                   'no_classes_found': no_classes_found})
         if not course_nmbr.isnumeric() and not course_nmbr == "":
             course_nmbr = ""
             fields['course_nmbr'] = ""
             active_class_messages = True
             class_messages.append("Course Number Field has been cleared due to an Invalid Value")
+            no_classes_found = True
+            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days,
+                                                                   'active_class_messages': active_class_messages,
+                                                                   'class_messages': class_messages,
+                                                                   'no_classes_found': no_classes_found})
         if " " in instructor:
-            instructor = instructor.split(" ")[0]
+            fields['instructor'] = instructor.split(" ")[0]
             active_class_messages = True
             class_messages.append("Instructor Field has been reverted to a Valid Value")
+            no_classes_found = True
+            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days,
+                                                                   'active_class_messages': active_class_messages,
+                                                                   'class_messages': class_messages,
+                                                                   'no_classes_found': no_classes_found})
+
+        if instructor and not instructor.isalnum() or instructor.isnumeric():
+            del fields['instructor']
+            active_class_messages = True
+            class_messages.append("Instructor Field only accepts alphabetical characters")
+            no_classes_found = True
+            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days,
+                                                                   'active_class_messages': active_class_messages,
+                                                                   'class_messages': class_messages,
+                                                                   'no_classes_found': no_classes_found})
+
         if " " in course_name:
-            course_name = course_name.split(" ")[0]
+            fields['course_name'] = course_name.split(" ")[0]
             active_class_messages = True
             class_messages.append("Course Name Field has been reverted to a Valid Value")
+            no_classes_found = True
+            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days,
+                                                                   'active_class_messages': active_class_messages,
+                                                                   'class_messages': class_messages,
+                                                                   'no_classes_found': no_classes_found})
+
+        if course_name and not course_name.isalnum():
+            del fields['course_name']
+            active_class_messages = True
+            class_messages.append("Course Name Field only accepts alphabetical characters")
+            no_classes_found = True
+            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days,
+                                                                   'active_class_messages': active_class_messages,
+                                                                   'class_messages': class_messages,
+                                                                   'no_classes_found': no_classes_found})
 
         for day in days.keys():
             days[day] = bool(fields.get(day))
