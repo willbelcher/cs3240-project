@@ -346,11 +346,15 @@ def view_cart(request):
 
 # Removes a course from the user's cart
 @login_required
-def remove_course(request, course_id):
+def remove_course(request, course_id, schedule_id):
     course = get_object_or_404(Course, id=course_id, cart__user=request.user)
     course.delete()
     messages.success(request, 'Course removed from cart.')
-    return redirect('schedule:view_cart')
+    context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
+               'schedules': get_context_schedules(request.user),
+               'active_class_messages': True, 'good_message': True,
+               'class_messages': "Course removed!"}
+    return render(request, 'schedule/view_cart.html', context)
 
 
 # Get schedules associated with the user for rerendering

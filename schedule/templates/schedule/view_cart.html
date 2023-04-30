@@ -102,7 +102,7 @@
                             </form>
 
                             <!-- Remove (from Cart) Button -->
-                            <form method="POST" action="{% url 'schedule:remove_course' course.course.id %}"
+                            <form method="POST" action="{% url 'schedule:remove_course' course.course.id current_id %}"
                                   class="d-inline-block">
                                 {% csrf_token %}
                                 <button type="submit" class="btn remove-course custom-remove-btn"

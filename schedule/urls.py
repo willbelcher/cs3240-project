@@ -10,7 +10,7 @@ urlpatterns = [
     path('add_course/', views.add_course, name='add_course'),
     path('add_course_success/', views.add_course, name='add_course_success'),
     path('view_cart/', views.view_cart, name='view_cart'),
-    path('remove-course/<int:course_id>/', views.remove_course, name='remove_course'),
+    path('remove-course/<int:course_id>/<int:schedule_id>', views.remove_course, name='remove_course'),
     path('add-to-schedule/<int:schedule_id>/<int:course_id>/', views.add_to_schedule, name='add_to_schedule'),
     path('view_schedule/', views.view_schedule, name='view_schedule'),
     path('remove_schedule_course/<int:schedule_id>/<int:course_id>', views.remove_course_from_schedule,
