@@ -73,6 +73,18 @@ def logout_view(request):
 # Provides user with filters to search for course by year, term, department, and instructor name
 subjects = [] # save subjects between searches
 
+
+def get_subjects():
+    raw_subjects = requests.get(
+        "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228").json()
+
+    for subject_info in raw_subjects["subjects"]:
+        subjects.append(subject_info["subject"])
+
+    subjects.sort()
+    return subjects
+
+
 @login_required
 def course_search_view(request):
     base_url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01"
@@ -222,6 +234,7 @@ def add_course_success(request):
 def add_course(request):
     days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
     fields = {'start_time': "00:00", 'end_time': "23:59"}
+    subjects = get_subjects()
     active_class_messages = False
     class_messages = []
     if request.method == 'POST':
