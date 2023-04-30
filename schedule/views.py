@@ -472,41 +472,42 @@ def add_to_schedule(request, schedule_id, course_id):
 
         added_course_times = CourseTime.objects.filter(course=added_course)  # get these already-added course times
         for time in times:
-            time_starting_hour = int(time.starting_time.split(":")[0])
-            time_ending_hour = int(time.ending_time.split(":")[0])
+            if not time:
+                time_starting_hour = int(time.starting_time.split(":")[0])
+                time_ending_hour = int(time.ending_time.split(":")[0])
 
-            # splits each day string "MoWe" into tokens of 2 characters ["Mo", "We"]
-            split_days = [time.days[i:i + 2] for i in range(0, len(time.days), 2)]
+                # splits each day string "MoWe" into tokens of 2 characters ["Mo", "We"]
+                split_days = [time.days[i:i + 2] for i in range(0, len(time.days), 2)]
 
-            for added_course_time in added_course_times:
-                for day in split_days:
-                    # if the to-be-added course has any day in common with an existing class
-                    if day in added_course_time.days:
-                        added_course_starting_hour = int(added_course_time.starting_time.split(":")[0])
-                        added_course_ending_time = int(added_course_time.ending_time.split(":")[0])
+                for added_course_time in added_course_times:
+                    for day in split_days:
+                        # if the to-be-added course has any day in common with an existing class
+                        if day in added_course_time.days:
+                            added_course_starting_hour = int(added_course_time.starting_time.split(":")[0])
+                            added_course_ending_time = int(added_course_time.ending_time.split(":")[0])
 
-                        added_course_starting_minutes = int(added_course_time.starting_time.split(":")[1])
-                        added_course_ending_minutes = int(added_course_time.ending_time.split(":")[1])
-                        time_starting_minutes = int(time.starting_time.split(":")[1])
-                        time_ending_minutes = int(time.ending_time.split(":")[1])
-                        if (added_course_starting_hour <= time_starting_hour <= added_course_ending_time and
-                            time_starting_minutes<added_course_ending_minutes) or \
-                                (time_starting_hour <= added_course_starting_hour <= time_ending_hour and
-                                 time_ending_minutes > added_course_starting_minutes):
-                            messages.error(request, 'Courses overlap!')
-                            course.save()
-                            # Get the user's cart
-                            cart, _ = Cart.objects.get_or_create(user=request.user)
+                            added_course_starting_minutes = int(added_course_time.starting_time.split(":")[1])
+                            added_course_ending_minutes = int(added_course_time.ending_time.split(":")[1])
+                            time_starting_minutes = int(time.starting_time.split(":")[1])
+                            time_ending_minutes = int(time.ending_time.split(":")[1])
+                            if (added_course_starting_hour <= time_starting_hour <= added_course_ending_time and
+                                time_starting_minutes < added_course_ending_minutes) or \
+                                    (time_starting_hour <= added_course_starting_hour <= time_ending_hour and
+                                     time_ending_minutes > added_course_starting_minutes):
+                                messages.error(request, 'Courses overlap!')
+                                course.save()
+                                # Get the user's cart
+                                cart, _ = Cart.objects.get_or_create(user=request.user)
 
-                            # Get the courses associated with the cart
-                            courses = Course.objects.filter(cart=cart)
+                                # Get the courses associated with the cart
+                                courses = Course.objects.filter(cart=cart)
 
-                            # Render the view_cart template with the courses
-                            context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
-                                       'schedules': get_context_schedules(request.user),
-                                       'active_class_messages': True,
-                                       'class_messages': "Can not add this course, it overlaps with a class already in your schedule."}
-                            return render(request, 'schedule/view_cart.html', context)
+                                # Render the view_cart template with the courses
+                                context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
+                                           'schedules': get_context_schedules(request.user),
+                                           'active_class_messages': True,
+                                           'class_messages': "Can not add this course, it overlaps with a class already in your schedule."}
+                                return render(request, 'schedule/view_cart.html', context)
 
     if schedule.total_units + course.units > 19:
         # Get the user's cart
