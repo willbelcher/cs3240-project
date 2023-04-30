@@ -584,10 +584,31 @@ def remove_course_from_schedule(request, schedule_id, course_id):
     schedule.total_units = schedule.total_units - course.units
     course.delete()
     schedule.save()
-    # schedule_item = ScheduleItem.objects.get(course = course)
-    # schedule_item.delete()
-    messages.success(request, 'Removed Course from the Schedule')
-    return redirect('schedule:view_schedule')
+
+    schedules = Schedule.objects.filter(user=request.user)
+
+    titles = []
+    for s in schedules:
+        titles.append(s.title)
+
+    context = {'schedule': {'id': schedule.id, 'title': schedule.title, 'total_units': schedule.total_units,
+                            'submitted': schedule.submitted, 'status': schedule.status,
+                            'approved_date': schedule.approved_date,
+                            'denied_date': schedule.denied_date, 'comments': schedule.comments,
+                            'comment_date': schedule.comment_date,
+                            'courses': []}, 'titles': titles, 'class_messages': "Course Removed!",
+               'active_class_messages': True}
+    schedule_items = ScheduleItem.objects.filter(schedule=schedule)
+
+    for item in schedule_items:
+        # course = Course.objects.get(course = item.course)
+        course = item.course
+        times = CourseTime.objects.filter(course=course)
+        all_times = []
+        for time in times:
+            all_times.append({'days': time.days, 'starting_time': time.starting_time, 'ending_time': time.ending_time})
+        context['schedule']['courses'].append({'course': course, 'all_times': all_times})
+    return render(request, 'schedule/view_schedule.html', context)
 
 
 def unsubmit_schedule(request, schedule_id):
