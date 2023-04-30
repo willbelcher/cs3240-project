@@ -269,14 +269,22 @@
                                                             <hr>
 
                                                             <!-- Displays Instruction Type (i.e. On Grounds vs Off Grounds) of class-->
-                                                            <p><b>Instruction Type:</b> {{ course.instruction_mode_descr }}</p>
+                                                            <p><b>Instruction
+                                                                Type:</b> {{ course.instruction_mode_descr }}</p>
                                                             <hr>
 
                                                             <!-- Displays days a class takes place-->
                                                             <p>
                                                                 <b>Days: </b>
                                                                 {% for days in course.meetings %}
-                                                                    {{days.days}} from {{ days.start_time|slice:"0:5"|to_colon|no_military }} to {{ days.end_time|slice:"0:5"|to_colon|no_military }}
+                                                                    {% if days.start_time and days.end_time %}
+                                                                        {{ days.days }} from
+                                                                        {{ days.start_time|slice:"0:5"|to_colon|no_military }}
+                                                                        to
+                                                                        {{ days.end_time|slice:"0:5"|to_colon|no_military }}
+                                                                    {% else %}
+                                                                        Asynchronous
+                                                                    {% endif %}
                                                                     <br>
                                                                 {% endfor %}
                                                             </p>

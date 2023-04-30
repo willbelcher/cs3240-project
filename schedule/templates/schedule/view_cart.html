@@ -84,8 +84,10 @@
                         </td>
                         <td>
                             {% for time in course.all_times %}
-                                {% if time %}
+                                {% if time.starting_time and time.ending_time %}
                                     {{ time.starting_time|no_military }} to {{ time.ending_time|no_military }}<br>
+                                {% else %}
+                                    Asynchronous<br>
                                 {% endif %}
                             {% endfor %}
                         </td>
