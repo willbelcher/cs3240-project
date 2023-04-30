@@ -70,8 +70,9 @@ def logout_view(request):
     logout(request)
     return redirect('schedule:home')
 
+
 # Provides user with filters to search for course by year, term, department, and instructor name
-subjects = [] # save subjects between searches
+subjects = []  # save subjects between searches
 
 
 def get_subjects():
@@ -93,17 +94,18 @@ def course_search_view(request):
 
     courses = []
 
-    #default field values
-    fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'course_name': '', 'course_nmbr': '', 'only_open': False, 'start_time': '00:00', 'end_time': '23:59'}
+    # default field values
+    fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'course_name': '', 'course_nmbr': '',
+              'only_open': False, 'start_time': '00:00', 'end_time': '23:59'}
     days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
     active_class_messages = False
     no_classes_found = False
     class_messages = []
 
-    #Initialize empty sets to store instructors
+    # Initialize empty sets to store instructors
     instructors = set()
 
-    if len(subjects) == 0: # If mnemonics not retrieved
+    if len(subjects) == 0:  # If mnemonics not retrieved
         raw_subjects = requests.get(
             "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228").json()
 
@@ -136,7 +138,7 @@ def course_search_view(request):
 
         if not catalog_nbr.isnumeric() and not catalog_nbr == "" :
             fields['catalog_nbr'] = ""
-            catalog_nbr=""
+            catalog_nbr = ""
             active_class_messages = True
             class_messages.append("Catalog Number Field has been cleared due to an Invalid Value")
         if not course_nmbr.isnumeric() and not course_nmbr == "":
@@ -290,7 +292,10 @@ def add_course(request):
                             messages.error(request, "Can not add identical course to Cart")
                             active_class_messages = True
                             class_messages.append("Can not add an identical course to Cart")
-                            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days, 'active_class_messages':active_class_messages, 'class_messages':class_messages})
+                            return render(request, 'schedule/course_search.html',
+                                          {'subjects': subjects, 'fields': fields, 'days': days,
+                                           'active_class_messages': active_class_messages,
+                                           'class_messages': class_messages})
 
                 course = Course(cart=cart, class_nbr=class_nbr, subject=subject, catalog_nbr=catalog_nbr, title=title,
                                 instructor_name=instructor_name, units=units, term=term)
@@ -463,7 +468,6 @@ def add_to_schedule(request, schedule_id, course_id):
 
     if schedule.total_units + course.units > 19:
         # Get the user's cart
-        print(total_units)
         cart, _ = Cart.objects.get_or_create(user=request.user)
 
         # Get the courses associated with the cart and exclude those in the user's schedule
@@ -531,12 +535,9 @@ def view_schedule(request):
 
 
 def remove_course_from_schedule(request, schedule_id, course_id):
-    # course = get_object_or_404(Course, id=course_id, cart__user=request.user)
-    # course.delete()
-    # messages.success(request, 'Course removed from cart.')
-    # return redirect('schedule:view_cart')
     schedule = get_object_or_404(Schedule, pk=schedule_id, user=request.user)
     course = get_object_or_404(Course, pk=course_id)
+
     schedule.total_units = schedule.total_units - course.units
     course.delete()
     schedule.save()
