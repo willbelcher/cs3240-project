@@ -715,6 +715,9 @@ def create_schedule(request):
         if " " in title:
             context['is_error'] = True
             context['error_message'] = 'Can not have a space in your schedule title, please try again'
+        elif title == "":
+            context['is_error'] = True
+            context['error_message'] = 'The Title box cannot be blank, please try again'
         elif Schedule.objects.filter(user=request.user, title=title).count() != 0:
             context['is_error'] = True
             context['error_message'] = 'A schedule with that name already exists, please choose another.'
@@ -737,6 +740,9 @@ def rename_schedule(request, schedule_id):
         if " " in title:
             context['is_error'] = True
             context['error_message'] = 'Can not have a space in your schedule title, please try again'
+        elif title == "":
+            context['is_error'] = True
+            context['error_message'] = 'The New Title box cannot be blank, please try again'
         elif Schedule.objects.filter(user=request.user, title=title).count() != 0:
             context['is_error'] = True
             context['error_message'] = 'A schedule with that name already exists, please choose another.'
