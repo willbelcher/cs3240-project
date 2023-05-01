@@ -21,62 +21,102 @@
             max-width: 100%;
             object-fit: contain;
         }
+
     </style>
 </head>
 <body>
 <header>
     <div class="container-fluid">
 
-        <div class="navb-logo">
-
-            <!--Probably need to find better picture-->
-            {% load static %}
-            <img src="{% static 'img/uva_logo.png' %}" alt="Logo">
-        </div>
-
-        <div class="navb-items d-none d-xl-flex">
-
-            <!-- Home Page Link -->
-            <div class="item">
-                <a href="{% url 'schedule:home' %}">Home</a>
-            </div>
-
-            <!-- Course Search Link -->
-            <div class="item">
-                <a href="{% url 'schedule:course_search' %}">Course Search</a>
-            </div>
-
-            <!-- Check Submissions (of schedule submission) Link -->
-            <!-- Only available to users with Advisor Status -->
-            {% if perms.global_permissions.is_advisor %}
-                <div class="item">
-                    <a href="{% url 'schedule:submissions' %}">Check Submissions</a>
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+              <div class="d-flex align-items-center">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navb-logo">
+                  {% load static %}
+                  <img src="{% static 'img/uva_logo.png' %}" alt="Logo">
                 </div>
+              </div>
+              <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+                <div class="navbar-backdrop"></div>
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
-                <!-- Schedule Builder Link -->
-                <!-- Only available to users with Student Status -->
-            {% else %}
-                <div class="item">
-                    <a href="{% url 'schedule:view_cart' %}">View Cart</a>
-                </div>
+                    <!-- Home Page Link -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'schedule:home' %}">
+                        <div class="item">
+                            Home Page
+                        </div>
+                        </a>
+                    </li>
 
-                <div class="item">
-                    <a href="{% url 'schedule:view_schedule' %}">View Schedule</a>
-                </div>
+                    <!-- Course Search Page Link -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'schedule:course_search' %}">
+                        <div class="item">
+                            Course Search
+                        </div>
+                        </a>
+                    </li>
 
-                <!-- Logout Link-->
-            {% endif %}
-            <div class="item-button">
-                <a href="{% url 'schedule:logout' %}" type="button">Logout</a>
+                    <!-- Check Submissions (of schedule submission) Link -->
+                    <!-- Only available to users with Advisor Status -->
+                    {% if perms.global_permissions.is_advisor %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'schedule:submissions' %}">
+                        <div class="item">
+                            Check Submissions
+                        </div>
+                        </a>
+                    </li>
+
+                    <!-- View Cart Page Link -->
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'schedule:view_cart' %}">
+                        <div class="item">
+                            View Cart
+                        </div>
+                        </a>
+                    </li>
+
+                    <!-- View Schedule Page Link -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'schedule:view_schedule' %}">
+                        <div class="item">
+                            View Schedule
+                        </div>
+                        </a>
+                    </li>
+
+                    <!-- Logout Button Link -->
+                    {% endif %}
+                    <li class="nav-item item-button">
+                        <a href="{% url 'schedule:logout' %}" type="button" class="navb-button">
+                        Logout
+                        </a>
+                    </li>
+                </ul>
+              </div>
             </div>
-
-        </div>
+          </nav>
     </div>
 </header>
 
 
 <!-- Add the Bootstrap JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybB3S4O4AmNo2E1/4xK5M2bxmNDMzKqs5Gmuj5E5vsyI5+a5k" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+<script>
+    const toggleButton = document.querySelector('.navbar-toggler');
+    const navbarCollapse = document.querySelector('.navbar-collapse');
+
+    toggleButton.addEventListener('click', () => {
+      navbarCollapse.classList.toggle('active');
+    });
+  </script>
 </body>
 </html>
