@@ -70,8 +70,21 @@ def logout_view(request):
     logout(request)
     return redirect('schedule:home')
 
+
 # Provides user with filters to search for course by year, term, department, and instructor name
-subjects = [] # save subjects between searches
+subjects = []  # save subjects between searches
+
+
+def get_subjects():
+    raw_subjects = requests.get(
+        "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228").json()
+
+    for subject_info in raw_subjects["subjects"]:
+        subjects.append(subject_info["subject"])
+
+    subjects.sort()
+    return subjects
+
 
 @login_required
 def course_search_view(request):
@@ -81,17 +94,18 @@ def course_search_view(request):
 
     courses = []
 
-    #default field values
-    fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'course_name': '', 'course_nmbr': '', 'only_open': False, 'start_time': '00:00', 'end_time': '23:59'}
+    # default field values
+    fields = {'year': '2023', 'term': 'Fall', 'dept': '', 'instructor': '', 'course_name': '', 'course_nmbr': '',
+              'only_open': False, 'start_time': '00:00', 'end_time': '23:59'}
     days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
     active_class_messages = False
     no_classes_found = False
     class_messages = []
 
-    #Initialize empty sets to store instructors
+    # Initialize empty sets to store instructors
     instructors = set()
 
-    if len(subjects) == 0: # If mnemonics not retrieved
+    if len(subjects) == 0:  # If mnemonics not retrieved
         raw_subjects = requests.get(
             "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228").json()
 
@@ -118,28 +132,70 @@ def course_search_view(request):
             messages.error(request, "Please enter a more specific search")
             active_class_messages = True
             class_messages.append("A Subject or Specific Time range is required")
+            no_classes_found = True
             return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days,
                                                                    'active_class_messages':active_class_messages,
                                                                    'class_messages': class_messages})
 
         if not catalog_nbr.isnumeric() and not catalog_nbr == "" :
             fields['catalog_nbr'] = ""
-            catalog_nbr=""
+            catalog_nbr = ""
             active_class_messages = True
             class_messages.append("Catalog Number Field has been cleared due to an Invalid Value")
+            no_classes_found = True
+            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days,
+                                                                   'active_class_messages': active_class_messages,
+                                                                   'class_messages': class_messages,
+                                                                   'no_classes_found': no_classes_found})
         if not course_nmbr.isnumeric() and not course_nmbr == "":
             course_nmbr = ""
             fields['course_nmbr'] = ""
             active_class_messages = True
             class_messages.append("Course Number Field has been cleared due to an Invalid Value")
+            no_classes_found = True
+            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days,
+                                                                   'active_class_messages': active_class_messages,
+                                                                   'class_messages': class_messages,
+                                                                   'no_classes_found': no_classes_found})
         if " " in instructor:
-            instructor = instructor.split(" ")[0]
+            fields['instructor'] = instructor.split(" ")[0]
             active_class_messages = True
             class_messages.append("Instructor Field has been reverted to a Valid Value")
+            no_classes_found = True
+            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days,
+                                                                   'active_class_messages': active_class_messages,
+                                                                   'class_messages': class_messages,
+                                                                   'no_classes_found': no_classes_found})
+
+        if instructor and not instructor.isalnum() or instructor.isnumeric():
+            del fields['instructor']
+            active_class_messages = True
+            class_messages.append("Instructor Field only accepts alphabetical characters")
+            no_classes_found = True
+            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days,
+                                                                   'active_class_messages': active_class_messages,
+                                                                   'class_messages': class_messages,
+                                                                   'no_classes_found': no_classes_found})
+
         if " " in course_name:
-            course_name = course_name.split(" ")[0]
+            fields['course_name'] = course_name.split(" ")[0]
             active_class_messages = True
             class_messages.append("Course Name Field has been reverted to a Valid Value")
+            no_classes_found = True
+            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days,
+                                                                   'active_class_messages': active_class_messages,
+                                                                   'class_messages': class_messages,
+                                                                   'no_classes_found': no_classes_found})
+
+        if course_name and not course_name.isalnum():
+            del fields['course_name']
+            active_class_messages = True
+            class_messages.append("Course Name Field only accepts alphabetical characters")
+            no_classes_found = True
+            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days,
+                                                                   'active_class_messages': active_class_messages,
+                                                                   'class_messages': class_messages,
+                                                                   'no_classes_found': no_classes_found})
 
         for day in days.keys():
             days[day] = bool(fields.get(day))
@@ -222,6 +278,7 @@ def add_course_success(request):
 def add_course(request):
     days = {'Mo': True, 'Tu': True, 'We': True, 'Th': True, 'Fr': True}
     fields = {'start_time': "00:00", 'end_time': "23:59"}
+    subjects = get_subjects()
     active_class_messages = False
     class_messages = []
     if request.method == 'POST':
@@ -273,11 +330,14 @@ def add_course(request):
                 courses_in_cart = Course.objects.filter(cart=cart)
                 if courses_in_cart:
                     for cart_course in courses_in_cart:
-                        if cart_course.subject == subject and cart_course.catalog_nbr == catalog_nbr:
+                        if cart_course.subject == subject and cart_course.catalog_nbr == catalog_nbr and cart_course.units == units:
                             messages.error(request, "Can not add identical course to Cart")
                             active_class_messages = True
                             class_messages.append("Can not add an identical course to Cart")
-                            return render(request, 'schedule/course_search.html', {'subjects': subjects, 'fields': fields, 'days': days, 'active_class_messages':active_class_messages, 'class_messages':class_messages})
+                            return render(request, 'schedule/course_search.html',
+                                          {'subjects': subjects, 'fields': fields, 'days': days,
+                                           'active_class_messages': active_class_messages,
+                                           'class_messages': class_messages})
 
                 course = Course(cart=cart, class_nbr=class_nbr, subject=subject, catalog_nbr=catalog_nbr, title=title,
                                 instructor_name=instructor_name, units=units, term=term)
@@ -346,11 +406,15 @@ def view_cart(request):
 
 # Removes a course from the user's cart
 @login_required
-def remove_course(request, course_id):
+def remove_course(request, course_id, schedule_id):
     course = get_object_or_404(Course, id=course_id, cart__user=request.user)
     course.delete()
     messages.success(request, 'Course removed from cart.')
-    return redirect('schedule:view_cart')
+    context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
+               'schedules': get_context_schedules(request.user),
+               'active_class_messages': True, 'good_message': True,
+               'class_messages': "Course removed!"}
+    return render(request, 'schedule/view_cart.html', context)
 
 
 # Get schedules associated with the user for rerendering
@@ -391,8 +455,8 @@ def add_to_schedule(request, schedule_id, course_id):
     items = ScheduleItem.objects.filter(schedule=schedule.id)
     for item in items:
         added_course = Course.objects.get(pk=item.course.id)  # get all courses already in schedule
-
-        if added_course.subject == course.subject and added_course.catalog_nbr == course.catalog_nbr:
+        if added_course.subject == course.subject and added_course.catalog_nbr == course.catalog_nbr \
+                and added_course.units == course.units:
             context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
                        'schedules': get_context_schedules(request.user),
                        'active_class_messages': True,
@@ -408,45 +472,45 @@ def add_to_schedule(request, schedule_id, course_id):
 
         added_course_times = CourseTime.objects.filter(course=added_course)  # get these already-added course times
         for time in times:
-            time_starting_hour = int(time.starting_time.split(":")[0])
-            time_ending_hour = int(time.ending_time.split(":")[0])
+            if not time:
+                time_starting_hour = int(time.starting_time.split(":")[0])
+                time_ending_hour = int(time.ending_time.split(":")[0])
 
-            # splits each day string "MoWe" into tokens of 2 characters ["Mo", "We"]
-            split_days = [time.days[i:i + 2] for i in range(0, len(time.days), 2)]
+                # splits each day string "MoWe" into tokens of 2 characters ["Mo", "We"]
+                split_days = [time.days[i:i + 2] for i in range(0, len(time.days), 2)]
 
-            for added_course_time in added_course_times:
-                for day in split_days:
-                    # if the to-be-added course has any day in common with an existing class
-                    if day in added_course_time.days:
-                        added_course_starting_hour = int(added_course_time.starting_time.split(":")[0])
-                        added_course_ending_time = int(added_course_time.ending_time.split(":")[0])
+                for added_course_time in added_course_times:
+                    for day in split_days:
+                        # if the to-be-added course has any day in common with an existing class
+                        if day in added_course_time.days:
+                            added_course_starting_hour = int(added_course_time.starting_time.split(":")[0])
+                            added_course_ending_time = int(added_course_time.ending_time.split(":")[0])
 
-                        added_course_starting_minutes = int(added_course_time.starting_time.split(":")[1])
-                        added_course_ending_minutes = int(added_course_time.ending_time.split(":")[1])
-                        time_starting_minutes = int(time.starting_time.split(":")[1])
-                        time_ending_minutes = int(time.ending_time.split(":")[1])
-                        if (added_course_starting_hour <= time_starting_hour <= added_course_ending_time and
-                            time_starting_minutes<added_course_ending_minutes) or \
-                                (time_starting_hour <= added_course_starting_hour <= time_ending_hour and
-                                 time_ending_minutes > added_course_starting_minutes):
-                            messages.error(request, 'Courses overlap!')
-                            course.save()
-                            # Get the user's cart
-                            cart, _ = Cart.objects.get_or_create(user=request.user)
+                            added_course_starting_minutes = int(added_course_time.starting_time.split(":")[1])
+                            added_course_ending_minutes = int(added_course_time.ending_time.split(":")[1])
+                            time_starting_minutes = int(time.starting_time.split(":")[1])
+                            time_ending_minutes = int(time.ending_time.split(":")[1])
+                            if (added_course_starting_hour <= time_starting_hour <= added_course_ending_time and
+                                time_starting_minutes < added_course_ending_minutes) or \
+                                    (time_starting_hour <= added_course_starting_hour <= time_ending_hour and
+                                     time_ending_minutes > added_course_starting_minutes):
+                                messages.error(request, 'Courses overlap!')
+                                course.save()
+                                # Get the user's cart
+                                cart, _ = Cart.objects.get_or_create(user=request.user)
 
-                            # Get the courses associated with the cart
-                            courses = Course.objects.filter(cart=cart)
+                                # Get the courses associated with the cart
+                                courses = Course.objects.filter(cart=cart)
 
-                            # Render the view_cart template with the courses
-                            context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
-                                       'schedules': get_context_schedules(request.user),
-                                       'active_class_messages': True,
-                                       'class_messages': "Can not add this course, it overlaps with a class already in your schedule."}
-                            return render(request, 'schedule/view_cart.html', context)
+                                # Render the view_cart template with the courses
+                                context = {'courses': get_context_courses(request.user), 'current_id': schedule_id,
+                                           'schedules': get_context_schedules(request.user),
+                                           'active_class_messages': True,
+                                           'class_messages': "Can not add this course, it overlaps with a class already in your schedule."}
+                                return render(request, 'schedule/view_cart.html', context)
 
     if schedule.total_units + course.units > 19:
         # Get the user's cart
-        print(total_units)
         cart, _ = Cart.objects.get_or_create(user=request.user)
 
         # Get the courses associated with the cart and exclude those in the user's schedule
@@ -514,19 +578,37 @@ def view_schedule(request):
 
 
 def remove_course_from_schedule(request, schedule_id, course_id):
-    # course = get_object_or_404(Course, id=course_id, cart__user=request.user)
-    # course.delete()
-    # messages.success(request, 'Course removed from cart.')
-    # return redirect('schedule:view_cart')
     schedule = get_object_or_404(Schedule, pk=schedule_id, user=request.user)
     course = get_object_or_404(Course, pk=course_id)
+
     schedule.total_units = schedule.total_units - course.units
     course.delete()
     schedule.save()
-    # schedule_item = ScheduleItem.objects.get(course = course)
-    # schedule_item.delete()
-    messages.success(request, 'Removed Course from the Schedule')
-    return redirect('schedule:view_schedule')
+
+    schedules = Schedule.objects.filter(user=request.user)
+
+    titles = []
+    for s in schedules:
+        titles.append(s.title)
+
+    context = {'schedule': {'id': schedule.id, 'title': schedule.title, 'total_units': schedule.total_units,
+                            'submitted': schedule.submitted, 'status': schedule.status,
+                            'approved_date': schedule.approved_date,
+                            'denied_date': schedule.denied_date, 'comments': schedule.comments,
+                            'comment_date': schedule.comment_date,
+                            'courses': []}, 'titles': titles, 'class_messages': "Course Removed!",
+               'active_class_messages': True}
+    schedule_items = ScheduleItem.objects.filter(schedule=schedule)
+
+    for item in schedule_items:
+        # course = Course.objects.get(course = item.course)
+        course = item.course
+        times = CourseTime.objects.filter(course=course)
+        all_times = []
+        for time in times:
+            all_times.append({'days': time.days, 'starting_time': time.starting_time, 'ending_time': time.ending_time})
+        context['schedule']['courses'].append({'course': course, 'all_times': all_times})
+    return render(request, 'schedule/view_schedule.html', context)
 
 
 def unsubmit_schedule(request, schedule_id):
@@ -633,6 +715,9 @@ def create_schedule(request):
         if " " in title:
             context['is_error'] = True
             context['error_message'] = 'Can not have a space in your schedule title, please try again'
+        elif title == "":
+            context['is_error'] = True
+            context['error_message'] = 'The Title box cannot be blank, please try again'
         elif Schedule.objects.filter(user=request.user, title=title).count() != 0:
             context['is_error'] = True
             context['error_message'] = 'A schedule with that name already exists, please choose another.'
@@ -655,6 +740,9 @@ def rename_schedule(request, schedule_id):
         if " " in title:
             context['is_error'] = True
             context['error_message'] = 'Can not have a space in your schedule title, please try again'
+        elif title == "":
+            context['is_error'] = True
+            context['error_message'] = 'The New Title box cannot be blank, please try again'
         elif Schedule.objects.filter(user=request.user, title=title).count() != 0:
             context['is_error'] = True
             context['error_message'] = 'A schedule with that name already exists, please choose another.'
