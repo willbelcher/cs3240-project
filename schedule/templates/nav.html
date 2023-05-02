@@ -50,6 +50,9 @@
             <!-- Only available to users with Advisor Status -->
             {% if perms.global_permissions.is_advisor %}
                 <div class="item">
+                    <a href="{% url 'schedule:see_users' %}">Add Advisors</a>
+                </div>
+                <div class="item">
                     <a href="{% url 'schedule:submissions' %}">Check Submissions</a>
                 </div>
 
