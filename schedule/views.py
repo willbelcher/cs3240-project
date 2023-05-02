@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
+from django.contrib.auth.models import Group
 from django.core.exceptions import PermissionDenied
 from .models import Cart, Course, Schedule, ScheduleItem, User, CourseTime
 import requests
@@ -39,12 +40,55 @@ def home(request):
 
     return render(request, 'schedule/home.html', {'role': role, 'username': username, 'schedule': schedule})
 
+
+@login_required
+def see_users(request):
+    curr_user = request.user
+    if curr_user.has_perm('global_permissions.is_advisor'):
+        user_list = []
+        count = 0
+        users = User.objects.all()
+
+        for user in users:
+            user_info = {'id': user.id, 'username': user.username, 'email': user.email,
+                         'is_advisor': user.has_perm('global_permissions.is_advisor'),
+                         'is_superuser': user.is_superuser,
+                         'is_active': user.is_active}
+            user_list.append(user_info)
+            count = count + 1
+        return render(request, 'schedule/see_users.html', {'user_list': user_list})
+    else:
+        return HttpResponse("You are not authorized to view this page.")
+
+
+@login_required
+def add_admin(request, user_id):
+    curr_user = User.objects.get(pk=user_id)
+    curr_user.groups.clear()
+    advisor_group = Group.objects.get(name='Advisor')
+    curr_user.groups.add(advisor_group)
+    curr_user.save()
+
+    return redirect('schedule:see_users')
+
+
+@login_required
+def remove_admin(request, user_id):
+    curr_user = User.objects.get(pk=user_id)
+    curr_user.groups.clear()
+    student_group = Group.objects.get(name='Student')
+    curr_user.groups.add(student_group)
+    curr_user.save()
+
+    return redirect('schedule:see_users')
+
+
 # View for Submitted Schedules Page (Advisor)
 def submissions(request):
     user = request.user
     if user.has_perm('global_permissions.is_advisor'):
         count = 0
-        schedules = Schedule.objects.filter(submitted = True).values()
+        schedules = Schedule.objects.filter(submitted=True).values()
         context = {'schedules': []}
 
         for schedule in schedules:
