@@ -44,31 +44,41 @@
             <div class="collapse navbar-collapse" id="navbarLinks">
                 <ul class="navbar-nav nav-fill w-100 navb-items">
                     <!-- Home Page Link -->
-                    <li class="item nav-item">
-                        <a class="nav-link" href="{% url 'schedule:home' %}">Home</a>
+                    <li class="nav-item">
+                        <div class="item">
+                            <a class="nav-link" href="{% url 'schedule:home' %}">Home</a>
+                        </div>
                     </li>
 
                     <!-- Course Search Link -->
-                    <li class="item nav-item">
-                        <a class="nav-link" href="{% url 'schedule:course_search' %}">Course Search</a>
+                    <li class="nav-item">
+                        <div class="item">
+                            <a class="nav-link" href="{% url 'schedule:course_search' %}">Course Search</a>
+                        </div>
                     </li>
 
                     <!-- Check Submissions (of schedule submission) Link -->
                     <!-- Only available to users with Advisor Status -->
                     {% if perms.global_permissions.is_advisor %}
-                        <li class="item nav-item">
-                            <a class="nav-link" href="{% url 'schedule:submissions' %}">Check Submissions</a>
+                        <li class="nav-item">
+                            <div class="item">
+                                <a class="nav-link" href="{% url 'schedule:submissions' %}">Check Submissions</a>
+                            </div>
                         </li>
 
                         <!-- Schedule Builder Link -->
                         <!-- Only available to users with Student Status -->
                     {% else %}
-                        <li class="item nav-item">
-                            <a class="nav-link" href="{% url 'schedule:view_cart' %}">View Cart</a>
+                        <li class="nav-item">
+                            <div class="item">
+                                <a class="nav-link" href="{% url 'schedule:view_cart' %}">View Cart</a>
+                            </div>
                         </li>
 
-                        <li class="item nav-item">
-                            <a class="nav-link" href="{% url 'schedule:view_schedule' %}">View Schedule</a>
+                        <li class="nav-item">
+                            <div class="item">
+                                <a class="nav-link" href="{% url 'schedule:view_schedule' %}">View Schedule</a>
+                            </div>  
                         </li>
 
                         <!-- Logout Link-->
