@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Home{% endblock %}</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/II5N2bsXsVf4PFNbeuriC/7N7lD3nRt83_f1Q8" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
     <!-- Adjusts logo on navigation bar -->
     <style>
@@ -25,61 +25,83 @@
 </head>
 <body>
 <header>
-    <div class="container-fluid">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
 
-        <div class="navb-logo">
+            <div class="navbar-brand navb-logo">
 
-            <!--Probably need to find better picture-->
-            {% load static %}
-            <img src="{% static 'img/uva_logo.png' %}" alt="Logo">
+                <!--Probably need to find better picture-->
+                {% load static %}
+                <a href="{% url 'schedule:home' %}">
+                    <img src="{% static 'img/uva_logo.png' %}" alt="Logo">
+                </a>
+            </div>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarLinks">
+                <ul class="navbar-nav nav-fill w-100 navb-items">
+                    <!-- Home Page Link -->
+                    <li class="nav-item">
+                        <div class="item">
+                            <a class="nav-link" href="{% url 'schedule:home' %}">Home</a>
+                        </div>
+                    </li>
+
+                    <!-- Course Search Link -->
+                    <li class="nav-item">
+                        <div class="item">
+                            <a class="nav-link" href="{% url 'schedule:course_search' %}">Course Search</a>
+                        </div>
+                    </li>
+                    
+                    <!-- Check Submissions (of schedule submission) Link -->
+                    <!-- Only available to users with Advisor Status -->
+                    {% if perms.global_permissions.is_advisor %}
+                        <li class="nav-item">
+                            <div class="item">
+                                <a class="nav-link" href="{% url 'schedule:see_users' %}">Add Advisors</a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <div class="item">
+                                <a class="nav-link" href="{% url 'schedule:submissions' %}">Check Submissions</a>
+                            </div>
+                        </li>
+
+                        <!-- Schedule Builder Link -->
+                        <!-- Only available to users with Student Status -->
+                    {% else %}
+                        <li class="nav-item">
+                            <div class="item">
+                                <a class="nav-link" href="{% url 'schedule:view_cart' %}">View Cart</a>
+                            </div>
+                        </li>
+
+                        <li class="nav-item">
+                            <div class="item">
+                                <a class="nav-link" href="{% url 'schedule:view_schedule' %}">View Schedule</a>
+                            </div>  
+                        </li>
+
+                        <!-- Logout Link-->
+                    {% endif %}
+                    <li class="d-flex">
+                        <div class="item-button">
+                            <a class="nav-link" href="{% url 'schedule:logout' %}" type="button">Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </div>
-
-        <div class="navb-items d-none d-xl-flex">
-
-            <!-- Home Page Link -->
-            <div class="item">
-                <a href="{% url 'schedule:home' %}">Home</a>
-            </div>
-
-            <!-- Course Search Link -->
-            <div class="item">
-                <a href="{% url 'schedule:course_search' %}">Course Search</a>
-            </div>
-
-            <!-- Check Submissions (of schedule submission) Link -->
-            <!-- Only available to users with Advisor Status -->
-            {% if perms.global_permissions.is_advisor %}
-                <div class="item">
-                    <a href="{% url 'schedule:see_users' %}">Add Advisors</a>
-                </div>
-                <div class="item">
-                    <a href="{% url 'schedule:submissions' %}">Check Submissions</a>
-                </div>
-
-                <!-- Schedule Builder Link -->
-                <!-- Only available to users with Student Status -->
-            {% else %}
-                <div class="item">
-                    <a href="{% url 'schedule:view_cart' %}">View Cart</a>
-                </div>
-
-                <div class="item">
-                    <a href="{% url 'schedule:view_schedule' %}">View Schedule</a>
-                </div>
-
-                <!-- Logout Link-->
-            {% endif %}
-            <div class="item-button">
-                <a href="{% url 'schedule:logout' %}" type="button">Logout</a>
-            </div>
-
-        </div>
-    </div>
+    </nav>
 </header>
 
 
 <!-- Add the Bootstrap JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybB3S4O4AmNo2E1/4xK5M2bxmNDMzKqs5Gmuj5E5vsyI5+a5k" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 </body>
 </html>
