@@ -93,7 +93,7 @@ class TestCourseSearch(TestCase):
         request = factory.delete('/schedule/remove-course/1/')
         setupRequest(request, user)
 
-        remove_course(request, course_id)
+        remove_course(request, course_id, 1)
 
         self.assertEqual(0, Course.objects.all().count())
 
