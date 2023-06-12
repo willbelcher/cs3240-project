@@ -1,4 +1,4 @@
 # Django Schedule Application
 
-A course schedule builder developed with DJango for hosting on Heroku.
+A course schedule builder developed with Django for hosting on Heroku.
 
