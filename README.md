@@ -1,6 +1,4 @@
 # Django Schedule Application
 
-__Name:__
-
-__Computing ID:__
+A course schedule builder developed with DJango for hosting on Heroku.
 
